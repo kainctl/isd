@@ -1,0 +1,35 @@
+name: Build & Test
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # write required for action-gh-release
+      id-token: write
+    steps:
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run `nix fmt`
+        run: nix fmt -- --check *
+      - name: Run `flake checks`
+        run: nix flake check -L
+      - name: Create AppImage
+        run: nix build .#isd-AppImage
+      # Leads to:
+      # `cannot write uid_map: Operation not permitted`
+      # - name: Test appimage
+      #   run: ./result --help
+      - name: Rename AppImage
+        if: startsWith(github.ref, 'refs/tags/')
+        run: cp ./result isd.AppImage
+      - name: Release AppImage
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: isd.AppImage

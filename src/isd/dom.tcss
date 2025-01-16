@@ -1,0 +1,70 @@
+/* Even if it isn't in focus, keep the highlight up */
+OptionList > .option-list--option-highlighted {
+  background: $primary;
+}
+
+PreviewArea {
+  background: $surface;
+  padding: 0 1;
+  width: 1fr;
+  height: 1fr;
+  border: tall $border-blurred;
+}
+
+PreviewArea:focus-within {
+  border: tall $border;
+}
+
+#unit-selection > .selection-list--button {
+  background: $boost 100% !important;
+}
+
+#unit-selection > .option-list--separator {
+  background: $primary;
+}
+
+#unit-selection > .option-list--option-hover {
+  background: $boost 100%;
+}
+
+#unit-selection > .selection-list--button {
+  color: $primary;
+  background: $primary;
+}
+
+#unit-selection:focus > .selection-list--button,
+#unit-selection > .selection-list--button-selected,
+#unit-selection:focus > .selection-list--button-selected,
+ {
+  color: $primary;
+  background: $accent;
+}
+
+#unit-selection:focus > .selection-list--button-highlighted,
+#unit-selection > .selection-list--button-highlighted,
+#unit-selection > .selection-list--button-selected-highlighted {
+  color: $accent;
+  background: $accent;
+}
+
+Fluid {
+  border-top: $primary heavy 50%;
+  background: $boost;
+  border-title-color: $primary;
+  border-title-align: left;
+}
+
+Input {
+  height: 3; /* Fix the height */
+  width: 100%;
+}
+
+OptionList {
+  height: 1fr;
+  width: 100%;
+}
+
+* {
+  scrollbar-size: 0 1;
+}
+

@@ -1,0 +1,103 @@
+site_name: isd
+site_url: https://isd-project.github.io/isd
+repo_url: https://github.com/isd-project/isd
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: indigo
+  # Downloads fonts from Google Fonts
+  font:
+    text: Atkinson Hyperlegible
+    # text: Noto Sans
+    code: Noto Sans Mono
+    # comfortaa or EB Garamond for titles
+  features:
+    - search.suggest
+    - search.highlight
+    - navigation.sections
+    - toc.integrate
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+nav:
+  - "Getting Started": "index.md"
+  - "Customization": "customization.md"
+  - FAQ: "faq.md"
+  - Roadmap: "roadmap.md"
+  - Security: "security.md"
+plugins: 
+  # No need for search support:
+  # - search
+  - tags
+  # - autorefs # https://github.com/mkdocstrings/autorefs/
+  # - mermaid2 # https://github.com/fralau/mkdocs-mermaid2-plugin
+  # https://mkdocs-macros-plugin.readthedocs.io/en/latest/
+  # mkdocs plugins
+  # GDPR compliance + downloading of external assets with optimizations!
+  - privacy:
+      assets: true
+  - social
+  # requires 'mkdocs-glightbox'
+  # - glightbox
+  # Stolen from: https://github.com/chipsenkbeil/distant.dev/blob/main/mkdocs.yml
+  # Requires: https://mkdocs-macros-plugin.readthedocs.io/en/latest/
+  - macros:
+      module_name: macros
+      on_error_fail: true
+      on_undefined: strict
+markdown_extensions: 
+  - abbr
+  - admonition
+  - pymdownx.details
+  - pymdownx.tasklist
+  - attr_list
+  - md_in_html
+  - def_list
+  - toc:
+      permalink: true
+  - footnotes
+  - tables
+  # - github-callouts # <- would require `uv` to install it via pip
+  # https://facelessuser.github.io/pymdown-extensions/extensions/blocks/plugins/
+  - pymdownx.keys
+  # - pymdownx.blocks.tab
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.inlinehilite
+  - pymdownx.highlight
+  - pymdownx.blocks.caption
+  # https://squidfunk.github.io/mkdocs-material/reference/diagrams/#configuration
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  # mkdocs requires tabbed and not recommended blocks.tab!
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.snippets:
+      auto_append:
+        - docs_glossary/abbreviations.md
+watch:
+  - docs_glossary
+
+  # - pymdownx.details
+copyright: Copyright &copy; 2025 isd Project
+extra_css:
+  - stylesheets/extra_fonts.css
+  - stylesheets/asciinema-player.css
+  - stylesheets/custom-asciinema-player.css
+extra_javascript:
+  - javascripts/asciinema-player.min.js
+# extra_javascript:
+#   - https://hypothes.is/embed.js
+
