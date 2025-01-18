@@ -109,7 +109,7 @@ If you are interested, read on and take a look at the [recorded terminal session
     `uvx --from git+{{config['repo_url']}} isd`
 
     To install and manage `isd` via [uv], run:
-    `uv tool install git+{{config['repo_url']}}@latest`
+    `uv tool install git+{{config['repo_url']}}`
 
     For more details regarding the tool management, see the upstream
     [uv] tool documentation:
