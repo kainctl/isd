@@ -1,0 +1,12 @@
+# Comment to be posted to on first time issues
+newIssueWelcomeComment: |
+  Thanks for opening your first issue here! 💖
+# Comment to be posted on PRs from first time contributors in your repository
+newPRWelcomeComment: |
+  Thanks for opening this pull request! 💖
+# Comment to be posted on PR merges from first time contributors in your repository
+firstPRMergeComment: |
+  Congrats on merging your first pull request! 🎉🎉🎉
+  We are proud of you and your accomplishment 🏆.
+
+  ![thanks-for-pr-image](https://github.com/user-attachments/assets/afffe1dc-9dbb-4c47-b62e-3415691a4031)
