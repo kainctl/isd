@@ -106,10 +106,10 @@ If you are interested, read on and take a look at the [recorded terminal session
     To install [uv] have a look at the [official uv installation documentation](https://docs.astral.sh/uv/).
 
     After installing [uv], you can _try_ `isd` by running:
-    `uvx {{config['repo_url']}}`
+    `uvx --from git+{{config['repo_url']}} isd`
 
     To install and manage `isd` via [uv], run:
-    `uv tool install {{config['repo_url']}}/isd@latest`
+    `uv tool install git+{{config['repo_url']}}@latest`
 
     For more details regarding the tool management, see the upstream
     [uv] tool documentation:
