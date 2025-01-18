@@ -88,11 +88,11 @@ If you are interested, read on and take a look at the [recorded terminal session
           # [...]
           # inside nixosConfigurations.<system>.modules or
           # {
-          #     environment.systemPackages = [ inputs.isd.default ];
+          #     environment.systemPackages = [ inputs.isd.packages.<system>.default ];
           # };
           # homeConfigurations.<name>.modules =
           # {
-          #   home.packages = [ inputs.isd.default ];
+          #   home.packages = [ inputs.isd.packages.<system>.default ];
           # };
         };
     }
