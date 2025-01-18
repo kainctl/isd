@@ -72,7 +72,7 @@ If you are interested, read on and take a look at the [recorded terminal session
     To install [nix] with sensible default options, use the [`nix-installer`](https://github.com/DeterminateSystems/nix-installer)
     from [determinate.systems](https://determinate.systems/).
 
-    Then, to _try out_ `isd`, simply run `nix run {{config['repo_url']}}`.
+    Then, to _try out_ `isd`, simply run `nix run {{config['repo_url'] | replace('https://github.com/', 'github:')}}`.
 
     To install `isd`, add it to your packages list:
 
