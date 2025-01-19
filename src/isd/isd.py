@@ -867,7 +867,7 @@ def systemctl_args_builder(
         # No! There are _many_ VSCode extensions that shouldn't be trusted.
         # FUTURE: Implement a _custom_ `systemd edit` wrapper that opens an
         # override file from USER space and then only copies the file with elevated
-        # priveliges. This avoids _all_ of the environment forwarding and editor trust issues.
+        # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
     if mode == "user":
         if sudo or is_root():
@@ -906,7 +906,7 @@ def journalctl_args_builder(
         # No! There are _many_ VSCode extensions that shouldn't be trusted.
         # FUTURE: Implement a _custom_ `systemd edit` wrapper that opens an
         # override file from USER space and then only copies the file with elevated
-        # priveliges. This avoids _all_ of the environment forwarding and editor trust issues.
+        # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
     if mode == "user":
         sys_cmd.extend(["journalctl", "--user"])
@@ -1108,7 +1108,7 @@ class PreviewArea(Container):
                     tail=self.max_lines,
                 )
             case other:
-                self.notify(f"Unkown state {other}", severity="error")
+                self.notify(f"Unknown state {other}", severity="error")
                 return
 
         output = (
@@ -1331,7 +1331,7 @@ class InteractiveSystemd(App):
     # FUTURE:
     # Add a 'systemd' page/screen that shows the overall status of the system
     # and potentially also the environment variables.
-    # Take a look at the enviornment commands, as they might be helpful
+    # Take a look at the environment commands, as they might be helpful
     # FUTURE: Figure out how to work with/handle --global
     # FUTURE: Add option to list the most recently failed units.
     #         -> This should be a global option, as this is a frequent use-case.
@@ -1390,7 +1390,7 @@ class InteractiveSystemd(App):
     #    If no  -> run with as is -> if this is wrong, the output will complain about missing polkit authentication
     #           -> inform the user about mistake & suggest to fix config.
     #           -> Continue with 'yes' logic
-    #    If yes -> run with sudo and no forground & see if caching is required
+    #    If yes -> run with sudo and no foreground & see if caching is required
     #             -> if it fails, then run it in the foreground
     #           -> in polkit mode, run it directly in the foreground
     # Somebody _could_ run the entire authentication as _root_. Then it should
@@ -1413,7 +1413,7 @@ class InteractiveSystemd(App):
         command = unsplit_command.split()
         # first I need to check if this is systemctl edit
         # if it is edit then I need to change the async commands to foreground
-        # commands with a forground TTY!
+        # commands with a foreground TTY!
         if "edit" in unsplit_command:
             # since this MUST run in the foreground and I CANNOT capture stderr
             # I am calling it directly with sudo if the current mode is `system`:
@@ -1441,7 +1441,7 @@ class InteractiveSystemd(App):
                 sudo=False,
             )
             # if it fails, check if there was an authentication issue
-            # and prefix it with sudo or explicitely wait for polkit authentication.
+            # and prefix it with sudo or explicitly wait for polkit authentication.
             if return_code != 0:
                 if "auth" in stderr:
                     if AUTHENTICATION_MODE == "sudo":
@@ -1569,7 +1569,7 @@ class InteractiveSystemd(App):
         if cur_tab == "status":
             # FUTURE: Consider allowing tuning `--lines` or using `--full`
             # but remember that this is only relevant for current in-memory or last
-            # invocation. Otherwise one shoudl always use journalctl
+            # invocation. Otherwise one should always use journalctl
             args = systemctl_args_builder(
                 "status", mode=self.mode, units=self.relevant_units
             )
@@ -1578,7 +1578,7 @@ class InteractiveSystemd(App):
                 "show", mode=self.mode, units=self.relevant_units
             )
         elif cur_tab == "cat":
-            # note that cat referes to the content on disk.
+            # note that cat refers to the content on disk.
             # if there is a missing daemon-reload then there will be a difference!
             args = systemctl_args_builder(
                 "cat", mode=self.mode, units=self.relevant_units
@@ -1787,7 +1787,7 @@ class InteractiveSystemd(App):
         _prepended_ as a user is most likely interested in interacting
         with them.
 
-        This _may_ trigger a new higlighted value to be set!
+        This _may_ trigger a new highlighted value to be set!
 
         Call this function within a function that has a debounce set!
         """
@@ -1962,16 +1962,16 @@ def render_field(key, field, level: int = 0) -> str:
             text += f"{key}: \n"
             for el in default_value:
                 # remove last
-                # get the indendation right
-                indendation = "  " * (level + 1)
+                # get the indentation right
+                indentation = "  " * (level + 1)
                 if isinstance(el, SystemctlCommand):
-                    text += indendation + "- " + f'keybinding: "{el.keybinding}"' + "\n"
-                    text += indendation + "  " + f'command: "{el.command}"' + "\n"
+                    text += indentation + "- " + f'keybinding: "{el.keybinding}"' + "\n"
+                    text += indentation + "  " + f'command: "{el.command}"' + "\n"
                     text += (
-                        indendation + "  " + f'description: "{el.description}"' + "\n"
+                        indentation + "  " + f'description: "{el.description}"' + "\n"
                     )
                 else:
-                    text += indendation + "- " + f'"{el}"' + "\n"
+                    text += indentation + "- " + f'"{el}"' + "\n"
 
     # add newline for next item
     # but do not add two empty lines if nested types already added

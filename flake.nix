@@ -242,7 +242,7 @@
                 # members = [ "hello-world" ];
               };
 
-              # Override previous set with our overrideable overlay.
+              # Override previous set with our overridable overlay.
               editablePythonSet = pythonSet.overrideScope editableOverlay;
 
               # Build virtual environment, with local packages being editable.
