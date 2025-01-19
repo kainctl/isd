@@ -68,8 +68,8 @@ def define_env(env):
         for key, value in kwargs.items():
             if key == "marker_names":
                 opts["markers"] = [
-                    [float(timetamp), name]
-                    for timetamp, name in zip(env.variables.timestamps, value)
+                    [float(timestamp), name]
+                    for timestamp, name in zip(env.variables.timestamps, value)
                 ]
             else:
                 opts[key] = value
