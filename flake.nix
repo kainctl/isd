@@ -144,13 +144,28 @@
               # Enable no optional dependencies for production build.
               venv = pythonSet.mkVirtualEnv "isd-env" workspace.deps.default;
             in
-            pkgs.runCommandNoCC "isd" { meta.mainProgram = "isd"; } ''
-              mkdir -p $out/bin
-              ln -s ${venv}/bin/isd $out/bin
-            '';
+            pkgs.stdenvNoCC.mkDerivation {
+              pname = "isd";
+              version = "0.1.0";
+              src = venv;
+              meta.mainProgram = "isd";
+              buildPhase = ''
+                mkdir -p $out/bin
+                ln -s $src/bin/isd $out/bin/
+              '';
+            };
           isd = default;
           isd-AppImage = inputs.nix-appimage.lib.${system}.mkAppImage {
-            program = pkgs.lib.getExe isd;
+            program = pkgs.lib.getExe (
+              isd.overrideAttrs (oldAttrs: {
+                buildInputs = oldAttrs.buildInputs or [ ] ++ [ pkgs.makeBinaryWrapper ];
+                postInstall =
+                  oldAttrs.postInstall or ""
+                  + ''
+                    wrapProgram $out/bin/isd --set SYSTEMD_IGNORE_CHROOT yes
+                  '';
+              })
+            );
           };
           player =
             let
