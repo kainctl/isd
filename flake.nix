@@ -136,6 +136,7 @@
         let
           pkgs = pkgsFor.${system};
           pythonSet = pythonSetFor.${system};
+          version = (builtins.fromTOML (builtins.readFile ./pyproject.toml)).project.version;
         in
         rec {
           default =
@@ -146,7 +147,7 @@
             in
             pkgs.stdenvNoCC.mkDerivation {
               pname = "isd";
-              version = "0.1.0";
+              inherit version;
               src = venv;
               meta.mainProgram = "isd";
               buildPhase = ''

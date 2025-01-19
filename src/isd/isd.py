@@ -241,13 +241,24 @@ class SelectionKeyBindings(BaseModel):
     down: str = Field(default="down,j", description="Down")
     up: str = Field(default="up,k", description="Up")
     toggle_selection: str = Field(default="space", description="Toggle selection.")
+    page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
+    page_up: str = Field(default="ctrl+up,pageup", description="Page up")
+    first: str = Field(default="home", description="First Element")
+    last: str = Field(default="end", description="Last Element")
 
 
 class PreviewKeyBindings(BaseModel):
-    scroll_down: str = Field(default="down,j", description="Scroll Down")
-    scroll_up: str = Field(default="up,k", description="Scroll Up")
-    scroll_right: str = Field(default="right,l", description="Scroll Right")
-    scroll_left: str = Field(default="left,h", description="Scroll Left")
+    scroll_down: str = Field(default="down,j", description="Scroll down")
+    scroll_up: str = Field(default="up,k", description="Scroll up")
+    scroll_right: str = Field(default="right,l", description="Scroll right")
+    scroll_left: str = Field(default="left,h", description="Scroll left")
+    scroll_page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
+    scroll_page_up: str = Field(default="ctrl+up,pageup", description="Page up")
+    # Not quite sure why but ctrl+pageup/down doesn't seem to work for me.
+    scroll_page_left: str = Field(default="ctrl+left", description="Page left")
+    scroll_page_right: str = Field(default="ctrl+right", description="Page right")
+    scroll_top: str = Field(default="home", description="First Page")
+    scroll_end: str = Field(default="end", description="Last Page")
 
 
 # Creating a temporary configuration file conflicts with
@@ -653,11 +664,36 @@ class CustomSelectionList(SelectionList, inherit_bindings=False):
             show=False,
         )
         self._bindings.bind(
+            keys=selection_keybindings.page_up,
+            action="page_up",
+            description="Page Up",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=selection_keybindings.page_down,
+            action="page_down",
+            description="Page Down",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=selection_keybindings.first,
+            action="first",
+            description="First",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=selection_keybindings.last,
+            action="last",
+            description="Last",
+            show=False,
+        )
+        self._bindings.bind(
             keys=selection_keybindings.toggle_selection,
             action="select",
             description="Select",
             show=True,
         )
+        # HERE: Add home/end!
 
 
 def unit_sort_priority(unit: str) -> int:
@@ -967,7 +1003,7 @@ async def journalctl_async(
     return (return_code, stdout, stderr)
 
 
-class Preview(RichLog):
+class Preview(RichLog, inherit_bindings=False):
     def __init__(self, keybindings: PreviewKeyBindings, **kwargs):
         super().__init__(**kwargs)
         self._bindings.bind(
@@ -992,6 +1028,42 @@ class Preview(RichLog):
             keys=keybindings.scroll_left,
             action="scroll_left",
             description="Left",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_page_up,
+            action="page_up",
+            description="Page Up",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_page_down,
+            action="page_down",
+            description="Page Down",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_page_left,
+            action="page_left",
+            description="Page Left",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_page_right,
+            action="page_right",
+            description="Page Right",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_top,
+            action="scroll_home",
+            description="First Page",
+            show=False,
+        )
+        self._bindings.bind(
+            keys=keybindings.scroll_end,
+            action="scroll_end",
+            description="Last Page",
             show=False,
         )
 
