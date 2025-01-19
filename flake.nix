@@ -149,7 +149,10 @@
               pname = "isd";
               inherit version;
               src = venv;
-              meta.mainProgram = "isd";
+              meta = {
+                mainProgram = "isd";
+                license = pkgs.lib.getLicenseFromSpdxId "GPL-3.0";
+              };
               buildPhase = ''
                 mkdir -p $out/bin
                 ln -s $src/bin/isd $out/bin/

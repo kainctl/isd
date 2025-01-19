@@ -4,6 +4,7 @@ version = "0.2.0"
 description = "Interactive systemd TUI"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "GPL-3.0"
 dependencies = [
     "xdg-base-dirs>=6.0.0",
     "pfzy>=0.3.4",
