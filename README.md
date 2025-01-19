@@ -5,12 +5,12 @@
 
 Simplify `systemd` management with `isd`!
 `isd` is a TUI offering fuzzy search for units, auto-refreshing previews,
-smart `sudo` handling, and a fully customizeable interface
+smart `sudo` handling, and a fully customizable interface
 for power-users and newcomers alike.
 <!-- --8<-- [end:tagline] -->
 
 <!-- --8<-- [start:features] -->
-`isd` is a keyboard-focused, highly customizeable TUI with the following features:
+`isd` is a keyboard-focused, highly customizable TUI with the following features:
 
 - Quickly switch between `system` and `user` units
 - Fuzzy search units
@@ -60,11 +60,11 @@ A collection of some _unordered_ ideas that could improve `isd`:
 Big thanks to the developers of:
 
 - [systemd](https://systemd.io/) for creating the most widely used service manager for Linux
-- [NixOS](https://nixos.org/) for peeking my interest in `systemd` and service managers
+- [NixOS](https://nixos.org/) for piquing my interest in `systemd` and service managers
 - [`sysz`](https://github.com/joehillen/sysz) for providing a starting point and a desire to build a more complex `systemctl` TUI
-- [textual](https://textual.textualize.io/) for making it a breeze to create TUI's in Python
+- [textual](https://textual.textualize.io/) for making it a breeze to create TUIs in Python
 - [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for building a solid and simple to use static site generator for the documentation
-- [asciinema](https://docs.asciinema.org/) for developing an easy to use _and self-hosteable_ terminal recorder and player
+- [asciinema](https://docs.asciinema.org/) for developing an easy to use _and self-hostable_ terminal recorder and player
 - [vhs](https://github.com/charmbracelet/vhs) for creating a scriptable terminal program
 <!-- --8<-- [end:acknowledgments] -->
 
