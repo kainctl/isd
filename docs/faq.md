@@ -58,14 +58,18 @@ priority at the moment, since a pager/editor can be launched with a single key p
 For a detailed description of possible security implications,
 take a look at the [Security page](./security.md).
 
-## Why can't I interact with the preview window?
+## Why Python and not Rust or Go?
 
-At the time of writing, I believe that by limiting the possible _interactions_ with
-the preview window one is more inclined towards using the pager or editor.
-These tools were purposefully build to navigate text and `isd` tries not to reinvent the wheel.
-I fear that by starting to add more "interactive features" to the preview window, feature creep
-would start.
+Mostly because the underlying TUI framework [textual] is _amazing_.
+The documentation has a very high quality and many relevant functions/widgets
+were already available. Plus, I am more experienced with Python and it
+was definitely the right tool for rapid prototyping.
 
-Nah, I should really add support for basic scrolling.
+Though, I am generally not a big fan of Python anymore due to frequent dependency issues[^cuda]
+I have encountered.
+But [uv] is a breath of fresh air and has convinced me to give Python another shot.
+Maybe I will rewrite the tool at some point but at this point in time, I want to see
+how far I can go with Python and my current packaging experience ([AppImage], [uv], and [nix]).
 
+[^cuda]: Especially, when working with CUDA libraries or custom package indexes.
 

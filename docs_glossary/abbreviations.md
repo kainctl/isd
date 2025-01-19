@@ -4,6 +4,7 @@
 [YAML]: https://en.wikipedia.org/wiki/YAML
 [TUI]: https://en.wikipedia.org/wiki/Text-based_user_interface
 [Ghostty]: https://ghostty.org/
+[textual]: https://textual.textualize.io/
 
 *[YAML]: a human-readable, space-sensitive markup language.
 *[TUI]: Terminal User Interface
