@@ -216,6 +216,7 @@ class GenericKeyBindings(BaseModel):
     clear_input: str = Field(
         default="ctrl+backspace", description="Clear search input."
     )
+    jump_to_input: str = Field(default="slash", description="Jump to the search input.")
     copy_unit_path: str = Field(
         default="ctrl+y",
         description="Copy highlighted unit path to the clipboard",
@@ -1419,6 +1420,13 @@ class InteractiveSystemd(App):
         """
         inp = cast(CustomInput, self.query_one(CustomInput))
         inp.clear()
+        inp.focus()
+
+    def action_jump_to_input(self) -> None:
+        """
+        Switch focus to the search input.
+        """
+        inp = cast(CustomInput, self.query_one(CustomInput))
         inp.focus()
 
     def action_stop(self) -> None:
