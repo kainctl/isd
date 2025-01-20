@@ -54,7 +54,7 @@ from pydantic_settings import (
 )
 from rich.style import Style
 from rich.text import Text
-from textual import on, work
+from textual import on, work, events
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
@@ -694,7 +694,19 @@ class CustomSelectionList(SelectionList, inherit_bindings=False):
             description="Select",
             show=True,
         )
-        # HERE: Add home/end!
+
+    async def on_click(self, event: events.Click) -> None:
+        """React to the mouse being clicked on an item.
+
+        Args:
+            event: The click event.
+        """
+        if event.ctrl or event.meta or event.shift:
+            # do nothing special if a modifier is pressed
+            pass
+        else:
+            # if no modifier is pressed, deselect the other ones!
+            self.deselect_all()
 
 
 def unit_sort_priority(unit: str) -> int:
