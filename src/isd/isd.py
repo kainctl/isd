@@ -1182,15 +1182,10 @@ class PreviewArea(Container):
             case other:
                 self.notify(f"Unknown state {other}", severity="error")
                 return
-
-        output = (
-            Text.from_ansi(stdout)
-            if stderr == ""
-            else Text.from_markup(
-                f"[b][red]Error while calling [code]{tabbed_content.active}[/code]:[/red][/b]\n\n"
-            )
-            + Text.from_ansi(stderr)
-        )
+        # style it like systemctl from CLI
+        # For example, previewing a template file with `status` raises
+        # an error but it shouldn't "cover" stdout.
+        output = Text.from_ansi(stdout if stderr == "" else stderr + "\n" + stdout)
         # Not sure if this comparison makes it slower or faster
         if output != self.last_output:
             preview.clear()
@@ -1706,7 +1701,9 @@ class InteractiveSystemd(App):
         with self.suspend():
             cmd_args = self.preview_output_command_builder(cur_tab)
             env = env_with_color()
-            p1 = subprocess.Popen(cmd_args, env=env, stdout=subprocess.PIPE)
+            p1 = subprocess.Popen(
+                cmd_args, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
             if p1.stdout is not None:
                 # for true `more` support I must inject the following
                 # environment variable but make sure to not bleed it here!
@@ -1729,12 +1726,15 @@ class InteractiveSystemd(App):
         cur_tab = cast(TabbedContent, self.query_one(TabbedContent)).active
         with self.suspend():
             args = self.preview_output_command_builder(cur_tab)
-            # env = env_with_color(colors=False)
-            # self.notify(" ".join(args))
-            p1 = subprocess.run(args, capture_output=True, text=True)
+            p1 = subprocess.run(
+                args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
             with tempfile.NamedTemporaryFile() as tmp_file:
                 p = Path(tmp_file.name)
-                p.write_text(p1.stdout)
+                p.write_text(
+                    # capture_output appends a newline to non-empty stderr!
+                    p1.stdout
+                )
                 subprocess.call([self.editor, p.absolute()])
         self.refresh()
 

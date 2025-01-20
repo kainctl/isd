@@ -188,6 +188,18 @@
               cp ${css} $out/asciinema-player.css
               cp ${js} $out/asciinema-player.min.js
             '';
+          isd-example-templated-unit =
+            inputs.systemd-nix.lib.${system}.mkUserService "0-isd-example-unit-template@"
+              {
+                description = "isd-example instantiated unit %i";
+                documentation = [ "man:python" ];
+                serviceConfig = {
+                  Type = "oneshot";
+                  ExecStart = "${lib.getExe' pkgs.coreutils "echo"} 'I am unit %i'";
+                  RemainAfterExit = true;
+                };
+              };
+
           isd-example-units =
             let
               gen_unit =
