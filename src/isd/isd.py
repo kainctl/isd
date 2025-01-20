@@ -229,7 +229,7 @@ class GenericKeyBindings(BaseModel):
         default="alt+enter",
         description="Open in editor",
     )
-    toggle_mode: str = Field(default="ctrl+m", description="Toggle mode")
+    toggle_mode: str = Field(default="ctrl+t", description="Toggle mode")
     open_config: str = Field(
         default="alt+o",
         description=dedent("""\
