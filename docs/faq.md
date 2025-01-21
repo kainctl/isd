@@ -50,6 +50,25 @@ may help you if you have never added your account to your group.
     permission issues! Allowing your user to view the system journal
     is much less invasive and is the _correct_ way to fix the issue.
 
+## Why are the features of the preview window so limited?
+
+A different title could be:
+
+> The preview window should support _X/Y/Z_.
+
+Limiting the functionality of the preview window is an explicit design decision of `isd`.
+`isd` should be seen as the gateway to interact and work with `systemd` units while
+seamlessly integrating with other, purpose-built tools.
+By integrating with other tools, `isd` limits the scope of the application
+(reducing feature creep) and gives users full control since it is easy to configure
+your favorite pager/editor.
+
+The main _goal_ of the preview window is to give quick feedback about the selected/highlighted
+units. But if you like to take a closer look at the output you should open the preview
+in a pager or editor. To open the pager you simply have to press ++enter++.
+
+<!-- FUTURE: Add a few example pagers -->
+
 ## Why is `isd` so big?
 
 At its core, `isd` is a Python application.
