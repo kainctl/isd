@@ -1,31 +1,5 @@
 # FAQ
 
-## How does it differ from `sysz`?
-
-[`sysz`](https://github.com/joehillen/sysz) is a beautiful, light-weight
-TUI for `systemctl` based on [`fzf`](https://github.com/junegunn/fzf) and `bash`.
-[`sysz`](https://github.com/joehillen/sysz) was the inspiration for
-`isd` and has proven to be great reference material.
-
-The main difference is that `isd` is _stateful_ and allows to quickly chain
-multiple action together. For example, within one `isd` session one can
-search for the desired unit, edit it with the favorite editor, restart the unit,
-and view the journal output.
-`sysz` closes after every action. Plus, `isd` allows for more [customization](./customization.md).
-
-## Why is `isd` so big?
-
-At its core, `isd` is a Python application.
-As such, it requires a Python interpreter to run and this alone contributes
-to around 40 MB of the total installation size.
-
-For the self-contained [AppImage][] installation, there is no way to minimize the size.
-For the [nix][] and [uv][] installations, the same Python interpreter may be re-used
-by other applications, which may amortize the size across multiple installations.
-
-If you are looking for a more light-weight solution, albeit with fewer features,
-have a look at [`sysz`](#how-does-it-differ-from-sysz).
-
 ## How do I copy text?
 
 Running `isd` puts the terminal into the application mode
@@ -53,10 +27,54 @@ and to copy the text from there.
 Usability enhancements for interacting with the preview window do not have a high
 priority at the moment, since a pager/editor can be launched with a single key press.
 
-## What are the security implications?
+## Why can't I view the `Journal` output as a normal user?
 
-For a detailed description of possible security implications,
-take a look at the [Security page](./security.md).
+If you see the following warning:
+```
+Warning: some journal files were not opened due to insufficient permissions
+```
+It means that your _user account_ does not have the necessary permissions to
+view the journal files.
+Some distributions add your user account to the necessary group(s) by default,
+which is why it works out-of-the-box for some.
+
+Usually, your user account needs be part of the `systemd-journal` group
+to view the system journal. Otherwise, ask community members of your distribution
+for support.
+The [tutorial from Linuxize](https://linuxize.com/post/how-to-add-user-to-group-in-linux/)
+may help you if you have never added your account to your group.
+
+!!! warning "Do not run `isd` as root!"
+
+    You should _never_ run `isd` as the root user to fix the `Journal`
+    permission issues! Allowing your user to view the system journal
+    is much less invasive and is the _correct_ way to fix the issue.
+
+## Why is `isd` so big?
+
+At its core, `isd` is a Python application.
+As such, it requires a Python interpreter to run and this alone contributes
+to around 40 MB of the total installation size.
+
+For the self-contained [AppImage][] installation, there is no way to minimize the size.
+For the [nix][] and [uv][] installations, the same Python interpreter may be re-used
+by other applications, which may amortize the size across multiple installations.
+
+If you are looking for a more light-weight solution, albeit with fewer features,
+have a look at [`sysz`](#how-does-it-differ-from-sysz).
+
+## How does it differ from `sysz`?
+
+[`sysz`](https://github.com/joehillen/sysz) is a beautiful, light-weight
+TUI for `systemctl` based on [`fzf`](https://github.com/junegunn/fzf) and `bash`.
+[`sysz`](https://github.com/joehillen/sysz) was the inspiration for
+`isd` and has proven to be great reference material.
+
+The main difference is that `isd` is _stateful_ and allows to quickly chain
+multiple action together. For example, within one `isd` session one can
+search for the desired unit, edit it with the favorite editor, restart the unit,
+and view the journal output.
+`sysz` closes after every action. Plus, `isd` allows for more [customization](./customization.md).
 
 ## Why Python and not Rust or Go?
 
@@ -72,4 +90,9 @@ Maybe I will rewrite the tool at some point but at this point in time, I want to
 how far I can go with Python and my current packaging experience ([AppImage], [uv], and [nix]).
 
 [^cuda]: Especially, when working with CUDA libraries or custom package indexes.
+
+## What are the security implications?
+
+For a detailed description of possible security implications,
+take a look at the [Security page](./security.md).
 
