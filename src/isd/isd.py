@@ -225,6 +225,7 @@ class GenericKeyBindings(BaseModel):
         default="enter",
         description="Open in pager",
     )
+    # HERE
     open_preview_in_editor: str = Field(
         default="alt+enter",
         description="Open in editor",
@@ -266,6 +267,8 @@ class PreviewKeyBindings(BaseModel):
 # a relative schema definition. The user should simply delete the configuration
 # file if they like to start "fresh".
 
+# HERE: Support adding commands _without_ requiring a keybindings
+# and prepare work for my "quick-selection" keybinding
 DEFAULT_COMMANDS = [
     SystemctlCommand(
         keybinding="ctrl+e",
