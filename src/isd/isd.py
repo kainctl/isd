@@ -60,7 +60,7 @@ from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
 from textual.events import Resize
 from textual.reactive import reactive
-from textual.screen import Screen
+from textual.screen import Screen, ModalScreen
 
 # FUTURE: Fix the settings for the default themes!
 # Issue is that the default green/yellow/red colors may not
@@ -77,10 +77,12 @@ from textual.widgets import (
     TabbedContent,
     TabPane,
     Tabs,
+    OptionList,
 )
 from textual.widgets._toggle_button import ToggleButton
 from xdg_base_dirs import xdg_cache_home, xdg_config_home
 from textual.widgets.selection_list import Selection
+from textual.widgets.option_list import Option
 
 from . import __version__
 
@@ -166,6 +168,43 @@ PRESET_LNAV_JOURNAL_ARGS: list[str] = PRESET_LNAV_DEFAULT_ARGS + [
 ]
 
 assert PRESET_LESS_DEFAULT_ARGS is not PRESET_LESS_JOURNAL_ARGS
+
+
+class CustomOptionList(OptionList, inherit_bindings=False):
+    # init should receive a custom type as input.
+    # that has a list of key triggers and
+    # associated "actions"
+    # These keys from the init, initialize the
+    # "bindings" that trigger a 'quick-select' action
+    # it should also receive a list of options for navigation keys
+    # (this should be a list).
+    # Since this is the third place, the configuration file
+    # should be updated to reflect this change and share the navigation
+    # keybindings across _all_ elements.
+    # This should avoid clashing configurations for up/down
+    # and modal shortcuts -> Avoiding unexpected behavior.
+    # Although the direct triggers should _still_ be supported!
+
+    def on_key(self):
+        pass
+
+
+class SystemctlActionScreen(ModalScreen):
+    """
+    Triggers
+    """
+
+    def compose(self) -> ComposeResult:
+        yield CustomOptionList(
+            Option("a"),
+            Option("o"),
+            Option("k"),
+        )
+        # ("I am a label")
+        #
+
+    # def on_key_pressed(self, event) -> None:
+    # self.dismiss()
 
 
 def get_default_pager_args_presets(pager: str) -> list[str]:
