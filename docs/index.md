@@ -81,7 +81,7 @@ If you are interested, read on and take a look at the [recorded terminal session
     {
 
         # [...]
-        inputs.isd.url = "github:isd-project/isd";
+        inputs.isd.url = "{{config['repo_url'] | replace('https://github.com/', 'github:')}};";
         # [...]
 
         outputs = {self, ...}@inputs: {
