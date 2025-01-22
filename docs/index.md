@@ -81,7 +81,7 @@ If you are interested, read on and take a look at the [recorded terminal session
     {
 
         # [...]
-        inputs.isd.url = "github:isd-project/isd"
+        inputs.isd.url = "github:isd-project/isd";
         # [...]
 
         outputs = {self, ...}@inputs: {
