@@ -68,3 +68,7 @@ Big thanks to the developers of:
 - [vhs](https://github.com/charmbracelet/vhs) for creating a scriptable terminal program
 <!-- --8<-- [end:acknowledgments] -->
 
+
+
+## Star history ⭐
+[![Star History Chart](https://api.star-history.com/svg?repos=isd-project/isd&type=Date)](https://star-history.com/#isd-project/isd&Date)
