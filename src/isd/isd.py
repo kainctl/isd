@@ -24,7 +24,7 @@ import os
 import shutil
 import subprocess
 import tempfile
-from collections import deque
+from collections import deque, Counter
 from copy import deepcopy
 from enum import Enum, StrEnum, auto
 from functools import partial
@@ -33,6 +33,7 @@ from pathlib import Path
 from textwrap import dedent, indent
 from typing import (
     Any,
+    Self,
     Deque,
     Dict,
     Iterable,
@@ -45,7 +46,7 @@ from typing import (
 )
 
 from pfzy.match import fuzzy_match
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -127,6 +128,26 @@ KEYBINDING_HELP_TEXT = dedent("""\
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
 
+RESERVED_KEYBINDINGS: Dict[str, str] = {
+    "ctrl+q": "Close App",
+    "ctrl+c": "Close App",
+    "ctrl+z": "Suspend App",
+    "ctrl+p": "Open Command Palette",
+    "escape": "Close modal",
+}
+
+
+def ensure_reserved(inp_keys: str) -> str:
+    """
+    Assert that the given keybinding(s)
+    is inside of the global `RESERVED_KEYBDINDINGS`.
+
+    Returns the inp as is.
+    """
+    for key in inp_keys.split(","):
+        assert key.strip() in RESERVED_KEYBINDINGS
+    return inp_keys
+
 
 def get_env_systemd_less_args() -> Optional[list[str]]:
     env_systemd_less = os.getenv("SYSTEMD_LESS")
@@ -142,7 +163,8 @@ PRESET_LESS_DEFAULT_ARGS: list[str] = get_env_systemd_less_args() or [
     "--no-init",  # -X
     "--LONG-PROMPT",  # -M
     "--quit-on-intr",  # -K
-    "--+quit-if-one-screen",  # never quit if it fits on one screen
+    "-+F",  # long version reset was broken in older versions
+    # "--+quit-if-one-screen",  # never quit if it fits on one screen
 ]
 # requires POSIXLY_CORRECT to be set.
 PRESET_MORE_DEFAULT_ARGS: list[str] = []
@@ -184,27 +206,109 @@ class CustomOptionList(OptionList, inherit_bindings=False):
     # This should avoid clashing configurations for up/down
     # and modal shortcuts -> Avoiding unexpected behavior.
     # Although the direct triggers should _still_ be supported!
+    def __init__(self, navigation_keybindings: NavigationKeyBindings, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for keys, action, description in [
+            (navigation_keybindings.down, "cursor_down", "Down"),
+            (navigation_keybindings.up, "cursor_up", "Up"),
+            (navigation_keybindings.page_up, "page_up", "Page Up"),
+            (navigation_keybindings.page_down, "page_down", "Page Down"),
+            (navigation_keybindings.top, "first", "First"),
+            (navigation_keybindings.bottom, "last", "Last"),
+        ]:
+            self._bindings.bind(
+                keys=keys,
+                action=action,
+                description=description,
+                show=False,
+            )
 
-    def on_key(self):
-        pass
+
+def rich_underline_key(inp_str: str, key: str) -> Text:
+    txt = inp_str.replace(key, f"[u]{key}[/u]", 1)
+    return Text.from_markup(txt)
 
 
-class SystemctlActionScreen(ModalScreen):
+class SystemctlActionScreen(ModalScreen[Optional[str]]):
     """
-    Triggers
+    Present a screen with the configured systemctl actions.
+    Uses the common navigation style with enter and uses the modal specific
+    shortcuts.
+
+    Assumes that the keybindings aren't conflicting.
     """
+
+    BINDINGS = [Binding("enter", "select", "Select", show=True)]
+
+    def __init__(
+        self,
+        close_modal_key: str,
+        navigation_keybindings: NavigationKeyBindings,
+        systemctl_commands: List[SystemctlCommand],
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.navigation_keybindings = navigation_keybindings
+        self.systemctl_commands = systemctl_commands
+        # only the first keybinding will be shown!
+        self._bindings.bind(
+            ensure_reserved("escape") + "," + close_modal_key, "close", "Close"
+        )
+
+    def build_options(self) -> List[Option]:
+        longest_keybinding = max(
+            len(cmd.modal_keybinding) for cmd in self.systemctl_commands
+        )
+
+        accent = self.app.theme_variables.get("accent")
+
+        opts = []
+        for cmd in self.systemctl_commands:
+            k = Text.from_markup(
+                f"[b]{cmd.modal_keybinding:>{longest_keybinding}}[/b]",
+            )
+            if accent is not None:
+                k.stylize(accent, start=0)
+            opts.append(
+                Option(
+                    k
+                    + " systemctl "
+                    + rich_underline_key(cmd.command, cmd.modal_keybinding),
+                    id=cmd.command,
+                )
+            )
+            # Add the quick_select bindings
+            self._bindings.bind(
+                cmd.modal_keybinding,
+                f"quick_select('{cmd.command}')",
+                description=f"Quick select {cmd.description}",
+                show=False,
+            )
+        return opts
 
     def compose(self) -> ComposeResult:
-        yield CustomOptionList(
-            Option("a"),
-            Option("o"),
-            Option("k"),
-        )
-        # ("I am a label")
-        #
+        opts = self.build_options()
+        yield CustomOptionList(self.navigation_keybindings, *opts)
+        yield Footer()
 
-    # def on_key_pressed(self, event) -> None:
-    # self.dismiss()
+    def action_select(self) -> None:
+        opt_list = cast(CustomOptionList, self.query_one(CustomOptionList))
+        opt_list.action_select()
+
+    def action_quick_select(self, id: str) -> None:
+        opt_list = cast(CustomOptionList, self.query_one(CustomOptionList))
+        opt_idx = opt_list.get_option_index(id)
+        opt_list.highlighted = opt_idx
+        opt_list.action_select()
+        # -> could be simplified to the following since `id` == selected option
+        # self.dismiss(id); but leave for now, to keep it consistent with enter
+
+    def action_close(self) -> None:
+        self.dismiss(None)
+
+    @on(CustomOptionList.OptionSelected)
+    def command_selected(self, event: CustomOptionList.OptionSelected):
+        self.dismiss(event.option_id)
 
 
 def get_default_pager_args_presets(pager: str) -> list[str]:
@@ -233,126 +337,155 @@ def get_journal_pager_args_presets(pager: str) -> list[str]:
     return []
 
 
+# The systemctl direct_keybindings should be unique!
+# They should never allow accidental triggers!
+# By default, there aren't any direct keybindings
+# Only modal keybindings.
+# These modal keybindings should also only map to a single key, ideally ascii.
+# The modal keybindings aren't allowed to overlap with the navigation keybindings.
 class SystemctlCommand(BaseModel):
     """SystemctlCommand documentation"""
 
-    keybinding: str = Field(description="Link to keybinding documentation from textual")
+    modal_keybinding: str = Field(description="Associated key to use in the modal")
+    direct_keybinding: Optional[str] = Field(
+        default=None, description="Direct Keybinding"
+    )
     command: str = Field(description="systemctl subcommand (may include arguments)")
-    description: str = Field(description="A short description of the command.")
+    description: str = Field(description="Additional command information.")
 
 
 class GenericKeyBindings(BaseModel):
-    """Defines the keybinding(s) for the given actions"""
+    """
+    Global keybindings; mainly for opening settings and
+    toggling screens/modals.
+    """
+
+    toggle_systemctl_modal: str = Field(
+        default="ctrl+o", description="Systemctl action"
+    )
+    open_config: str = Field(
+        # confi*g*ure; there are just too few safe keybindings :(
+        default="ctrl+g",
+        description="Open config in editor",
+    )
+
+    def keymap(self) -> Dict[str, str]:
+        return {
+            key.strip().lower(): attr
+            for attr, keys in self.dict().items()
+            for key in keys.split(",")
+        }
+
+
+class MainKeyBindings(BaseModel):
+    """
+    Defines the keybindings for the main window.
+    """
 
     next_preview_tab: str = Field(
-        default="l,right",
+        default="full_stop",
         description="Next preview tab",
     )
     previous_preview_tab: str = Field(
-        default="h,left",
+        default="comma",
         description="Previous preview tab",
     )
     clear_input: str = Field(
-        default="ctrl+backspace", description="Clear search input."
+        default="backspace,ctrl+backspace", description="Clear search input."
     )
     jump_to_input: str = Field(default="slash", description="Jump to the search input.")
     copy_unit_path: str = Field(
-        default="ctrl+y",
+        default="ctrl+x",
         description="Copy highlighted unit path to the clipboard",
     )
     open_preview_in_pager: str = Field(
         default="enter",
         description="Open in pager",
     )
-    # HERE
     open_preview_in_editor: str = Field(
-        default="alt+enter",
+        default="ctrl+v",  # Ctrl-V is Visual Mode so I find opening in EDITOR fitting
         description="Open in editor",
     )
     toggle_mode: str = Field(default="ctrl+t", description="Toggle mode")
-    open_config: str = Field(
-        default="alt+o",
-        description=dedent("""\
-            Open `config.yaml` file with `editor`.
-            Creates `config.yaml` if it doesn't exist."""),
-    )
+
+    def keymap(self) -> Dict[str, str]:
+        return {
+            key.strip().lower(): attr
+            for attr, keys in self.dict().items()
+            for key in keys.split(",")
+        }
 
 
-class SelectionKeyBindings(BaseModel):
+# These will be used in _all_ scrollable widgets
+# They may overlap with GenericKeyBindings but these will have a higher
+# priority.
+class NavigationKeyBindings(BaseModel):
     down: str = Field(default="down,j", description="Down")
     up: str = Field(default="up,k", description="Up")
-    toggle_selection: str = Field(default="space", description="Toggle selection.")
     page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
     page_up: str = Field(default="ctrl+up,pageup", description="Page up")
-    first: str = Field(default="home", description="First Element")
-    last: str = Field(default="end", description="Last Element")
+    top: str = Field(default="home", description="Goto Top")
+    bottom: str = Field(default="end", description="Goto bottom")
+    # These are probably only needed for the preview output!
+    left: str = Field(default="left,h", description="Left")
+    right: str = Field(default="right,l", description="Right")
+    page_left: str = Field(default="ctrl+left", description="Page left")
+    page_right: str = Field(default="ctrl+right", description="Page right")
+
+    def keymap(self) -> Dict[str, str]:
+        return {
+            key.strip().lower(): attr
+            for attr, keys in self.dict().items()
+            for key in keys.split(",")
+        }
 
 
-class PreviewKeyBindings(BaseModel):
-    scroll_down: str = Field(default="down,j", description="Scroll down")
-    scroll_up: str = Field(default="up,k", description="Scroll up")
-    scroll_right: str = Field(default="right,l", description="Scroll right")
-    scroll_left: str = Field(default="left,h", description="Scroll left")
-    scroll_page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
-    scroll_page_up: str = Field(default="ctrl+up,pageup", description="Page up")
-    # Not quite sure why but ctrl+pageup/down doesn't seem to work for me.
-    scroll_page_left: str = Field(default="ctrl+left", description="Page left")
-    scroll_page_right: str = Field(default="ctrl+right", description="Page right")
-    scroll_top: str = Field(default="home", description="First Page")
-    scroll_end: str = Field(default="end", description="Last Page")
-
-
-# Creating a temporary configuration file conflicts with
-# a relative schema definition. The user should simply delete the configuration
-# file if they like to start "fresh".
-
-# HERE: Support adding commands _without_ requiring a keybindings
-# and prepare work for my "quick-selection" keybinding
 DEFAULT_COMMANDS = [
     SystemctlCommand(
-        keybinding="ctrl+e",
-        command="edit",
-        description="systemctl edit",
-    ),
-    SystemctlCommand(
-        keybinding="alt+e",
-        command="edit --runtime",
-        description="systemctl edit --runtime",
-    ),
-    SystemctlCommand(
-        keybinding="ctrl+o",
-        command="stop",
-        description="systemctl stop",
-    ),
-    SystemctlCommand(
-        keybinding="ctrl+a",
+        modal_keybinding="a",
         command="start",
-        description="systemctl start",
+        description="Start unit(s)",
     ),
     SystemctlCommand(
-        keybinding="ctrl+l",
-        command="reload",
-        description="systemctl reload",
+        modal_keybinding="o",
+        command="stop",
+        direct_keybinding="ctrl+s",
+        description="Stop unit(s)",
     ),
     SystemctlCommand(
-        keybinding="ctrl+n",
-        command="enable",
-        description="systemctl enable",
-    ),
-    SystemctlCommand(
-        keybinding="ctrl+r",
+        modal_keybinding="s",
         command="restart",
-        description="systemctl restart",
+        description="Restart unit(s)",
     ),
     SystemctlCommand(
-        keybinding="ctrl+k",
+        modal_keybinding="e",
+        command="edit",
+        description="Edit unit(s) with configured editor",
+    ),
+    SystemctlCommand(
+        modal_keybinding="r",
+        command="edit --runtime",
+        description="Edit unit(s) only for current runtime",
+    ),
+    SystemctlCommand(
+        modal_keybinding="d",
+        command="reload",
+        description="Reload unit(s)",
+    ),
+    SystemctlCommand(
+        modal_keybinding="n",
+        command="enable",
+        description="Enable unit(s)",
+    ),
+    SystemctlCommand(
+        modal_keybinding="m",
         command="mask",
-        description="systemctl mask",
+        description="Mask/Disable starting unit(s)",
     ),
     SystemctlCommand(
-        keybinding="ctrl+u",
+        modal_keybinding="u",
         command="unmask",
-        description="systemctl unmask",
+        description="Undo masking of unit(s)",
     ),
 ]
 
@@ -504,27 +637,33 @@ class Settings(BaseSettings):
         default=Theme("textual-dark"), description="The theme of the application."
     )
 
-    # FUTURE: Add configuration for input selection keybindings
     # FUTURE: Allow option to select if multi-select is allowed or not.
     generic_keybindings: GenericKeyBindings = Field(
         default=GenericKeyBindings(),
+        # HERE: Do I have to write the description or is it taken from class?
+        # Make sure to dynamically generate the config in the docs from now on!
         description=dedent("""\
-            Configurable keybindings for common actions.
-            The actions (keys) are predefined and the configured keybindings
+            Global keybindings; mainly for opening settings and
+            toggling screens/modals.
+            """),
+    )
+
+    main_keybindings: MainKeyBindings = Field(
+        default=MainKeyBindings(),
+        description=dedent(
+            """\
+            Configurable keybindings for common actions on the main screen.
+            The actions (YAML keys) are predefined and the configured keybindings
             are given as values.
-
-            """)
-        + KEYBINDING_HELP_TEXT,
+            
+        """
+            + KEYBINDING_HELP_TEXT,
+        ),
     )
 
-    selection_keybindings: SelectionKeyBindings = Field(
-        default=SelectionKeyBindings(),
-        description="Configurable keybindings for the selection window.",
-    )
-
-    preview_keybindings: PreviewKeyBindings = Field(
-        default=PreviewKeyBindings(),
-        description="Configurable keybindings for preview log windows.",
+    navigation_keybindings: NavigationKeyBindings = Field(
+        default=NavigationKeyBindings(),
+        description="TODO",  # HERE
     )
 
     systemctl_commands: list[SystemctlCommand] = Field(
@@ -532,13 +671,16 @@ class Settings(BaseSettings):
         description=dedent(
             """\
             List of configurable systemctl subcommands.
-            The exact subcommand (including arguments) can be defined
-            by settings `command`. The keybinding(s) that triggers this
-            systemctl subcommand is configured via the `keybinding` key.
-            The description is used to describe the subcommand
-            and used in the applications command palette to find
-            the action.
+            The exact subcommand (including arguments) can be defined by setting `command`.
+            The `modal_keybinding`s provide the shortcut key(s)
+            for the modal action window.
+            Optionally, `direct_keybinding`s can be configured to
+            immediately trigger systemctl action from the main screen
+            without having to open the modal first.
 
+            The description is used to describe the subcommand
+            in the `CommandPalette`
+            
             """
         )
         + KEYBINDING_HELP_TEXT,
@@ -579,9 +721,6 @@ class Settings(BaseSettings):
             Note: The output is not trimmed when a pager or editor is opened!"""),
     )
 
-    # FUTURE: Add in-depth documentation about possible security issues.
-    # https://github.com/darrenburns/posting/blob/94feabc232da078c8cc9194e5259c3cd2206cfbb/src/posting/config.py#L113
-
     # https://github.com/tinted-theming/home?tab=readme-ov-file
     @classmethod
     def settings_customise_sources(
@@ -598,6 +737,63 @@ class Settings(BaseSettings):
         if config_file is not None and config_file.exists():
             settings.append(YamlConfigSettingsSource(settings_cls, config_file))
         return tuple(settings)
+
+    @model_validator(mode="after")
+    def check_keybinding_overlaps(self) -> Self:
+        """
+        Check whether or not the provided keybindings overlap
+        with reserved keybindings or with each other.
+        """
+
+        def get_keys(inp_keys: str) -> list[str]:
+            return [key.strip().lower() for key in inp_keys.split(",")]
+
+        key_maps: list[Dict[str, str]] = []
+
+        # have the methods keymap !
+        for simple_keybinding_model in [
+            "generic_keybindings",
+            "main_keybindings",
+            "navigation_keybindings",
+        ]:
+            key_map = getattr(self, simple_keybinding_model).keymap()
+            key_maps.append(key_map)
+            conflicting_keys = key_map.keys() & RESERVED_KEYBINDINGS.keys()
+            if len(conflicting_keys) != 0:
+                error_message = "\n".join(
+                    f"The reserved keybinding: {key} for '{RESERVED_KEYBINDINGS[key]}' was used in {simple_keybinding_model}.{key_map[key]}"
+                    for key in conflicting_keys
+                )
+                raise ValueError(error_message)
+
+        for sys_cmd in self.systemctl_commands:
+            for key_attr in ["direct_keybinding", "modal_keybinding"]:
+                complex_key = getattr(sys_cmd, key_attr)
+                if complex_key is None:  # may be unset
+                    continue
+                keys = get_keys(complex_key)
+                for key in keys:
+                    key_maps.append({key: f"systemctl_commands.{sys_cmd.command}"})
+                    if key in RESERVED_KEYBINDINGS:
+                        raise ValueError(
+                            f"The systemctl command {sys_cmd.command}.{key_attr} {key} conflicts with the reserved option: {RESERVED_KEYBINDINGS[key]}"
+                        )
+
+        # conflict resolution is _hard_
+        # especially if I want to keep the terminal support as big as possible
+        key_counts = Counter(k for key_map in key_maps for k in key_map.keys())
+        overlapping_keys = [key for key, count in key_counts.items() if count > 1]
+        if len(overlapping_keys) != 0:
+            error_message = ""
+            for overlapping_key in overlapping_keys:
+                error_message += f"Conflicts for keybinding: {overlapping_key}"
+                for key_map in key_maps:
+                    if overlapping_key in key_map.keys():
+                        error_message += f"\n\t- {key_map[overlapping_key]}"
+                error_message += "\n"
+            raise ValueError(error_message)
+
+        return self
 
 
 def get_default_settings_yaml() -> str:
@@ -692,46 +888,29 @@ class CustomInput(Input):
 
 
 class CustomSelectionList(SelectionList, inherit_bindings=False):
-    def __init__(self, selection_keybindings: SelectionKeyBindings, **kwargs):
+    def __init__(
+        self,
+        navigation_keybindings: NavigationKeyBindings,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
+        for keys, action, description in [
+            (navigation_keybindings.down, "cursor_down", "Down"),
+            (navigation_keybindings.up, "cursor_up", "Up"),
+            (navigation_keybindings.page_up, "page_up", "Page Up"),
+            (navigation_keybindings.page_down, "page_down", "Page Down"),
+            (navigation_keybindings.top, "first", "First"),
+            (navigation_keybindings.bottom, "last", "Last"),
+        ]:
+            self._bindings.bind(
+                keys=keys,
+                action=action,
+                description=description,
+                show=False,
+            )
+
         self._bindings.bind(
-            keys=selection_keybindings.down,
-            action="cursor_down",
-            description="Down",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.up,
-            action="cursor_up",
-            description="Up",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.page_up,
-            action="page_up",
-            description="Page Up",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.page_down,
-            action="page_down",
-            description="Page Down",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.first,
-            action="first",
-            description="First",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.last,
-            action="last",
-            description="Last",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=selection_keybindings.toggle_selection,
+            keys="space",
             action="select",
             description="Select",
             show=True,
@@ -784,8 +963,11 @@ class UnitReprState(Enum):
         elif self == UnitReprState.not_found:
             prefix = "○"
             style = "yellow"
-        # TODO: Implement additional ones for:
-        # activating, deactivating, maintenance, reloading
+        elif unit.rsplit(".", maxsplit=1)[0][-1] == "@":
+            # a template service does not have a 'valid' status output
+            # -> this is a visual indication that it is "different"
+            prefix = "○"
+            style = "#878787"  # gray
         else:
             prefix = "○"
             style = ""  # plain
@@ -819,6 +1001,7 @@ def parse_units_to_state_dict(
             state = UnitReprState.failed
         elif d.get("load") == "not-found":
             state = UnitReprState.not_found
+        # inactive
         else:
             state = UnitReprState.other
         state_mapper[d["unit"]] = state
@@ -939,7 +1122,7 @@ async def systemctl_async(
             if i == head:
                 break
 
-        # I believe that will read everything until EOF
+    # I believe that will read everything until EOF
     stdout = "\n".join(byte_line.decode() for byte_line in stdout_deque)
     stderr = "\n".join(byte_line.decode() for byte_line in stderr_deque)
     return_code = await proc.wait()
@@ -1059,68 +1242,26 @@ async def journalctl_async(
 
 
 class Preview(RichLog, inherit_bindings=False):
-    def __init__(self, keybindings: PreviewKeyBindings, **kwargs):
+    def __init__(self, navigation_keybindings: NavigationKeyBindings, **kwargs):
         super().__init__(**kwargs)
-        self._bindings.bind(
-            keys=keybindings.scroll_down,
-            action="scroll_down",
-            description="Down",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_up,
-            action="scroll_up",
-            description="Up",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_right,
-            action="scroll_right",
-            description="Right",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_left,
-            action="scroll_left",
-            description="Left",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_page_up,
-            action="page_up",
-            description="Page Up",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_page_down,
-            action="page_down",
-            description="Page Down",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_page_left,
-            action="page_left",
-            description="Page Left",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_page_right,
-            action="page_right",
-            description="Page Right",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_top,
-            action="scroll_home",
-            description="First Page",
-            show=False,
-        )
-        self._bindings.bind(
-            keys=keybindings.scroll_end,
-            action="scroll_end",
-            description="Last Page",
-            show=False,
-        )
+        for keys, action, description in [
+            (navigation_keybindings.down, "scroll_down", "Down"),
+            (navigation_keybindings.up, "scroll_up", "Up"),
+            (navigation_keybindings.left, "scroll_left", "Left"),
+            (navigation_keybindings.right, "scroll_right", "Right"),
+            (navigation_keybindings.page_up, "page_up", "Page Up"),
+            (navigation_keybindings.page_down, "page_down", "Page Down"),
+            (navigation_keybindings.top, "scroll_home", "First"),
+            (navigation_keybindings.bottom, "scroll_end", "Last"),
+            (navigation_keybindings.page_left, "page_left", "Page Left"),
+            (navigation_keybindings.page_right, "page_right", "Page Right"),
+        ]:
+            self._bindings.bind(
+                keys=keys,
+                action=action,
+                description=description,
+                show=False,
+            )
 
 
 class PreviewArea(Container):
@@ -1139,15 +1280,17 @@ class PreviewArea(Container):
     def __init__(
         self,
         max_lines: int,
-        preview_keybindings: PreviewKeyBindings,
+        navigation_keybindings: NavigationKeyBindings,
         *args,
         journalctl_args: list[str],
         **kwargs,
     ) -> None:
         self.max_lines = max_lines
         self.journalctl_args = journalctl_args
-        self.preview_keybindings = preview_keybindings
+        self.navigation_keybindings = navigation_keybindings
         super().__init__(*args, **kwargs)
+        self._bindings.bind(navigation_keybindings.right, "next_tab")
+        self._bindings.bind(navigation_keybindings.left, "previous_tab")
 
     def on_mount(self) -> None:
         self.last_output = Text("")
@@ -1254,42 +1397,42 @@ class PreviewArea(Container):
             with TabPane("Status", id="status"):
                 yield Preview(
                     id="status_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=False,
                 )
 
             with TabPane("Journal", id="journal"):
                 yield Preview(
                     id="journal_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=True,
                 )
 
             with TabPane("Cat", id="cat"):
                 yield Preview(
                     id="cat_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=False,
                 )
 
             with TabPane("Dependencies", id="dependencies"):
                 yield Preview(
                     id="dependencies_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=False,
                 )
 
             with TabPane("Show", id="show"):
                 yield Preview(
                     id="show_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=False,
                 )
 
             with TabPane("Help", id="help"):
                 yield Preview(
                     id="help_log",
-                    keybindings=self.preview_keybindings,
+                    navigation_keybindings=self.navigation_keybindings,
                     auto_scroll=False,
                 )
 
@@ -1317,9 +1460,7 @@ def cached_search_term() -> str:
     return ""
 
 
-class InteractiveSystemd(App):
-    TITLE = "isd"
-    CSS_PATH = "dom.tcss"
+class MainScreen(Screen):
     unit_to_state_dict: reactive[Dict[str, UnitReprState]] = reactive(dict())
     # Relevant = Union(ordered selected units & highlighted unit)
     relevant_units: Deque[str] = deque()
@@ -1332,98 +1473,40 @@ class InteractiveSystemd(App):
     ordered_selection: Deque[str] = deque()
     highlighted_unit: Optional[str] = None
     _tracked_keybinds: Dict[str, str] = dict()
-    # Future: Consider not tracking all settings globally
 
-    def get_default_system_commands_subset(
-        self, screen: Screen
-    ) -> Iterable[SystemCommand]:
-        """
-        Only show a subset of the default system commands
-        https://github.com/Textualize/textual/blob/d34f4a4bcf683144bc3b45ded331f297012c8d40/src/textual/app.py#L1096
-        """
-        # Always allow changing the theme:
-        # if not self.ansi_color:
-        yield SystemCommand(
-            "Change theme",
-            "Change the current theme",
-            self.action_change_theme,
-        )
-        yield SystemCommand(
-            "Quit the application",
-            "Quit the application as soon as possible",
-            self.action_quit,
-        )
-        yield SystemCommand(
-            "Show the version", "Show the isd version", self.action_show_version
-        )
+    def __init__(self, settings, *args, **kwargs) -> None:
+        self.settings = settings
+        super().__init__(*args, **kwargs)
+        self.update_keybindings()
 
-        if screen.query("HelpPanel"):
-            yield SystemCommand(
-                "Hide keys and help panel",
-                "Hide the keys and widget help panel",
-                self.action_hide_help_panel,
-            )
-        else:
-            yield SystemCommand(
-                "Show keys and help panel",
-                "Show help for the focused widget and a summary of available keys",
-                self.action_show_help_panel,
-            )
-
-    def action_show_version(self) -> None:
-        self.notify(f"isd version: {__version__}", timeout=30)
-
-    def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
-        yield from self.get_default_system_commands_subset(screen)
-        # Re-reading from settings file, as I might add additional information
-        # into the schema for this viewer + only finding the local bindings is
-        # a pain.
-        for systemctl_command in self.settings.systemctl_commands:
-            yield SystemCommand(
-                systemctl_command.description,
-                f"Shortcut: {systemctl_command.keybinding}",
-                partial(self.action_systemctl_command, systemctl_command.command),
-            )
-        for action, field in self.settings.generic_keybindings.model_fields.items():
-            keys = getattr(self.settings.generic_keybindings, action)
-            yield SystemCommand(
-                action.replace("_", " ").title(),
-                f"Shortcut: {keys}",
-                eval(f"self.action_{action}"),
-            )
-
-    # FUTURE: Use rich text to highlight/underline the letter
-    COMMAND_PALETTE_BINDING = "ctrl+p"
-    NOTIFICATION_TIMEOUT = 5
-    BINDINGS = [
-        Binding("ctrl+c", "stop", "Quit the application", priority=True, show=False),
-    ]
-
-    def __init__(self) -> None:
-        self.settings = Settings()
-        super().__init__()
+    def update_keybindings(self) -> None:
+        # update keybindings
         for command in self.settings.systemctl_commands:
             action = f"systemctl_command('{command.command}')"
-            self.update_tracked_keybindings(command.keybinding, action)
-            self.bind(
-                keys=command.keybinding,
-                action=action,
-                description=command.description,
-                show=False,
-            )
-        generic_keybindings = self.settings.generic_keybindings
-        show_fields = ["open_preview_in_pager", "open_preview_in_editor", "toggle_mode"]
-        model_fields = GenericKeyBindings.model_fields
+            direct_keybind = command.direct_keybinding
+            if direct_keybind is not None:
+                self._bindings.bind(
+                    keys=direct_keybind,
+                    action=action,
+                    description=command.description,
+                    show=False,
+                )
+        main_keybindings = self.settings.main_keybindings
+        show_fields = [
+            "open_preview_in_pager",
+            "open_preview_in_editor",
+            "toggle_mode",
+        ]
+        model_fields = MainKeyBindings.model_fields
         assert all(
             [show_field in model_fields for show_field in show_fields]
         ), "Forgot to update show_field"
         for action, field in model_fields.items():
             # name of keybinding == action name and
             # description is used for binding description
-            keys = getattr(generic_keybindings, action)
-            self.update_tracked_keybindings(keys, action)
+            keys = getattr(main_keybindings, action)
 
-            self.bind(
+            self._bindings.bind(
                 keys,
                 action,
                 description=getattr(field, "description", ""),
@@ -1433,22 +1516,30 @@ class InteractiveSystemd(App):
                 show=action in show_fields,
             )
 
-    def update_tracked_keybindings(self, keys: str, action: str) -> None:
+    def system_commands(self):
         """
-        Custom function that keeps track of all custom keybindings and
-        raises a warning notification if there are any overlapping keybindings.
+        Yields `SystemCommand`s that are specific for this screen.
         """
-        new_keybinds = {key: action for key in keys.split(",")}
-        clashes = new_keybinds.keys() & self._tracked_keybinds.keys()
-        if len(clashes) != 0:
-            msg = "\n".join(
-                f"{key}: {new_keybinds[key]} and {self._tracked_keybinds[key]}"
-                for key in clashes
+        for systemctl_command in self.settings.systemctl_commands:
+            shortcut_txt = (
+                ""
+                if systemctl_command.direct_keybinding is None
+                else f" (Shortcut: {systemctl_command.direct_keybinding})"
             )
-            self.notify(
-                "Keybinding clashes between: \n" + msg, severity="error", timeout=30
+            yield SystemCommand(
+                "systemctl " + systemctl_command.command,
+                systemctl_command.description + f"{shortcut_txt}",
+                # partial(self.exec_systemctl_command, systemctl_command.command),
+                partial(self.action_systemctl_command, systemctl_command.command),
             )
-        self._tracked_keybinds.update(new_keybinds)
+
+        for action, field in self.settings.main_keybindings.model_fields.items():
+            keys = getattr(self.settings.main_keybindings, action)
+            yield SystemCommand(
+                action.replace("_", " ").title(),
+                f"Shortcut: {keys}",
+                eval(f"self.action_{action}"),
+            )
 
     # FUTURE:
     # Add a 'systemd' page/screen that shows the overall status of the system
@@ -1462,10 +1553,6 @@ class InteractiveSystemd(App):
 
     def action_previous_preview_tab(self) -> None:
         self.query_one(PreviewArea).action_previous_tab()
-
-    # Not supporting this as it leads to too many keyboard shortcuts
-    # def action_jump_tab(self, tab: str) -> None:
-    #     self.query_one(TabbedContent).active = tab
 
     def action_clear_input(self) -> None:
         """
@@ -1483,9 +1570,9 @@ class InteractiveSystemd(App):
         inp = cast(CustomInput, self.query_one(CustomInput))
         inp.focus()
 
-    def action_stop(self) -> None:
+    def store_state(self) -> None:
         """
-        Stop the current application.
+        Store the current application state.
         """
         json_state = json.dumps({"mode": self.mode, "search_term": self.search_term})
 
@@ -1496,7 +1583,6 @@ class InteractiveSystemd(App):
                 fp.write_text(json_state)
             except Exception as e:
                 print(f"Exception: {e} while writing state to: {fp}")
-        self.exit()
 
     # There isn't really any additional foreground commands apart from
     # edit that are useful. All the other ones are encoded as preview windows.
@@ -1551,7 +1637,7 @@ class InteractiveSystemd(App):
             # Since `edit` is such an weird outlier, enforcing `sudo` in this instance
             # is probably the most straight-forward solution IF the mode is `system`!
             # In `user` mode, there should never be a reason to prefix it with sudo!
-            with self.suspend():
+            with self.app.suspend():
                 args = systemctl_args_builder(
                     *command,
                     mode=self.mode,
@@ -1585,7 +1671,7 @@ class InteractiveSystemd(App):
                             foreground=False,
                         )
                         if return_code == 1:
-                            with self.suspend():
+                            with self.app.suspend():
                                 return_code, stdout, stderr = await systemctl_async(
                                     *command,
                                     mode=self.mode,
@@ -1594,7 +1680,7 @@ class InteractiveSystemd(App):
                                     foreground=True,
                                 )
                     else:
-                        with self.suspend():
+                        with self.app.suspend():
                             return_code, stdout, stderr = await systemctl_async(
                                 *command,
                                 mode=self.mode,
@@ -1639,46 +1725,8 @@ class InteractiveSystemd(App):
             for line in p1.stdout.splitlines()
             if line.startswith("FragmentPath=")
         )
-        self.copy_to_clipboard(path)
+        self.app.copy_to_clipboard(path)
         self.notify(f"Copied '{path}' to the clipboard.")
-
-    def update_schema(self) -> None:
-        schema = json.dumps(Settings.model_json_schema())
-        fp = isd_config_dir() / "schema.json"
-        if fp.exists() and fp.read_text() == schema:
-            # self.notify("Schema is already up-to-date.")
-            return
-        try:
-            fp.parent.mkdir(parents=True, exist_ok=True)
-            fp.write_text(schema)
-        except Exception as e:
-            self.notify(f"Error while creating/updating {fp}: {e}", severity="error")
-
-    def action_open_config(self) -> None:
-        fp = get_config_file_path()
-        if not fp.exists():
-            prev = ""
-            try:
-                # in theory `get_config_file_path` should already try to create
-                # the parent directories. But doing it again here to potentially
-                # propagate the exception to the app.
-                fp.parent.mkdir(parents=True, exist_ok=True)
-                self.update_schema()
-                fp.write_text(get_default_settings_yaml())
-            except Exception as e:
-                self.notify(f"Error while creating default config.yaml: {e}")
-        else:
-            prev = fp.read_text()
-        with self.suspend():
-            subprocess.call([self.editor, fp.absolute()])
-        if prev != fp.read_text():
-            self.notify(
-                dedent("""\
-                    Changes to configuration detected!
-                    Please restart application for them to take effect."""),
-                severity="warning",
-            )
-        self.refresh()
 
     def action_toggle_mode(self) -> None:
         # only allow changing mode if current user isn't root user
@@ -1760,7 +1808,7 @@ class InteractiveSystemd(App):
             )
             pager_args = get_default_pager_args_presets(pager)
 
-        with self.suspend():
+        with self.app.suspend():
             cmd_args = self.preview_output_command_builder(cur_tab)
             env = env_with_color()
             p1 = subprocess.Popen(
@@ -1776,17 +1824,10 @@ class InteractiveSystemd(App):
                 self.notify("Preview was empty.", severity="information")
         self.refresh()
 
-    @property
-    def editor(self) -> str:
-        return (
-            get_systemd_editor()
-            if self.settings.editor == "auto"
-            else self.settings.editor
-        )
-
     def action_open_preview_in_editor(self) -> None:
         cur_tab = cast(TabbedContent, self.query_one(TabbedContent)).active
-        with self.suspend():
+        editor = cast(InteractiveSystemd, self.app).editor
+        with self.app.suspend():
             args = self.preview_output_command_builder(cur_tab)
             p1 = subprocess.run(
                 args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -1797,12 +1838,10 @@ class InteractiveSystemd(App):
                     # capture_output appends a newline to non-empty stderr!
                     p1.stdout
                 )
-                subprocess.call([self.editor, p.absolute()])
+                subprocess.call([editor, p.absolute()])
         self.refresh()
 
     async def on_mount(self) -> None:
-        # always make sure to use the latest schema
-        self.update_schema()
         self.set_interval(
             self.settings.preview_and_selection_refresh_interval_sec,
             self.partial_refresh_unit_to_state_dict,
@@ -1824,7 +1863,8 @@ class InteractiveSystemd(App):
         self.debounced_search_units(self.search_term)
 
     def on_input_submitted(self, value: CustomInput.Submitted) -> None:
-        self.action_focus_next()
+        sel = self.query_one(CustomSelectionList)
+        sel.focus()
 
     def update_relevant_units(self) -> None:
         # With exclusive=True, I should make sure to NOT use parameters!
@@ -1841,7 +1881,7 @@ class InteractiveSystemd(App):
         self.relevant_units = units
 
     @work(exclusive=True)
-    async def refresh_preview(self):
+    async def refresh_preview(self) -> None:
         await asyncio.sleep(self.settings.updates_throttle_sec)
         if len(self.relevant_units) > 0:
             preview_area = self.query_one(PreviewArea)
@@ -1850,7 +1890,7 @@ class InteractiveSystemd(App):
 
     async def watch_unit_to_state_dict(
         self, unit_to_state_dict: Dict[str, UnitReprState]
-    ):
+    ) -> None:
         # if it has been correctly initialized
         if len(unit_to_state_dict) != 0:
             await self.refresh_selection()
@@ -2000,7 +2040,7 @@ class InteractiveSystemd(App):
         # also needs to update the search_results, since we may now have
         # _more_ results _or_ completely different results if the mode was switched!
         self.search_results = await self.search_units(self.search_term)
-        self.mutate_reactive(InteractiveSystemd.unit_to_state_dict)
+        self.mutate_reactive(MainScreen.unit_to_state_dict)
 
     @work(exclusive=True)
     async def throttled_refresh_unit_to_state_dict_worker(self, *units: str) -> None:
@@ -2038,7 +2078,7 @@ class InteractiveSystemd(App):
             # happen at the same time! I do not want to loose updates to
             # new keys!
             self.unit_to_state_dict.update(local_unit_to_state_dict)
-            self.mutate_reactive(InteractiveSystemd.unit_to_state_dict)
+            self.mutate_reactive(MainScreen.unit_to_state_dict)
             # unit_to_state_dict watcher calls update_selection!
 
     # FUTURE: Evaluate if updating the self values in compose makes sense.
@@ -2059,16 +2099,197 @@ class InteractiveSystemd(App):
                     id="search_input",
                 )
                 yield CustomSelectionList(
-                    selection_keybindings=self.settings.selection_keybindings,
+                    navigation_keybindings=self.settings.navigation_keybindings,
                     id="unit-selection",
                 )
-                # with Vertical():
                 yield PreviewArea(
                     max_lines=self.settings.preview_max_lines,
                     journalctl_args=self.settings.journalctl_args,
-                    preview_keybindings=self.settings.preview_keybindings,
+                    navigation_keybindings=self.settings.navigation_keybindings,
                 )
         yield Footer()
+
+
+class InteractiveSystemd(App):
+    """
+    The textual `App` that loads the settings and controls the screens.
+
+    The bindings are controlled by the dedicated screens!
+    """
+
+    TITLE = "isd"
+    CSS_PATH = "dom.tcss"
+    COMMAND_PALETTE_BINDING = ensure_reserved("ctrl+p")
+    NOTIFICATION_TIMEOUT = 5
+    BINDINGS = [
+        Binding(
+            ensure_reserved("ctrl+q,ctrl+c"),
+            "stop",
+            description="Close",
+            show=False,
+            priority=True,
+        ),
+        Binding(
+            ensure_reserved("ctrl+z"), "suspend_process", show=False, priority=True
+        ),
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.settings = Settings()
+        # only show the following bindings in the footer
+        show_bindings = ["toggle_systemctl_modal"]
+        for action, field in GenericKeyBindings.model_fields.items():
+            keys = getattr(self.settings.generic_keybindings, action)
+            self.bind(
+                keys,
+                action,
+                description=getattr(field, "description"),
+                show=action in show_bindings,
+            )
+
+    # HERE:
+    # Consider adding better error messages for the JSON decoder
+
+    def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
+        yield from self.get_default_system_commands_subset(screen)
+
+        for action, field in GenericKeyBindings.model_fields.items():
+            keys = getattr(self.settings.generic_keybindings, action)
+            description = getattr(field, "description")
+            yield SystemCommand(
+                description,
+                f"Shortcut: {keys}",
+                eval(f"self.action_{action}"),
+            )
+
+        if isinstance(screen, MainScreen):
+            yield from screen.system_commands()
+
+    def action_suspend_process(self) -> None:
+        super().action_suspend_process()
+        # enforce a full refresh to not have broken layout
+        self.refresh()
+
+    def update_schema(self) -> None:
+        schema = json.dumps(Settings.model_json_schema())
+        fp = isd_config_dir() / "schema.json"
+        if fp.exists() and fp.read_text() == schema:
+            # self.notify("Schema is already up-to-date.")
+            return
+        try:
+            fp.parent.mkdir(parents=True, exist_ok=True)
+            fp.write_text(schema)
+        except Exception as e:
+            self.notify(f"Error while creating/updating {fp}: {e}", severity="error")
+
+    # FUTURE: Also add the pager as property here
+    @property
+    def editor(self) -> str:
+        return (
+            get_systemd_editor()
+            if self.settings.editor == "auto"
+            else self.settings.editor
+        )
+
+    def action_open_config(self) -> None:
+        fp = get_config_file_path()
+        if not fp.exists():
+            prev = ""
+            try:
+                # in theory `get_config_file_path` should already try to create
+                # the parent directories. But doing it again here to potentially
+                # propagate the exception to the app.
+                fp.parent.mkdir(parents=True, exist_ok=True)
+                self.update_schema()
+                fp.write_text(get_default_settings_yaml())
+            except Exception as e:
+                self.notify(f"Error while creating default config.yaml: {e}")
+        else:
+            prev = fp.read_text()
+        with self.app.suspend():
+            subprocess.call([self.editor, fp.absolute()])
+        if prev != fp.read_text():
+            self.notify(
+                dedent("""\
+                    Changes to configuration detected!
+                    Please restart application for them to take effect."""),
+                severity="warning",
+            )
+        self.refresh()
+
+    def get_default_system_commands_subset(
+        self, screen: Screen
+    ) -> Iterable[SystemCommand]:
+        """
+        Only show a subset of the default system commands
+        https://github.com/Textualize/textual/blob/d34f4a4bcf683144bc3b45ded331f297012c8d40/src/textual/app.py#L1096
+        """
+        # Always allow changing the theme:
+        # if not self.ansi_color:
+        yield SystemCommand(
+            "Change theme",
+            "Change the current theme",
+            self.action_change_theme,
+        )
+        yield SystemCommand(
+            "Quit application",
+            "Quit the application as soon as possible (Shortcut: ctrl+q,ctrl+c)",
+            self.action_stop,
+        )
+        yield SystemCommand(
+            "Show version", "Show the isd version", self.action_show_version
+        )
+
+        if screen.query("HelpPanel"):
+            yield SystemCommand(
+                "Hide keys and help panel",
+                "Hide the keys and widget help panel",
+                self.action_hide_help_panel,
+            )
+        else:
+            yield SystemCommand(
+                "Show keys and help panel",
+                "Show help for the focused widget and a summary of available keys",
+                self.action_show_help_panel,
+            )
+
+    def action_stop(self) -> None:
+        """
+        Calls the `stop` function of the `MainScreen` and exists.
+        """
+        self.get_screen("main", MainScreen).store_state()
+        self.exit()
+
+    def action_show_version(self) -> None:
+        self.notify(f"isd version: {__version__}", timeout=30)
+
+    # AUTO_FOCUS = None
+
+    async def exec_systemctl_command(self, cmd: str) -> None:
+        screen = self.get_screen("main", MainScreen)
+        await screen.action_systemctl_command(cmd)
+
+    def on_mount(self) -> None:
+        # always make sure to use the latest schema
+        self.update_schema()
+        self.install_screen(MainScreen(self.settings), "main")
+        self.push_screen("main")
+
+    @work
+    async def action_toggle_systemctl_modal(self) -> None:
+        prev_focus = self.focused
+        self.set_focus(None)
+        cmd = await self.push_screen_wait(
+            SystemctlActionScreen(
+                self.settings.generic_keybindings.toggle_systemctl_modal,
+                self.settings.navigation_keybindings,
+                self.settings.systemctl_commands,
+            )
+        )
+        self.set_focus(prev_focus)
+        if cmd is not None:
+            await self.exec_systemctl_command(cmd)
 
 
 def render_field(key, field, level: int = 0) -> str:
@@ -2084,7 +2305,11 @@ def render_field(key, field, level: int = 0) -> str:
         text += f"{key}: null"
     elif isinstance(
         default_value,
-        (GenericKeyBindings, SelectionKeyBindings, PreviewKeyBindings),
+        (
+            GenericKeyBindings,
+            MainKeyBindings,
+            NavigationKeyBindings,
+        ),
     ):
         text += f"{key}:\n"
         for key, value in default_value.model_fields.items():
@@ -2099,8 +2324,18 @@ def render_field(key, field, level: int = 0) -> str:
                 # get the indentation right
                 indentation = "  " * (level + 1)
                 if isinstance(el, SystemctlCommand):
-                    text += indentation + "- " + f'keybinding: "{el.keybinding}"' + "\n"
-                    text += indentation + "  " + f'command: "{el.command}"' + "\n"
+                    text += indentation + "- " + f'command: "{el.command}"' + "\n"
+                    text += (
+                        indentation
+                        + "  "
+                        + f'modal_keybinding: "{el.modal_keybinding}"'
+                        + "\n"
+                    )
+                    text += (
+                        indentation + "  " + "direct_keybinding: " + "null"
+                        if el.direct_keybinding is None
+                        else f'"{el.direct_keybinding}"' + "\n"
+                    )
                     text += (
                         indentation + "  " + f'description: "{el.description}"' + "\n"
                     )
