@@ -7,7 +7,7 @@ During start-up `isd` will read a configuration file and load those settings.
 
 By default, the configuration is read from `~/.config/isd/config.yaml`[^1].
 Though you can also simply open the file from _within_ `isd` by running the
-`Open Config` command (++alt+o++ by default).
+`Open Config` command ({{ render_shortcut(default_settings.generic_keybindings.open_config) }} by default).
 However, you will _have_ to restart `isd` for the changes to take effect!
 
 [^1]: More precisely from `$XDG_CONFIG_DIR/isd` but for most users, it will
@@ -27,9 +27,7 @@ The following collapsed document shows the _entire_ default configuration:
 ??? "Default `config.yaml`"
 
     ```yaml
-
-    --8<-- "docs/config/isd/config.yaml"
-
+    {{ default_config_data | replace('\n', '\n\t') }}
     ```
 
 To not get too bored by the wall 🧱 of text, let's have a look
@@ -52,15 +50,15 @@ Just jump to the sections that sound interesting:
 - [Journal Pager](#journal-pager)
 - [Journal Pager Arguments](#journal-pager-arguments)
 - [Theme](#theme)
-- [Generic Keybindings](#generic-keybindings)
-- [Selection Keybindings](#selection-keybindings)
-- [Preview Keybindings](#preview-keybindings)
-- [`systemctl` Commands](#systemctl-commands)
+- [Keybindings](#keybindings)
+    - [Generic Keybindings](#generic-keybindings)
+    - [Main Keybindings](#main-keybindings)
+    - [Navigation Keybindings](#navigation-keybindings)
+    - [`systemctl` Keybindings](#systemctl-keybindings)
 - [Pager Arguments](#pager-arguments)
 - [Journal Pager Arguments](#journal-pager-arguments)
 - [Maximum Preview Lines](#maximum-preview-lines)
 <!--toc:end-->
-
 
 
 ### Editing The Configuration With Editor Support
@@ -173,46 +171,67 @@ But to persist the changes you _must_ update the configuration file.
 <!-- [ansi escape codes](https://github.com/tinted-theming/home) -->
 <!-- you --> 
 
-### Generic Keybindings
+### Keybindings
+
+> With great flexibility comes great responsibility.
+
+This section shows the different keybinding configuration options.
+For all entries, multiple keys can be defined by separating them with a comma `,`.
+
+!!! warning
+
+    Please note that depending on the terminal, terminal multiplexer, and
+    operating system, supported keys will vary and may require trial and error.
+
+    See <https://posting.sh/guide/keymap/#key-format> for more details.
+
+`isd` is opinionated regarding _overlapping_ keybindings and will
+usually fail if keybindings are not globally unique.
+The motivation is simply to ensure that `isd` does not accidentally
+stop an important unit, just because the keybinding was overloaded and
+the focus was accidentally on a different widget.
+
+#### Generic Keybindings
 
 {{ config_block(11) }}
 
-Generic keybindings are enabled _globally_ and are not limited to a specific widget.
-For example, `"ctrl+backspace"` will clear the search input and focus the search input
-widget, even if the selection or preview window is currently focused.
+See [Keybindings](#keybindings) for more general information.
 
-If a focused widget already defines the same keybinding, the generic keybinding
-will have a lower priority. For example, `right` would switch to the next preview window
-when the selection window is focused but it would move the cursor to the right if the
-preview log output is focused.
-
-For the key format, see: <https://posting.sh/guide/keymap/#key-format>
-
-### Selection Keybindings
+#### Main Keybindings
 
 {{ config_block(12) }}
 
-Keybindings specific to the selection widget.
+See [Keybindings](#keybindings) for more general information.
 
-### Preview Keybindings
+#### Navigation Keybindings
 
 {{ config_block(13) }}
 
-Keybindings specific for the preview _log_ window.
-Note that the preview tab header is _different_ to the preview _log_ window.
+See [Keybindings](#keybindings) for more general information.
 
-### `systemctl` Commands
+#### `systemctl` Keybindings
 
 {{ config_block(14) }}
 
 This allows you to configure the `systemctl` commands and keybindings.
 It is important to note that the `command` key may contain spaces (like `edit --runtime`)
-but _does not_ include the prefix `systemctl`, since this will always be inserted.
-The full command name (for example `systemctl start`) is used for the `description` which
-will be shown in the command palette.
+but _may not_ include the prefix `systemctl`, since this will always be inserted.
+The `description` is used to provide additional information about the command
+in the command palette.
+
+!!! warning
+
+    Make sure to avoid overlaps between the [Navigation Keybindings](#navigation-keybindings)
+    and these `modal_keybinding`s and `direct_keybinding`s!
+
+Generally, it is recommended to use `ASCII` keys for the `modal_keybinding`s
+and modifier keys, such as ++ctrl++ or ++alt++, for the `direct_keybinding`s.
+
+See [Keybindings](#keybindings) for more general information.
 
 For the security implications of setting these variables see
 the [shell injection section](security.md/#shell-injection).
+
 
 ### Pager Arguments
 

@@ -1,5 +1,9 @@
 # isd – *i*nteractive *s*ystem*d*
 
+<center>
+    <img src="./assets/isd.png" alt="isd logo" style="max-width: 50vh;">
+</center>
+
 <!-- --8<-- [start:tagline] -->
 > `isd` – a better way to work with `systemd` units
 
@@ -66,6 +70,7 @@ Big thanks to the developers of:
 - [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for building a solid and simple to use static site generator for the documentation
 - [asciinema](https://docs.asciinema.org/) for developing an easy to use _and self-hostable_ terminal recorder and player
 - [vhs](https://github.com/charmbracelet/vhs) for creating a scriptable terminal program
+- [posting](https://github.com/darrenburns/posting) for showing me how to use `textual`
 <!-- --8<-- [end:acknowledgments] -->
 
 

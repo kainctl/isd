@@ -24,7 +24,7 @@ import os
 import shutil
 import subprocess
 import tempfile
-from collections import deque, Counter
+from collections import deque
 from copy import deepcopy
 from enum import Enum, StrEnum, auto
 from functools import partial
@@ -118,13 +118,6 @@ AUTHENTICATION_MODE = "sudo"
 
 _CACHE_DIR = xdg_cache_home() / __package__ / __version__
 _CONFIG_DIR = xdg_config_home() / __package__
-KEYBINDING_HELP_TEXT = dedent("""\
-    Note about keybindings:
-    Multiple keys can be defined by separating them with a comma `,`.
-    Please note that depending on the terminal, terminal multiplexer, and
-    operating system supported keys will vary and may require trial and error.
-    See: <https://posting.sh/guide/keymap/#key-format>
-   """)
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
 
@@ -135,6 +128,13 @@ RESERVED_KEYBINDINGS: Dict[str, str] = {
     "ctrl+p": "Open Command Palette",
     "escape": "Close modal",
 }
+
+
+def smart_dedent(inp: Optional[str]) -> str:
+    if inp is None:
+        return ""
+    else:
+        return dedent(inp).strip()
 
 
 def ensure_reserved(inp_keys: str) -> str:
@@ -206,7 +206,7 @@ class CustomOptionList(OptionList, inherit_bindings=False):
     # This should avoid clashing configurations for up/down
     # and modal shortcuts -> Avoiding unexpected behavior.
     # Although the direct triggers should _still_ be supported!
-    def __init__(self, navigation_keybindings: NavigationKeyBindings, *args, **kwargs):
+    def __init__(self, navigation_keybindings: NavigationKeybindings, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for keys, action, description in [
             (navigation_keybindings.down, "cursor_down", "Down"),
@@ -243,7 +243,7 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
     def __init__(
         self,
         close_modal_key: str,
-        navigation_keybindings: NavigationKeyBindings,
+        navigation_keybindings: NavigationKeybindings,
         systemctl_commands: List[SystemctlCommand],
         **kwargs,
     ):
@@ -353,11 +353,62 @@ class SystemctlCommand(BaseModel):
     command: str = Field(description="systemctl subcommand (may include arguments)")
     description: str = Field(description="Additional command information.")
 
+    @model_validator(mode="after")
+    def check_overlaps_with_reserved(self) -> Self:
+        for attr in ["modal_keybinding", "direct_keybinding"]:
+            complex_key = getattr(self, attr)
+            if complex_key is None:
+                continue
+            for unformatted_key in complex_key.split(","):
+                key = unformatted_key.lower().strip()
+                if key in RESERVED_KEYBINDINGS.keys():
+                    raise ValueError(
+                        f"The reserved keybinding: `{key}` for `{RESERVED_KEYBINDINGS[key]}` was used in {self.__class__}.{attr} for `{self.command}`"
+                    )
+        return self
 
-class GenericKeyBindings(BaseModel):
+
+class KeybindingModel(BaseModel):
+    @model_validator(mode="after")
+    def check_overlaps(self) -> Self:
+        # normalized_key_map would raise an error
+        # if there would be a conflict
+        key_map = self.normalized_key_map()
+        # check if any of these keys are from the reserved keybindings
+        conflicting_keys = key_map.keys() & RESERVED_KEYBINDINGS.keys()
+        if len(conflicting_keys) != 0:
+            error_message = "\n".join(
+                f"The reserved keybinding: `{key}` for `{RESERVED_KEYBINDINGS[key]}` was used in {self.__class__}.{key_map[key]}"
+                for key in conflicting_keys
+            )
+            raise ValueError(error_message)
+
+        return self
+
+    def normalized_key_map(self) -> Dict[str, str]:
+        """
+        Returns a normalized keymap.
+        Raises a ValueError if there conflicts
+        """
+        d: Dict[str, str] = {}
+        for attr, keys in self.dict().items():
+            for unformatted_key in keys.split(","):
+                key = unformatted_key.strip().lower()
+                if key in d:
+                    raise ValueError(
+                        f"{self.__class__} has conflicting definitions for the key `{key}`"
+                        + f" between the attributes `{d[key]}` and `{attr}`."
+                    )
+                else:
+                    d[key] = attr
+
+        return d
+
+
+class GenericKeybinding(KeybindingModel):
     """
-    Global keybindings; mainly for opening settings and
-    toggling screens/modals.
+    Uncategorized generic keybindings for
+    toggling screens/modals and opening settings.
     """
 
     toggle_systemctl_modal: str = Field(
@@ -369,17 +420,11 @@ class GenericKeyBindings(BaseModel):
         description="Open config in editor",
     )
 
-    def keymap(self) -> Dict[str, str]:
-        return {
-            key.strip().lower(): attr
-            for attr, keys in self.dict().items()
-            for key in keys.split(",")
-        }
 
-
-class MainKeyBindings(BaseModel):
+class MainKeybindings(KeybindingModel):
     """
-    Defines the keybindings for the main window.
+    Configurable keybindings for common actions on the main screen.
+    These keybindings must be unique across the entire application.
     """
 
     next_preview_tab: str = Field(
@@ -391,12 +436,12 @@ class MainKeyBindings(BaseModel):
         description="Previous preview tab",
     )
     clear_input: str = Field(
-        default="backspace,ctrl+backspace", description="Clear search input."
+        default="backspace,ctrl+backspace", description="Clear search input"
     )
-    jump_to_input: str = Field(default="slash", description="Jump to the search input.")
+    jump_to_input: str = Field(default="slash", description="Jump to search input")
     copy_unit_path: str = Field(
         default="ctrl+x",
-        description="Copy highlighted unit path to the clipboard",
+        description="Copy highlighted unit path to clipboard",
     )
     open_preview_in_pager: str = Field(
         default="enter",
@@ -408,36 +453,27 @@ class MainKeyBindings(BaseModel):
     )
     toggle_mode: str = Field(default="ctrl+t", description="Toggle mode")
 
-    def keymap(self) -> Dict[str, str]:
-        return {
-            key.strip().lower(): attr
-            for attr, keys in self.dict().items()
-            for key in keys.split(",")
-        }
 
+class NavigationKeybindings(KeybindingModel):
+    """
+    Keybindings specific to navigation.
+    These will be applied to _all_ widgets that
+    have any navigational component.
+    To avoid confusion, these must be unique across the entire application;
+    even if a given widget does not have horizontal navigation.
+    """
 
-# These will be used in _all_ scrollable widgets
-# They may overlap with GenericKeyBindings but these will have a higher
-# priority.
-class NavigationKeyBindings(BaseModel):
     down: str = Field(default="down,j", description="Down")
     up: str = Field(default="up,k", description="Up")
     page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
     page_up: str = Field(default="ctrl+up,pageup", description="Page up")
-    top: str = Field(default="home", description="Goto Top")
+    top: str = Field(default="home", description="Goto top")
     bottom: str = Field(default="end", description="Goto bottom")
     # These are probably only needed for the preview output!
     left: str = Field(default="left,h", description="Left")
     right: str = Field(default="right,l", description="Right")
     page_left: str = Field(default="ctrl+left", description="Page left")
     page_right: str = Field(default="ctrl+right", description="Page right")
-
-    def keymap(self) -> Dict[str, str]:
-        return {
-            key.strip().lower(): attr
-            for attr, keys in self.dict().items()
-            for key in keys.split(",")
-        }
 
 
 DEFAULT_COMMANDS = [
@@ -638,52 +674,37 @@ class Settings(BaseSettings):
     )
 
     # FUTURE: Allow option to select if multi-select is allowed or not.
-    generic_keybindings: GenericKeyBindings = Field(
-        default=GenericKeyBindings(),
-        # HERE: Do I have to write the description or is it taken from class?
-        # Make sure to dynamically generate the config in the docs from now on!
-        description=dedent("""\
-            Global keybindings; mainly for opening settings and
-            toggling screens/modals.
-            """),
+    generic_keybindings: GenericKeybinding = Field(
+        default=GenericKeybinding(),
+        description=smart_dedent(GenericKeybinding.__doc__),
     )
 
-    main_keybindings: MainKeyBindings = Field(
-        default=MainKeyBindings(),
-        description=dedent(
-            """\
-            Configurable keybindings for common actions on the main screen.
-            The actions (YAML keys) are predefined and the configured keybindings
-            are given as values.
-            
-        """
-            + KEYBINDING_HELP_TEXT,
-        ),
+    main_keybindings: MainKeybindings = Field(
+        default=MainKeybindings(),
+        description=smart_dedent(MainKeybindings.__doc__),
     )
 
-    navigation_keybindings: NavigationKeyBindings = Field(
-        default=NavigationKeyBindings(),
-        description="TODO",  # HERE
+    navigation_keybindings: NavigationKeybindings = Field(
+        default=NavigationKeybindings(),
+        description=smart_dedent(NavigationKeybindings.__doc__),
     )
 
     systemctl_commands: list[SystemctlCommand] = Field(
         default=DEFAULT_COMMANDS,
-        description=dedent(
-            """\
-            List of configurable systemctl subcommands.
+        description=smart_dedent(
+            """
+            List of configurable systemctl subcommand keybindings.
             The exact subcommand (including arguments) can be defined by setting `command`.
             The `modal_keybinding`s provide the shortcut key(s)
             for the modal action window.
             Optionally, `direct_keybinding`s can be configured to
-            immediately trigger systemctl action from the main screen
+            immediately trigger the systemctl action from the main screen
             without having to open the modal first.
 
             The description is used to describe the subcommand
             in the `CommandPalette`
-            
             """
-        )
-        + KEYBINDING_HELP_TEXT,
+        ),
     )
 
     default_pager_args: Annotated[
@@ -745,55 +766,61 @@ class Settings(BaseSettings):
         with reserved keybindings or with each other.
         """
 
-        def get_keys(inp_keys: str) -> list[str]:
-            return [key.strip().lower() for key in inp_keys.split(",")]
+        direct_keys = {
+            unformatted_key.lower().strip()
+            for sys_cmd in self.systemctl_commands
+            if sys_cmd.direct_keybinding is not None
+            for unformatted_key in sys_cmd.direct_keybinding.split(",")
+        }
+        modal_keys = {
+            unformatted_key.lower().strip()
+            for sys_cmd in self.systemctl_commands
+            if sys_cmd.modal_keybinding is not None
+            for unformatted_key in sys_cmd.modal_keybinding.split(",")
+        }
+        generic_keys = self.generic_keybindings.normalized_key_map().keys()
+        main_keys = self.main_keybindings.normalized_key_map().keys()
+        navigation_keys = self.navigation_keybindings.normalized_key_map().keys()
 
-        key_maps: list[Dict[str, str]] = []
+        named_keybindings = {
+            "navigation_keybindings": navigation_keys,
+            "systemctl.direct_keybinding": direct_keys,
+            "generic_keybindings": generic_keys,
+            "systemctl.modal_keybinding": modal_keys,
+            "main_keybindings": main_keys,
+        }
 
-        # have the methods keymap !
-        for simple_keybinding_model in [
-            "generic_keybindings",
-            "main_keybindings",
+        # what combinations are not allowed?
+        # navigation with ANY
+        # direct_keybinding with ANY
+        # global with ANY
+        # atm only modal_keybinding and main_keybindings may overlap
+        # Remember: The reason why modal_keybindings should be unique
+        # is to ensure that nobody _accidentally_ triggers something
+        # out of habit, even if the modal "catches" all keybindings.
+        for strict_keybinding_name in [
             "navigation_keybindings",
+            "systemctl.direct_keybinding",
+            "generic_keybindings",
         ]:
-            key_map = getattr(self, simple_keybinding_model).keymap()
-            key_maps.append(key_map)
-            conflicting_keys = key_map.keys() & RESERVED_KEYBINDINGS.keys()
-            if len(conflicting_keys) != 0:
-                error_message = "\n".join(
-                    f"The reserved keybinding: {key} for '{RESERVED_KEYBINDINGS[key]}' was used in {simple_keybinding_model}.{key_map[key]}"
-                    for key in conflicting_keys
-                )
-                raise ValueError(error_message)
-
-        for sys_cmd in self.systemctl_commands:
-            for key_attr in ["direct_keybinding", "modal_keybinding"]:
-                complex_key = getattr(sys_cmd, key_attr)
-                if complex_key is None:  # may be unset
+            for name, keybindings in named_keybindings.items():
+                if strict_keybinding_name == name:
                     continue
-                keys = get_keys(complex_key)
-                for key in keys:
-                    key_maps.append({key: f"systemctl_commands.{sys_cmd.command}"})
-                    if key in RESERVED_KEYBINDINGS:
-                        raise ValueError(
-                            f"The systemctl command {sys_cmd.command}.{key_attr} {key} conflicts with the reserved option: {RESERVED_KEYBINDINGS[key]}"
-                        )
-
-        # conflict resolution is _hard_
-        # especially if I want to keep the terminal support as big as possible
-        key_counts = Counter(k for key_map in key_maps for k in key_map.keys())
-        overlapping_keys = [key for key, count in key_counts.items() if count > 1]
-        if len(overlapping_keys) != 0:
-            error_message = ""
-            for overlapping_key in overlapping_keys:
-                error_message += f"Conflicts for keybinding: {overlapping_key}"
-                for key_map in key_maps:
-                    if overlapping_key in key_map.keys():
-                        error_message += f"\n\t- {key_map[overlapping_key]}"
-                error_message += "\n"
-            raise ValueError(error_message)
+                overlapping_keys = (
+                    keybindings & named_keybindings[strict_keybinding_name]
+                )
+                if len(overlapping_keys) != 0:
+                    error_message = "\n".join(
+                        f"The key `{key}` overlaps between `{name}` and `{strict_keybinding_name}`"
+                        for key in overlapping_keys
+                    )
+                    raise ValueError(error_message)
 
         return self
+
+
+def get_default_settings() -> Settings:
+    return Settings.construct()
 
 
 def get_default_settings_yaml() -> str:
@@ -811,7 +838,7 @@ def get_default_settings_yaml() -> str:
         # simply delete this file. It will be re-created when `isd` starts.
 
     """)
-    text = render_model_as_yaml(Settings())
+    text = render_model_as_yaml(get_default_settings())
     return header + text
 
 
@@ -890,7 +917,7 @@ class CustomInput(Input):
 class CustomSelectionList(SelectionList, inherit_bindings=False):
     def __init__(
         self,
-        navigation_keybindings: NavigationKeyBindings,
+        navigation_keybindings: NavigationKeybindings,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -1242,7 +1269,7 @@ async def journalctl_async(
 
 
 class Preview(RichLog, inherit_bindings=False):
-    def __init__(self, navigation_keybindings: NavigationKeyBindings, **kwargs):
+    def __init__(self, navigation_keybindings: NavigationKeybindings, **kwargs):
         super().__init__(**kwargs)
         for keys, action, description in [
             (navigation_keybindings.down, "scroll_down", "Down"),
@@ -1280,7 +1307,7 @@ class PreviewArea(Container):
     def __init__(
         self,
         max_lines: int,
-        navigation_keybindings: NavigationKeyBindings,
+        navigation_keybindings: NavigationKeybindings,
         *args,
         journalctl_args: list[str],
         **kwargs,
@@ -1497,7 +1524,7 @@ class MainScreen(Screen):
             "open_preview_in_editor",
             "toggle_mode",
         ]
-        model_fields = MainKeyBindings.model_fields
+        model_fields = MainKeybindings.model_fields
         assert all(
             [show_field in model_fields for show_field in show_fields]
         ), "Forgot to update show_field"
@@ -2110,7 +2137,7 @@ class MainScreen(Screen):
         yield Footer()
 
 
-class InteractiveSystemd(App):
+class InteractiveSystemd(App, inherit_bindings=False):
     """
     The textual `App` that loads the settings and controls the screens.
 
@@ -2121,6 +2148,18 @@ class InteractiveSystemd(App):
     CSS_PATH = "dom.tcss"
     COMMAND_PALETTE_BINDING = ensure_reserved("ctrl+p")
     NOTIFICATION_TIMEOUT = 5
+    # If the modal is dismissed, this App would be focused by default
+    # for a split second.
+    # Causing the footer to flash the `App`s footer before updating
+    # itself to the focused widget.
+    # Disabling auto-focus solves this issue.
+    AUTO_FOCUS = None
+
+    # posting defines the `Binding`s manually here via `BINDINGS`
+    # and then runs self.set_keymap(self.settings.keymap) to
+    # update the Bindings via an explicit `id`!
+    # -> This is done globally and doesn't really work for me.
+    # I will continue to use my "illegal" methods.
     BINDINGS = [
         Binding(
             ensure_reserved("ctrl+q,ctrl+c"),
@@ -2139,7 +2178,7 @@ class InteractiveSystemd(App):
         self.settings = Settings()
         # only show the following bindings in the footer
         show_bindings = ["toggle_systemctl_modal"]
-        for action, field in GenericKeyBindings.model_fields.items():
+        for action, field in GenericKeybinding.model_fields.items():
             keys = getattr(self.settings.generic_keybindings, action)
             self.bind(
                 keys,
@@ -2154,7 +2193,7 @@ class InteractiveSystemd(App):
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
         yield from self.get_default_system_commands_subset(screen)
 
-        for action, field in GenericKeyBindings.model_fields.items():
+        for action, field in GenericKeybinding.model_fields.items():
             keys = getattr(self.settings.generic_keybindings, action)
             description = getattr(field, "description")
             yield SystemCommand(
@@ -2228,8 +2267,8 @@ class InteractiveSystemd(App):
         # Always allow changing the theme:
         # if not self.ansi_color:
         yield SystemCommand(
-            "Change theme",
-            "Change the current theme",
+            "Preview theme",
+            "Preview the current theme",
             self.action_change_theme,
         )
         yield SystemCommand(
@@ -2266,10 +2305,6 @@ class InteractiveSystemd(App):
 
     # AUTO_FOCUS = None
 
-    async def exec_systemctl_command(self, cmd: str) -> None:
-        screen = self.get_screen("main", MainScreen)
-        await screen.action_systemctl_command(cmd)
-
     def on_mount(self) -> None:
         # always make sure to use the latest schema
         self.update_schema()
@@ -2289,7 +2324,8 @@ class InteractiveSystemd(App):
         )
         self.set_focus(prev_focus)
         if cmd is not None:
-            await self.exec_systemctl_command(cmd)
+            screen = self.get_screen("main", MainScreen)
+            await screen.action_systemctl_command(cmd)
 
 
 def render_field(key, field, level: int = 0) -> str:
@@ -2306,9 +2342,9 @@ def render_field(key, field, level: int = 0) -> str:
     elif isinstance(
         default_value,
         (
-            GenericKeyBindings,
-            MainKeyBindings,
-            NavigationKeyBindings,
+            GenericKeybinding,
+            MainKeybindings,
+            NavigationKeybindings,
         ),
     ):
         text += f"{key}:\n"
@@ -2332,9 +2368,15 @@ def render_field(key, field, level: int = 0) -> str:
                         + "\n"
                     )
                     text += (
-                        indentation + "  " + "direct_keybinding: " + "null"
-                        if el.direct_keybinding is None
-                        else f'"{el.direct_keybinding}"' + "\n"
+                        indentation
+                        + "  "
+                        + "direct_keybinding: "
+                        + (
+                            "null"
+                            if el.direct_keybinding is None
+                            else f'"{el.direct_keybinding}"'
+                        )
+                        + "\n"
                     )
                     text += (
                         indentation + "  " + f'description: "{el.description}"' + "\n"

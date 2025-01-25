@@ -26,6 +26,7 @@ nav:
   - FAQ: "faq.md"
   - Roadmap: "roadmap.md"
   - Security: "security.md"
+  - Media: "media.md"
 plugins: 
   # No need for search support:
   # - search
