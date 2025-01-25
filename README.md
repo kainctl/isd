@@ -1,7 +1,7 @@
-# isd — *i*nteractive *s*ystem*d*
+# isd – *i*nteractive *s*ystem*d*
 
 <!-- --8<-- [start:tagline] -->
-> `isd` — a better way to work with `systemd` units
+> `isd` – a better way to work with `systemd` units
 
 Simplify `systemd` management with `isd`!
 `isd` is a TUI offering fuzzy search for units, auto-refreshing previews,
