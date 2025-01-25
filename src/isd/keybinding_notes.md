@@ -19,7 +19,6 @@ From <https://github.com/Textualize/textual/blob/dc7156449d69cf45cf6a226717c4fe2
 - Control-N (14) (history forward)
 - Control-O (15)
 - Control-P (16) (history back)
-- Control-Q
 - Control-R (18) (reverse search)
 - Control-S (19) (forward search)
 - Control-[ = ESC
