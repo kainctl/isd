@@ -2,6 +2,11 @@ import uuid
 from pathlib import Path
 import re
 from textwrap import dedent
+from isd.isd import (
+    get_default_settings_yaml,
+    get_default_settings,
+    RESERVED_KEYBINDINGS,
+)
 
 
 def value_str(value) -> str:
@@ -33,26 +38,24 @@ def format_timestamps(timestamps: list[str]) -> list[str]:
 
 
 def define_env(env):
-    # Define feature icons
-    # env.variables["f_full"] = ':white_check_mark:{ title="Full support" }'
-    # env.variables["f_partial"] = ':warning:{ title="Partial support" }'
-    # env.variables["f_none"] = ':x:{ title="No support" }'
-    #
-    # env.variables["marker_0"] = "npt:7.724359"
     env.variables["timestamps"] = extract_timestamps(
         Path(env.project_dir) / "docs/assets/images/isd.cast"
     )
     env.variables["poster_markers"] = format_timestamps(env.variables["timestamps"])
-    env.variables["config_file"] = dedent("""
-        ```yaml
-        --8<-- "docs/config/isd/config.yaml"
-        ```""")
+    env.variables["default_settings"] = get_default_settings()
+    env.variables["default_config_data"] = get_default_settings_yaml()
+    env.variables["reserved_keys_list"] = "\n".join(
+        f"- ++{k}++" for k in RESERVED_KEYBINDINGS.keys()
+    )
 
     @env.macro
     def config_block(number: int) -> str:
-        p = Path(env.project_dir) / "docs/config/isd/config.yaml"
-        block = p.read_text().split("\n\n")[number]
+        block = env.variables.default_config_data.split("\n\n")[number]
         return "```yaml\n" + block + "\n```"
+
+    @env.macro
+    def render_shortcut(keys: str) -> str:
+        return " or ".join(f"++{key}++" for key in keys.split(","))
 
     @env.macro
     def asciinema(file, **kwargs):
@@ -73,10 +76,13 @@ def define_env(env):
                 ]
             else:
                 opts[key] = value
+            if key == "only_pic":
+                opts["controls"] = not value
 
         # Create an empty div that we will use for the player
         div_id = "asciinema-" + str(uuid.uuid4())
-        div_style = "z-index: 1; position: relative;"
+        z_index = -1 if opts.get("only_key") else 1
+        div_style = f"z-index: {z_index}; position: relative;"
         html += '<div id="' + div_id + '" style="' + div_style + '"></div>'
 
         # if "poster_mark" in kwargs:

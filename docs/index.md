@@ -2,6 +2,10 @@
 
 --8<-- "README.md:tagline"
 
+<center>
+    <img src="./assets/images/isd.png" alt="isd logo" style="max-width: 50vh;">
+</center>
+
 ## Short Motivation
 
 !!! note
@@ -135,16 +139,19 @@ can be used to:
     'Overview',
     'Fuzzy Search',
     'Select Multiple Units',
-    'Command Palette',
+    'Systemctl Action',
     'Auto-Refreshing Preview Windows',
-    'Default Pager',
-    'Journal Preview',
+    'Command Palette',
+    'Fuzzy Matching Commands',
+    'Open Pager',
+    'Preview Journal',
     'Custom Journal Pager',
     'Different theme',
     'Cat Preview',
     'Dependencies Preview',
     'Show Preview',
     'Help Preview',
+    'Quit',
 ], pauseOnMarkers=False) }}
 
 ### User/System `mode`
@@ -181,20 +188,19 @@ will show a preview of the selected units for a given output (`Status` by defaul
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[2], startAt=timestamps[2]) }}
 
-### Command Palette
+### `systemctl action`
 
 The toolbar at the bottom shows the most important keybindings for the currently focused
 widget, where the `^` symbol means ++ctrl++.
-To open the command palette, press ++ctrl+p++.
+To open the `systemctl action` modal, press ++ctrl+o++.
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[3], startAt=timestamps[3]) }}
 
-The command palette will show all available commands and their respective
-keybindings if available.
-
-### Commands
-
-For example, press ++ctrl+o++ to stop the selected units.
+This modal will show a list of possible actions that can be applied to the
+currently selected/highlighted units. To select the desired action
+navigate the list with the same keys as for the _search result_ widget and
+then press ++enter++ to select the unit. Or type any of the colored _shortcut_ keys
+to directly execute the action.
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[4], startAt=timestamps[4]) }}
 
@@ -203,28 +209,60 @@ executed command and if necessary, error messages.
 The selection and preview widget will automatically update to show
 the new state of the selected units.
 
-### Pager support
+### Command Palette
 
-To view the entire preview output, a `pager` can be opened _while_
-running `isd`/_without_ closing the application.
-The `pager` can be opened via the `command palette` or simply
-by pressing ++enter++ while focusing the _search result_ widget.
+To open the command palette, press ++ctrl+p++.
+The command palette will show all currently available commands and their
+respective keybindings if available.
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[5], startAt=timestamps[5]) }}
 
-To switch to a different _tab_ of the _preview widget_ the
-arrow keys (++left++, ++right++) or the vim keys (++h++, ++l++)
-can be pressed. The next image shows the preview for the
-`Journal` output of the selected units:
+!!! note
+
+    The command palette also includes the same actions as the `systemctl actions`
+    modal. However, the `systemctl actions` modal provides a _cleaner_ interface
+    and is generally recommended over running these actions via the command palette.
+    Though, you can use whatever you prefer 👍
+
+The command palette also uses fuzzy searching to make it easier to find the command you are
+interested in.
+
+
+### Pager support
+
+To view the entire preview output, a `pager` can be opened _while_
+running `isd` and _without_ closing the application.
+The `pager` can be opened
+by pressing ++enter++ while focusing the _search result_ widget or
+via the `command palette`:
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[6], startAt=timestamps[6]) }}
 
-Similarly to the `Status` output, the output of the `Journal` preview
-window can be opened in a `pager`. To provide more flexibility, `isd`
-allows to configure a special `pager` for the `Journal` output.
-In this example, [`lnav`](https://lnav.org/) is used to view the `Journal` output.
+Then you can efficiently navigate the text with the [`pager` of your choice](./customization.md#default-pager).
+By deeply integrating with `pager`s `isd` avoids the need to re-invent the wheel
+for code navigation and gives you full control over how you would like to navigate
+the text. Here, for example, showing the output in `moar`.
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[7], startAt=timestamps[7]) }}
+
+### Journal Support
+
+To switch to a different _tab_ of the _preview widget_ the
+arrow keys (++left++, ++right++) or the vim keys (++h++, ++l++)
+can be pressed while focusing the tab header or globally by triggering the
+[`Next/Previous Preview Tab` actions](./customization.md#main-keybindings).
+
+The next image shows the preview for the
+`Journal` output of the selected units:
+
+{{ asciinema("./assets/images/isd.cast", poster=poster_markers[8], startAt=timestamps[8]) }}
+
+Similarly to the `Status` output, the output of the `Journal` preview
+window can be opened in a `pager`. To provide more flexibility, `isd`
+allows you [to configure a special `pager` for the `Journal` output](./customization.md#journal-pager).
+In this example, [`lnav`](https://lnav.org/) is used to view the `Journal` output.
+
+{{ asciinema("./assets/images/isd.cast", poster=poster_markers[9], startAt=timestamps[9]) }}
 
 ### Customizeability
 
@@ -233,7 +271,13 @@ _You_ decide which keybindings work best for you and maximize your productivity 
 It also comes with a couple of different _themes_. For example, the
 `dracula` theme:
 
-{{ asciinema("./assets/images/isd.cast", poster=poster_markers[8], startAt=timestamps[8]) }}
+{{ asciinema("./assets/images/isd.cast", poster=poster_markers[10], startAt=timestamps[10]) }}
+
+### Quitting
+
+To quit the application you can either press ++ctrl+q++ or stop it via the command palette:
+
+{{ asciinema("./assets/images/isd.cast", poster=poster_markers[15], startAt=timestamps[15]) }}
 
 ### Summary
 
@@ -245,11 +289,15 @@ It is a lot easier to get feeling for the tool when you try it on your own :)
 
     If you like `isd`, please give it a :star: on GitHub!
 
+    And if you _really_ like it and can afford it, consider
+    buying me a coffee via [ko-fi](https://ko-fi.com/isdproject).
+
 
 ## Next steps
 
 Checkout the other sections as well:
 
-- [Customization](customization.md)
+- [Customization](./customization.md)
+- [FAQ](./faq.md)
 - [Security](./security.md)
 

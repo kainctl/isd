@@ -1,6 +1,7 @@
 .helix/
 schema.json
 config.yaml
+drafts/
 result
 # config should be automatically generated when running vhs!
 docs/config/*

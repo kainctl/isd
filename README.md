@@ -1,7 +1,11 @@
-# isd — *i*nteractive *s*ystem*d*
+# isd – *i*nteractive *s*ystem*d*
+
+<center>
+    <img src="./assets/isd.png" alt="isd logo" style="max-width: 50vh;">
+</center>
 
 <!-- --8<-- [start:tagline] -->
-> `isd` — a better way to work with `systemd` units
+> `isd` – a better way to work with `systemd` units
 
 Simplify `systemd` management with `isd`!
 `isd` is a TUI offering fuzzy search for units, auto-refreshing previews,
@@ -27,7 +31,7 @@ for power-users and newcomers alike.
 
 ## Demo
 
-https://github.com/user-attachments/assets/4aad0902-6094-4fc2-90b9-b62456df22f5
+https://github.com/user-attachments/assets/1f82a5c6-d6ef-4293-aa2f-347113209882
 
 [Click here for a higher quality recording](https://isd-project.github.io/isd/#working-with-isd).
 
@@ -66,6 +70,7 @@ Big thanks to the developers of:
 - [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for building a solid and simple to use static site generator for the documentation
 - [asciinema](https://docs.asciinema.org/) for developing an easy to use _and self-hostable_ terminal recorder and player
 - [vhs](https://github.com/charmbracelet/vhs) for creating a scriptable terminal program
+- [posting](https://github.com/darrenburns/posting) for showing me how to use `textual`
 <!-- --8<-- [end:acknowledgments] -->
 
 

@@ -96,9 +96,9 @@ Sleep 2s Space Down Down
 # Multi-selection marker
 Sleep 1s Type "]" Sleep 1s
 
-# Command palette marker
-Sleep 1s Ctrl+p Sleep 1s Type "sys" Type "]" Sleep 1s
-Type " stop" Sleep 2s Enter
+# systemctl action marker
+Sleep 1s Ctrl+o Sleep 2s Type "]" Sleep 1s
+Down Sleep 2s Enter
 
 # Auto-refresh marker
 Sleep 0.5s Type "]"
@@ -107,21 +107,25 @@ Sleep 0.5s Type "]"
 # units have stopped and updated their preview
 Sleep 4s
 
-# open pager via command palette
-Sleep 1s Ctrl+p Sleep 1s Type "open pager" Sleep 0.5s
+# Command palette marker
+Ctrl+p Sleep 1s Type "]" Sleep 1s
+
+# Command palette search marker
+Type "open pager" Sleep 1s Type "]" Sleep 1s
 Enter Sleep 0.5s
 # set marker to opened pager
 Type "]"
 Sleep 2s
-Right Right Right Right Right
+Right Right Right
 Sleep 2s
 Type "q"
 
 Sleep 2s
 
 # show journal preview marker
-Type "l" Sleep 3s Type "]"
-Sleep 1s Ctrl+p Type "open p" Sleep 1.5s
+Tab Sleep 0.5s Right
+Sleep 3s Type "]"
+Sleep 1s Ctrl+p Type "open pag" Sleep 1.5s
 Enter
 
 # set marker to journal pager
@@ -137,28 +141,28 @@ Sleep 2s Type "q" Sleep 1s
 Ctrl+p Sleep 1s Type "theme" Sleep 0.5s Enter Sleep 0.5s
 Type "dracula" Sleep 1s Enter Sleep 0.5s Type "]" Sleep 2s
 
-Type "l" Sleep 1s
+Right Sleep 1s
 # marker for Cat 
 Type "]"
 Sleep 1s
 
 # marker for Dependencies 
-Type "l" Sleep 1s 
+Right Sleep 1s 
 Type "]"
 Sleep 1s
 
 # marker for Show
-Type "l" Sleep 2s
+Right Sleep 2s
 Type "]"
 Sleep 1s
 
 # marker for Help 
-Type "l" Sleep 2s
+Right Sleep 2s
 Type "]"
 Sleep 1s
-Type "l" Sleep 2s
 
 # show status again
-Type "l" Sleep 2s
-Hide
-Ctrl+d
+Right Sleep 2s
+
+# quit marker
+Ctrl+p Type "quit" Sleep 0.5s Type "]" Sleep 0.5s Enter

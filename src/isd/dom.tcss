@@ -3,6 +3,18 @@ OptionList > .option-list--option-highlighted {
   background: $primary;
 }
 
+/* center middle is an amazing feature! */
+SystemctlActionScreen {
+  align: center middle;
+}
+
+SystemctlActionScreen CustomOptionList {
+  padding: 1 2;
+  border: tall $primary;
+  width: auto;
+  min-width: 75vw;
+}
+
 PreviewArea {
   background: $surface;
   padding: 0 1;
@@ -59,7 +71,7 @@ Input {
   width: 100%;
 }
 
-OptionList {
+MainScreen OptionList {
   height: 1fr;
   width: 100%;
 }
