@@ -191,6 +191,13 @@ The motivation is simply to ensure that `isd` does not accidentally
 stop an important unit, just because the keybinding was overloaded and
 the focus was accidentally on a different widget.
 
+#### Reserved Keys
+
+Please note that the following keys are _reserved_ and cannot be used
+for keybindings:
+
+{{ reserved_keys_list }}
+
 #### Generic Keybindings
 
 {{ config_block(11) }}

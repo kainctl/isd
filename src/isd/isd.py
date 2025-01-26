@@ -239,6 +239,7 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
     """
 
     BINDINGS = [Binding("enter", "select", "Select", show=True)]
+    AUTO_FOCUS = "CustomOptionList"
 
     def __init__(
         self,
@@ -1487,7 +1488,29 @@ def cached_search_term() -> str:
     return ""
 
 
+# class SettingsError(ModalScreen):
+#     def __init__(
+#         self, settings: Settings, exception: Exception, *args, **kwargs
+#     ) -> None:
+#         self.settings = settings
+#         self.exception = exception
+#         super().__init__(*args, **kwargs)
+
+#     def compose(self):
+#         tb = Traceback.from_exception(Exception, self.exception)
+#         yield RichLog().write(tb)
+#         yield CustomOptionList(
+#             self.settings.navigation_keybindings,
+#             "option1",
+#             "option2",
+#             # continue with default settings
+#             # copy error message to clipboard
+#         )
+
+
 class MainScreen(Screen):
+    AUTO_FOCUS = "CustomInput"
+
     unit_to_state_dict: reactive[Dict[str, UnitReprState]] = reactive(dict())
     # Relevant = Union(ordered selected units & highlighted unit)
     relevant_units: Deque[str] = deque()
@@ -1724,8 +1747,8 @@ class MainScreen(Screen):
         # FUTURE: Provide different colored outputs depending on the exit code.
         # Potentially also include the error output.
         self.notify(f"Executed `systemctl {unsplit_command}`")
-        self.refresh()
         self.partial_refresh_unit_to_state_dict()
+        self.refresh()
 
     async def watch_mode(self, mode: str) -> None:
         self.query_one(PreviewArea).mode = self.mode
@@ -2175,7 +2198,12 @@ class InteractiveSystemd(App, inherit_bindings=False):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.settings = Settings()
+        try:
+            self.settings = Settings()
+            self.settings_error = None
+        except Exception as e:
+            self.settings = Settings.construct()
+            self.settings_error = e
         # only show the following bindings in the footer
         show_bindings = ["toggle_systemctl_modal"]
         for action, field in GenericKeybinding.model_fields.items():
@@ -2186,9 +2214,6 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 description=getattr(field, "description"),
                 show=action in show_bindings,
             )
-
-    # HERE:
-    # Consider adding better error messages for the JSON decoder
 
     def get_system_commands(self, screen: Screen) -> Iterable[SystemCommand]:
         yield from self.get_default_system_commands_subset(screen)
@@ -2309,6 +2334,22 @@ class InteractiveSystemd(App, inherit_bindings=False):
         # always make sure to use the latest schema
         self.update_schema()
         self.install_screen(MainScreen(self.settings), "main")
+        if self.settings_error is not None:
+            self.notify(
+                "Error encountered while loading settings; falling back to defaults.",
+                severity="error",
+                timeout=90,
+            )
+            n = tempfile.NamedTemporaryFile(
+                "w", prefix="isd_", suffix=".txt", delete=False
+            )
+            self.notify(
+                f"Error while loading settings:\nLog stored under: {n.name})\n\n{self.settings_error}",
+                severity="error",
+                timeout=90,
+            )
+            n.write(str(self.settings_error))
+            n.close()
         self.push_screen("main")
 
     @work

@@ -2,7 +2,11 @@ import uuid
 from pathlib import Path
 import re
 from textwrap import dedent
-from isd.isd import get_default_settings_yaml, get_default_settings
+from isd.isd import (
+    get_default_settings_yaml,
+    get_default_settings,
+    RESERVED_KEYBINDINGS,
+)
 
 
 def value_str(value) -> str:
@@ -40,6 +44,9 @@ def define_env(env):
     env.variables["poster_markers"] = format_timestamps(env.variables["timestamps"])
     env.variables["default_settings"] = get_default_settings()
     env.variables["default_config_data"] = get_default_settings_yaml()
+    env.variables["reserved_keys_list"] = "\n".join(
+        f"- ++{k}++" for k in RESERVED_KEYBINDINGS.keys()
+    )
 
     @env.macro
     def config_block(number: int) -> str:
@@ -69,10 +76,13 @@ def define_env(env):
                 ]
             else:
                 opts[key] = value
+            if key == "only_pic":
+                opts["controls"] = not value
 
         # Create an empty div that we will use for the player
         div_id = "asciinema-" + str(uuid.uuid4())
-        div_style = "z-index: 1; position: relative;"
+        z_index = -1 if opts.get("only_key") else 1
+        div_style = f"z-index: {z_index}; position: relative;"
         html += '<div id="' + div_id + '" style="' + div_style + '"></div>'
 
         # if "poster_mark" in kwargs:
