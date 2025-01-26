@@ -31,7 +31,7 @@ for power-users and newcomers alike.
 
 ## Demo
 
-https://github.com/user-attachments/assets/4aad0902-6094-4fc2-90b9-b62456df22f5
+https://github.com/user-attachments/assets/1f82a5c6-d6ef-4293-aa2f-347113209882
 
 [Click here for a higher quality recording](https://isd-project.github.io/isd/#working-with-isd).
 
