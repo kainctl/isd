@@ -37,37 +37,28 @@ If you are interested, read on and take a look at the [recorded terminal session
 
 `isd` can currently be installed in three different ways:
 
-- As an [AppImage], via
-- [nix], or via
-- [uv].
+- via [uv], or via
+- [nix], or 
+- as an [AppImage].
 
-=== "AppImage"
+=== "uv"
 
-    An [AppImage] is a single self-containing _executable_, similar to a Windows
-    `.exe` and MacOS `.dmg` file. This should make it easy to run `isd`
-    on _any_ Linux distribution and on remote servers where you do
-    not have elevated privileges.
+    [uv] is a Python package manager.
+    To install [uv] have a look at the [official uv installation documentation](https://docs.astral.sh/uv/).
 
-    _Manual installation_:
+    After installing [uv], you can _try_ `isd` by running:
+    `uvx --python=3.12 --from git+{{config['repo_url']}} isd`
 
-    First, download the `.AppImage` file from:
+    To install and manage `isd` via [uv], run:
+    `uv tool install --python=3.12 git+{{config['repo_url']}}`
 
-    - <{{config['repo_url']}}/releases/latest>
-    
-    Then make the file executable as
-    mentioned in the [AppImage documentation](https://docs.appimage.org/introduction/quickstart.html#ref-quickstart)
-    and run the application.
+    `isd` requires `--python` to be set `>=3.12` and would fail
+    if the default Python version is older.
+    For more details regarding the tool management, see the upstream
+    [uv] tool documentation:
 
-    _Managed installation_:
+    - <https://docs.astral.sh/uv/guides/tools/#installing-tools>
 
-    Or manage the `.AppImage` via [AppImageLauncher](https://assassinate-you.net/tags/appimagelauncher/)
-    for better desktop integration support (application icon & entry) and in-app
-    update functionality.
-
-    !!! warning
-
-        If you have `nix` installed, this `AppImage` will _not_ work!
-        Either use the `nix` or `uv` installation instructions!
 
 === "nix"
 
@@ -104,23 +95,39 @@ If you are interested, read on and take a look at the [recorded terminal session
         
     ```
 
-=== "uv"
+=== "AppImage"
 
-    [uv] is a Python package manager.
-    To install [uv] have a look at the [official uv installation documentation](https://docs.astral.sh/uv/).
+    An [AppImage] is a single self-containing _executable_, similar to a Windows
+    `.exe` and MacOS `.dmg` file. This should make it easy to run `isd`
+    on _any_ Linux distribution and on remote servers where you do
+    not have elevated privileges.
 
-    After installing [uv], you can _try_ `isd` by running:
-    `uvx --python=3.12 --from git+{{config['repo_url']}} isd`
+    _Manual installation_:
 
-    To install and manage `isd` via [uv], run:
-    `uv tool install --python=3.12 git+{{config['repo_url']}}`
+    First, download the `.AppImage` file from:
 
-    `isd` requires `--python` to be set `>=3.12` and would fail
-    if the default Python version is older.
-    For more details regarding the tool management, see the upstream
-    [uv] tool documentation:
+    - <{{config['repo_url']}}/releases/latest>
+    
+    Then make the file executable as
+    mentioned in the [AppImage documentation](https://docs.appimage.org/introduction/quickstart.html#ref-quickstart)
+    and run the application.
 
-    - <https://docs.astral.sh/uv/guides/tools/#installing-tools>
+    _Managed installation_:
+
+    Or manage the `.AppImage` via [AppImageLauncher](https://assassinate-you.net/tags/appimagelauncher/)
+    for better desktop integration support (application icon & entry) and in-app
+    update functionality.
+
+    !!! warning
+
+        If you are using Ubuntu 24.04, extra installation steps are required.
+        Please see the [open issue #10](https://github.com/isd-project/isd/issues/10).
+
+    !!! warning
+
+        If you have `nix` installed, this `AppImage` will _not_ work!
+        Either use the `nix` or `uv` installation instructions!
+
 
 ## Working with `isd`
 
