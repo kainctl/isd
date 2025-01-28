@@ -41,6 +41,11 @@ The documentation is live at:
 
 - <https://isd-project.github.io/isd>
 
+## Installation
+
+The tool can be installed via `uv`, `nix`, and as an `AppImage`.
+Refer to [official installation documentation](https://isd-project.github.io/isd/#installation) for more details.
+
 ## Road map
 
 <!-- --8<-- [start:roadmap] -->
