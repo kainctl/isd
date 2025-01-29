@@ -1,10 +1,24 @@
 [project]
 name = "isd"
-version = "0.3.0"
-description = "Interactive systemd TUI"
-readme = "README.md"
 requires-python = ">=3.12"
-license = "GPL-3.0"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+readme = "README.md"
+description = "Interactive systemd TUI"
+keywords = ["systemd", "tui", "service-manager"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Terminals",
+    "Topic :: Utilities",
+]
+
 dependencies = [
     "xdg-base-dirs>=6.0.0",
     "pfzy>=0.3.4",
@@ -13,6 +27,16 @@ dependencies = [
     "pydantic>=2.10.4",
     "types-pyyaml>=6.0.12.20241221",
 ]
+version = "0.3.1"
+
+# # versioningit was great in theory
+# # but it comes with too many issues for packaging
+# # in other distros. :/
+# # https://github.com/jwodder/versioningit
+# dynamic = ["version"]
+# [tool.hatch.version]
+# source = "versioningit"
+# [tool.versioningit]
 
 [dependency-groups]
 dev = [
@@ -36,3 +60,29 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 isd = "isd.isd:main"
+
+[project.urls]
+Hompage = "https://github.com/isd-project/isd"
+Documentation = "https://isd-project.github.io/isd/"
+Repository = "https://github.com/isd-project/isd"
+"Bug Tracker" = "https://github.com/isd-project/isd/issues"
+
+# build.hooks.<HOOK_NAME> is global
+# and applied to _all_ build targets
+# [tool.hatch.build.hooks.custom]
+
+[tool.hatch.build]
+exclude = [
+    "docs/",
+    "docs_glossary/",
+    "flake.nix",
+    "flake.lock",
+    "mkdocs.yml",
+    "macros.py",
+    "*.tape",
+    "src/isd/*.md"
+]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"share/" = "share/"
+

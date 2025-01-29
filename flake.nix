@@ -22,7 +22,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    systems.url = "github:nix-systems/x86_64-linux";
+    # Supports linux x86_64 and aarch64.
+    systems.url = "github:nix-systems/default-linux";
     nix-filter.url = "github:numtide/nix-filter";
     # pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
     systemd-nix = {
@@ -156,6 +157,7 @@
               buildPhase = ''
                 mkdir -p $out/bin
                 ln -s $src/bin/isd $out/bin/
+                ln -s $src/share $out/
               '';
             };
           isd = default;

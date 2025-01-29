@@ -349,7 +349,7 @@ wheels = [
 
 [[package]]
 name = "isd"
-version = "0.1.0"
+version = "0.3.0.post3+g369fd55.d19800101"
 source = { editable = "." }
 dependencies = [
     { name = "pfzy" },
@@ -368,6 +368,7 @@ dev = [
     { name = "python-lsp-ruff" },
     { name = "python-lsp-server" },
     { name = "textual-dev" },
+    { name = "versioningit" },
 ]
 docs = [
     { name = "markdown-callouts" },
@@ -394,6 +395,7 @@ dev = [
     { name = "python-lsp-ruff", specifier = ">=2.2.2" },
     { name = "python-lsp-server", specifier = ">=1.12.0" },
     { name = "textual-dev", specifier = ">=1.7.0" },
+    { name = "versioningit" },
 ]
 docs = [
     { name = "markdown-callouts" },
@@ -1416,6 +1418,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/aa/63/e53da845320b757bf29ef6a9062f5c669fe997973f966045cb019c3f4b66/urllib3-2.3.0.tar.gz", hash = "sha256:f8c5449b3cf0861679ce7e0503c7b44b5ec981bec0d1d3795a07f1ba96f0204d", size = 307268 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/19/4ec628951a74043532ca2cf5d97b7b14863931476d117c471e8e2b1eb39f/urllib3-2.3.0-py3-none-any.whl", hash = "sha256:1cee9ad369867bfdbbb48b7dd50374c0967a0bb7710050facf0dd6911440e3df", size = 128369 },
+]
+
+[[package]]
+name = "versioningit"
+version = "3.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5c/9b/941647e9e3616b5da7bbc4601ed9920f44a886704100fa8151406c07c149/versioningit-3.1.2.tar.gz", hash = "sha256:4db83ed99f56b07d83940bee3445ca46ca120d13b6b304cdb5fb44e5aa4edec0", size = 213047 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/56/50784a34941e6a77cb068289c851d35c8b9af6a4d266fdb85d4d4828fe21/versioningit-3.1.2-py3-none-any.whl", hash = "sha256:33c0905aeac7877b562171387c2c98af87b391aa9195f095455f21ddc47d4636", size = 37950 },
 ]
 
 [[package]]

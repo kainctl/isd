@@ -3,6 +3,8 @@ schema.json
 config.yaml
 drafts/
 result
+__pycache__
+/_version.py
 # config should be automatically generated when running vhs!
 docs/config/*
 # same for .cast/gif files!
