@@ -1,5 +1,5 @@
 """
-isd: Interactive Systemd
+isd: interactive systemd
 ---
 
 The following code is a probably the messiest code I have ever written.
@@ -1509,7 +1509,11 @@ def cached_search_term() -> str:
 
 
 class MainScreen(Screen):
-    AUTO_FOCUS = "CustomInput"
+    # Zellij writes some weird output to the input otherwise.
+    # If this is `None` it may lead to weird flashes in the foote
+    # below but Zellij users have to live with it until the bug is
+    # fixed: https://github.com/zellij-org/zellij/issues/3959
+    AUTO_FOCUS = "CustomInput" if os.getenv("ZELLIJ") is None else None
 
     unit_to_state_dict: reactive[Dict[str, UnitReprState]] = reactive(dict())
     # Relevant = Union(ordered selected units & highlighted unit)
