@@ -27,7 +27,7 @@ dependencies = [
     "pydantic>=2.10.4",
     "types-pyyaml>=6.0.12.20241221",
 ]
-version = "0.3.1"
+version = "0.3.0"
 
 # # versioningit was great in theory
 # # but it comes with too many issues for packaging
@@ -40,11 +40,13 @@ version = "0.3.1"
 
 [dependency-groups]
 dev = [
-    "pylsp-mypy>=0.6.9",
-    "pylsp-rope>=0.1.17",
-    "python-lsp-isort>=0.2.0",
-    "python-lsp-ruff>=2.2.2",
-    "python-lsp-server>=1.12.0",
+    "bump-my-version>=0.30.1",
+    # Remove LSP deps
+    # "pylsp-mypy>=0.6.9",
+    # "pylsp-rope>=0.1.17",
+    # "python-lsp-isort>=0.2.0",
+    # "python-lsp-ruff>=2.2.2",
+    # "python-lsp-server>=1.12.0",
     "textual-dev>=1.7.0",
 ]
 docs = [
@@ -86,3 +88,37 @@ exclude = [
 [tool.hatch.build.targets.wheel.shared-data]
 "share/" = "share/"
 
+[tool.bumpversion]
+current_version = "0.3.0"
+# parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+parse = """
+    (?P<major>0|[1-9]\\d*)\\.
+    (?P<minor>0|[1-9]\\d*)\\.
+    (?P<patch>0|[1-9]\\d*)
+    (?:
+        -                             # dash separator for pre-release section
+        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
+        (?:0|[1-9]\\d*)               # pre-release version number
+    )?                                # pre-release section is optional
+"""
+serialize = [
+    "{major}.{minor}.{patch}-{pre_l}{distance_to_latest_tag}",
+    "{major}.{minor}.{patch}",
+]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+moveable_tags = []
+commit_args = ""
+setup_hooks = []
+pre_commit_hooks = []
+post_commit_hooks = []

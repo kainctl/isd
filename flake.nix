@@ -2,6 +2,8 @@
   description = "interactive systemd flake";
 
   inputs = {
+    # 24.11 does _not_ contain asciinema_3
+    # nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     pyproject-nix = {
@@ -32,6 +34,7 @@
     };
     nix-appimage = {
       url = "github:ralismark/nix-appimage";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -152,7 +155,7 @@
               src = venv;
               meta = {
                 mainProgram = "isd";
-                license = pkgs.lib.getLicenseFromSpdxId "GPL-3.0";
+                license = pkgs.lib.getLicenseFromSpdxId "GPL-3.0-or-later";
               };
               buildPhase = ''
                 mkdir -p $out/bin
@@ -281,7 +284,7 @@
               # Build virtual environment, with local packages being editable.
               #
               # Enable all optional dependencies for development.
-              virtualenv = editablePythonSet.mkVirtualEnv "hello-world-dev-env" workspace.deps.all;
+              virtualenv = editablePythonSet.mkVirtualEnv "isd-env" workspace.deps.all;
             in
             pkgs.mkShell {
               packages = [
