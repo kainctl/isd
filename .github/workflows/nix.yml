@@ -6,7 +6,10 @@ on:
 
 jobs:
   build:
-    runs-on: [ubuntu-latest, ubuntu-24.04-arm]
+    # runs-on: [ubuntu-latest, ubuntu-24.04-arm]
+    # wait times for `-arm` are insane. Let's see how
+    # good cross-compilation works with nix
+    runs-on: [ubuntu-latest]
     permissions:
       contents: write # write required for action-gh-release
       id-token: write
@@ -23,11 +26,11 @@ jobs:
       # `cannot write uid_map: Operation not permitted`
       # - name: Test appimage
       #   run: ./result --help
-      - name: Rename AppImage
-        if: startsWith(github.ref, 'refs/tags/')
-        run: cp ./result isd.${{ runner.arch }}.AppImage
-      - name: Release AppImage
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: isd.${{ runner.arch}}.AppImage
+      # - name: Rename AppImage
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   run: cp ./result isd.${{ runner.arch }}.AppImage
+      # - name: Release AppImage
+      #   uses: softprops/action-gh-release@v2
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     files: isd.${{ runner.arch}}.AppImage
