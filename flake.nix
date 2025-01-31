@@ -34,7 +34,9 @@
     };
     nix-appimage = {
       url = "github:ralismark/nix-appimage";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # nix-appimage cannot track nixos-unstable until this issue is resolved:
+      # - <https://github.com/ralismark/nix-appimage/issues/23>
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -164,6 +166,7 @@
               '';
             };
           isd = default;
+          # HERE: Check if the appimage can be build!
           isd-AppImage = inputs.nix-appimage.lib.${system}.mkAppImage {
             program = pkgs.lib.getExe (
               isd.overrideAttrs (oldAttrs: {
