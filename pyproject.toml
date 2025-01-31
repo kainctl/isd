@@ -110,7 +110,9 @@ replace = "{new_version}"
 regex = false
 ignore_missing_version = false
 ignore_missing_files = false
-tag = true
+# do not tag with bump, as I want to tag a merged PR on main
+# and not the PR commit that will probably be squashed.
+tag = false
 sign_tags = false
 tag_name = "v{new_version}"
 tag_message = "Bump version: {current_version} → {new_version}"
