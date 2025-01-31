@@ -166,8 +166,8 @@
               '';
             };
           isd = default;
-          # HERE: Check if the appimage can be build!
-          isd-AppImage = inputs.nix-appimage.lib.${system}.mkAppImage {
+          "isd-AppImage" = inputs.nix-appimage.lib.${system}.mkAppImage {
+            pname = "isd.${system}";
             program = pkgs.lib.getExe (
               isd.overrideAttrs (oldAttrs: {
                 buildInputs = oldAttrs.buildInputs or [ ] ++ [ pkgs.makeBinaryWrapper ];
