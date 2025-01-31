@@ -29,6 +29,7 @@ from copy import deepcopy
 from enum import Enum, StrEnum, auto
 from functools import partial
 from itertools import chain, repeat
+from importlib.resources import as_file, files, as_file
 from pathlib import Path
 from textwrap import dedent, indent
 from typing import (
@@ -86,6 +87,25 @@ from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
 
 from . import __version__
+
+CSS_RESOURCE = files(__name__).joinpath("dom.tcss")
+
+with as_file(CSS_RESOURCE) as f:
+    _CSS_RESOURCE_PATH = f
+
+if _CSS_RESOURCE_PATH.exists():
+    # package resources are persisted on the file system
+    CSS_RESOURCE_PATH = _CSS_RESOURCE_PATH
+else:
+    # this means that the resource is dynamically extracted
+    # and not read as-is from the unpacked wheel.
+    # So extract it again, copy its contents
+    _tmp_file = tempfile.NamedTemporaryFile(
+        "w", prefix="isd_", suffix=".tcss", delete=False
+    )
+    _tmp_file.write(CSS_RESOURCE.read_text())
+    CSS_RESOURCE_PATH = Path(_tmp_file.name)
+    del _tmp_file
 
 ToggleButton.BUTTON_LEFT = ""
 ToggleButton.BUTTON_INNER = "▐"  # "▌"  # "█"
@@ -1552,9 +1572,9 @@ class MainScreen(Screen):
             "toggle_mode",
         ]
         model_fields = MainKeybindings.model_fields
-        assert all(
-            [show_field in model_fields for show_field in show_fields]
-        ), "Forgot to update show_field"
+        assert all([show_field in model_fields for show_field in show_fields]), (
+            "Forgot to update show_field"
+        )
         for action, field in model_fields.items():
             # name of keybinding == action name and
             # description is used for binding description
@@ -2172,7 +2192,8 @@ class InteractiveSystemd(App, inherit_bindings=False):
     """
 
     TITLE = "isd"
-    CSS_PATH = "dom.tcss"
+    # CSS_PATH = "dom.tcss"
+    CSS_PATH = CSS_RESOURCE_PATH
     COMMAND_PALETTE_BINDING = ensure_reserved("ctrl+p")
     NOTIFICATION_TIMEOUT = 5
     # If the modal is dismissed, this App would be focused by default
