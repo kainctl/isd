@@ -1,7 +1,7 @@
 # isd – *i*nteractive *s*ystem*d*
 
 <center>
-    <img src="./assets/isd.png" alt="isd logo" style="max-width: 50vh;">
+    <img src="./share/icons/hicolor/512x512/isd.png" alt="isd logo" style="max-width: 50vh;">
 </center>
 
 <!-- --8<-- [start:tagline] -->

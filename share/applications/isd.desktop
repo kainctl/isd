@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=isd
+GenericName=interactive systemd
+Comment=A better way to work with systemd units
+Icon=isd
+Exec=isd
+Terminal=true
+Categories=System;Monitor;ConsoleOnly;
+Keywords=systemd;tui;service-manager

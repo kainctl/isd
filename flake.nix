@@ -2,6 +2,8 @@
   description = "interactive systemd flake";
 
   inputs = {
+    # 24.11 does _not_ contain asciinema_3
+    # nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     pyproject-nix = {
@@ -22,7 +24,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    systems.url = "github:nix-systems/x86_64-linux";
+    # Supports linux x86_64 and aarch64.
+    systems.url = "github:nix-systems/default-linux";
     nix-filter.url = "github:numtide/nix-filter";
     # pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
     systemd-nix = {
@@ -31,6 +34,9 @@
     };
     nix-appimage = {
       url = "github:ralismark/nix-appimage";
+      # nix-appimage cannot track nixos-unstable until this issue is resolved:
+      # - <https://github.com/ralismark/nix-appimage/issues/23>
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -143,7 +149,7 @@
             let
               # Package the virtual environment
               # Enable no optional dependencies for production build.
-              venv = pythonSet.mkVirtualEnv "isd-env" workspace.deps.default;
+              venv = pythonSet.mkVirtualEnv "isd-tui-env" workspace.deps.default;
             in
             pkgs.stdenvNoCC.mkDerivation {
               pname = "isd";
@@ -151,15 +157,18 @@
               src = venv;
               meta = {
                 mainProgram = "isd";
-                license = pkgs.lib.getLicenseFromSpdxId "GPL-3.0";
+                license = pkgs.lib.getLicenseFromSpdxId "GPL-3.0-or-later";
               };
               buildPhase = ''
                 mkdir -p $out/bin
                 ln -s $src/bin/isd $out/bin/
+                ln -s $src/share $out/
               '';
             };
           isd = default;
-          isd-AppImage = inputs.nix-appimage.lib.${system}.mkAppImage {
+          isd-tui = isd;
+          "isd-AppImage" = inputs.nix-appimage.lib.${system}.mkAppImage {
+            pname = "isd.${system}";
             program = pkgs.lib.getExe (
               isd.overrideAttrs (oldAttrs: {
                 buildInputs = oldAttrs.buildInputs or [ ] ++ [ pkgs.makeBinaryWrapper ];
@@ -279,7 +288,7 @@
               # Build virtual environment, with local packages being editable.
               #
               # Enable all optional dependencies for development.
-              virtualenv = editablePythonSet.mkVirtualEnv "hello-world-dev-env" workspace.deps.all;
+              virtualenv = editablePythonSet.mkVirtualEnv "isd-tui-env" workspace.deps.all;
             in
             pkgs.mkShell {
               packages = [
