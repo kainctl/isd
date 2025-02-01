@@ -29,7 +29,7 @@ from copy import deepcopy
 from enum import Enum, StrEnum, auto
 from functools import partial
 from itertools import chain, repeat
-from importlib.resources import as_file, files, as_file
+from importlib.resources import as_file, files
 from pathlib import Path
 from textwrap import dedent, indent
 from typing import (
@@ -88,7 +88,9 @@ from textual.widgets.option_list import Option
 
 from . import __version__
 
-CSS_RESOURCE = files(__name__).joinpath("dom.tcss")
+# make type checker happy.
+assert __package__ is not None
+CSS_RESOURCE = files(__package__).joinpath("dom.tcss")
 
 with as_file(CSS_RESOURCE) as f:
     _CSS_RESOURCE_PATH = f
@@ -1775,11 +1777,11 @@ class MainScreen(Screen):
         self.refresh()
 
     async def watch_mode(self, mode: str) -> None:
-        self.query_one(PreviewArea).mode = self.mode
+        self.query_one(PreviewArea).mode = mode
         # clear current selection
         sel = cast(SelectionList, self.query_one(SelectionList))
         sel.deselect_all()
-        self.query_one(Fluid).border_title = " " + self.mode + " "
+        self.query_one(Fluid).border_title = " " + mode + " "
         await self.new_unit_to_state_dict()
         # self.query_one(Vertical).border_title = self.mode
         # await self.update_unit_to_state_dict()
@@ -1936,7 +1938,7 @@ class MainScreen(Screen):
         self.search_term = event.value
         self.debounced_search_units(self.search_term)
 
-    def on_input_submitted(self, value: CustomInput.Submitted) -> None:
+    def on_input_submitted(self, _: CustomInput.Submitted) -> None:
         sel = self.query_one(CustomSelectionList)
         sel.focus()
 
@@ -2059,7 +2061,7 @@ class MainScreen(Screen):
                 initial_state=d["value"] in prev_selected,
                 id=d["value"],
             )
-            for i, d in enumerate(match_dicts)
+            for d in match_dicts
         ]
         matched_units = [d["value"] for d in match_dicts]
         # first show the now "unmatched" selected units,
@@ -2227,7 +2229,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
             self.settings = Settings()
             self.settings_error = None
         except Exception as e:
-            self.settings = Settings.construct()
+            self.settings = Settings.model_construct()
             self.settings_error = e
         # only show the following bindings in the footer
         show_bindings = ["toggle_systemctl_modal"]
@@ -2475,7 +2477,7 @@ def render_model_as_yaml(model: Settings) -> str:
     """
     text = ""
     model_fields = model.model_fields
-    for key, value in model.model_dump().items():
+    for key in model.model_dump().keys():
         field = model_fields[key]
         text += render_field(key, field)
     return text

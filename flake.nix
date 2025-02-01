@@ -87,14 +87,15 @@
       # python = pkgs.python313;
 
       # Construct package set
-      pythonSetFor = eachSystem (
+      pythonSet311For = eachSystem (
         system:
         let
           # injecting cairosvg from upstream nixpkgs, as it is currently not
           # supported by the uv2nix_hammer project and is still in the todo list.
           # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
           pkgs = pkgsFor.${system};
-          python = pkgs.python312;
+          # python = pkgs.python312;
+          python = pkgs.python311;
           hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
         in
         # Use base package set from pyproject.nix builders
@@ -108,11 +109,44 @@
               pyprojectOverrides
               (_final: prev: {
                 cairosvg = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python312Packages.cairosvg;
+                  from = pkgs.python311Packages.cairosvg;
                   prev = prev.cairosvg;
                 };
                 cairocffi = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python312Packages.cairocffi;
+                  from = pkgs.python311Packages.cairocffi;
+                  prev = prev.cairocffi;
+                };
+              })
+            ]
+          )
+      );
+      pythonSet313For = eachSystem (
+        system:
+        let
+          # injecting cairosvg from upstream nixpkgs, as it is currently not
+          # supported by the uv2nix_hammer project and is still in the todo list.
+          # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
+          pkgs = pkgsFor.${system};
+          # python = pkgs.python312;
+          python = pkgs.python313;
+          hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
+        in
+        # Use base package set from pyproject.nix builders
+        (pkgs.callPackage inputs.pyproject-nix.build.packages {
+          inherit python;
+        }).overrideScope
+          (
+            lib.composeManyExtensions [
+              inputs.pyproject-build-systems.overlays.default
+              overlay
+              pyprojectOverrides
+              (_final: prev: {
+                cairosvg = hacks.nixpkgsPrebuilt {
+                  from = pkgs.python313Packages.cairosvg;
+                  prev = prev.cairosvg;
+                };
+                cairocffi = hacks.nixpkgsPrebuilt {
+                  from = pkgs.python313Packages.cairocffi;
                   prev = prev.cairocffi;
                 };
               })
@@ -137,11 +171,13 @@
         // self.packages.${system}
       );
 
+      # use the newest python version to build packages
+      # -> get the benefit of improvements to CPython for free.
       packages = eachSystem (
         system:
         let
           pkgs = pkgsFor.${system};
-          pythonSet = pythonSetFor.${system};
+          pythonSet = pythonSet313For.${system};
           version = (builtins.fromTOML (builtins.readFile ./pyproject.toml)).project.version;
         in
         rec {
@@ -247,11 +283,13 @@
       # This example provides two different modes of development:
       # - Impurely using uv to manage virtual environments
       # - Pure development using uv2nix to manage virtual environments
+      #
+      # Use Python311 (oldest supported Python) for local development and testing.
       devShells = eachSystem (
         system:
         let
           pkgs = pkgsFor.${system};
-          pythonSet = pythonSetFor.${system};
+          pythonSet = pythonSet311For.${system};
           lib = pkgs.lib;
         in
         {
