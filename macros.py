@@ -1,8 +1,7 @@
 import uuid
 from pathlib import Path
 import re
-from textwrap import dedent
-from isd.isd import (
+from isd_tui.isd import (
     get_default_settings_yaml,
     get_default_settings,
     RESERVED_KEYBINDINGS,
