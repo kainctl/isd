@@ -1,5 +1,5 @@
 [project]
-name = "isd"
+name = "isd-tui"
 requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
@@ -61,7 +61,10 @@ requires = ["hatchling", "editables"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-isd = "isd.isd:main"
+isd = "isd_tui.isd:main"
+# only for compatibility when running
+# `uvx isd-tui`
+isd-tui = "isd_tui.isd:main"
 
 [project.urls]
 Hompage = "https://github.com/isd-project/isd"

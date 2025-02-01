@@ -149,7 +149,7 @@
             let
               # Package the virtual environment
               # Enable no optional dependencies for production build.
-              venv = pythonSet.mkVirtualEnv "isd-env" workspace.deps.default;
+              venv = pythonSet.mkVirtualEnv "isd-tui-env" workspace.deps.default;
             in
             pkgs.stdenvNoCC.mkDerivation {
               pname = "isd";
@@ -166,6 +166,7 @@
               '';
             };
           isd = default;
+          isd-tui = isd;
           "isd-AppImage" = inputs.nix-appimage.lib.${system}.mkAppImage {
             pname = "isd.${system}";
             program = pkgs.lib.getExe (
@@ -287,7 +288,7 @@
               # Build virtual environment, with local packages being editable.
               #
               # Enable all optional dependencies for development.
-              virtualenv = editablePythonSet.mkVirtualEnv "isd-env" workspace.deps.all;
+              virtualenv = editablePythonSet.mkVirtualEnv "isd-tui-env" workspace.deps.all;
             in
             pkgs.mkShell {
               packages = [

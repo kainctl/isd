@@ -355,8 +355,8 @@ wheels = [
 ]
 
 [[package]]
-name = "isd"
-version = "0.3.0"
+name = "isd-tui"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "pfzy" },
