@@ -8,6 +8,7 @@ squashfs-root/
 /_version.py
 # config should be automatically generated when running vhs!
 docs/config/*
+*.AppImage
 # same for .cast/gif files!
 *.cast
 *.gif
