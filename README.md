@@ -44,17 +44,17 @@ The documentation is live at:
 ## Installation
 
 The tool can be installed via `uv`, `nix`, and as an `AppImage`.
-Refer to [official installation documentation](https://isd-project.github.io/isd/#installation) for more details.
+Refer to the [official installation documentation](https://isd-project.github.io/isd/#installation) for more details.
 
 ## Road map
 
 <!-- --8<-- [start:roadmap] -->
 A collection of some _unordered_ ideas that could improve `isd`:
 
+- [x] Add icon for project and application menu
 - [ ] Option to view the security rating of units
 - [ ] Improve highlighting of `systemd` units (tree-sitter grammar)
 - [ ] Write a custom, more secure `$EDITOR` integration (more secure `sytemctl edit`)
-- [ ] Add icon for project and application menu
 - [ ] Allow customization of preview windows
 - [ ] Improve `journal_pager` integration
 - [ ] Add custom sort options
