@@ -171,7 +171,7 @@
         // self.packages.${system}
       );
 
-      # use the newest python version to build packages
+      # Use the newest python version to build packages
       # -> get the benefit of improvements to CPython for free.
       packages = eachSystem (
         system:

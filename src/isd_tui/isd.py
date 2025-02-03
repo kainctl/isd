@@ -143,6 +143,21 @@ _CONFIG_DIR = xdg_config_home() / __package__
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
 
+SETTINGS_YAML_HEADER = dedent("""\
+        # yaml-language-server: $schema=schema.json
+        # ^ This links to the JSON Schema that provides auto-completion support
+        #   and dynamically checks the input. For this to work, your editor must have
+        #   support for the `yaml-language-server`
+        #   - <https://github.com/redhat-developer/yaml-language-server>
+        #
+        #   Check the `Clients` section for more information:
+        #   - <https://github.com/redhat-developer/yaml-language-server?tab=readme-ov-file#clients>
+        #
+        # To create a fresh `config.yaml` file with the defaults,
+        # simply delete this file. It will be re-created when `isd` starts.
+
+    """)
+
 RESERVED_KEYBINDINGS: Dict[str, str] = {
     "ctrl+q": "Close App",
     "ctrl+c": "Close App",
@@ -851,23 +866,26 @@ def get_default_settings() -> Settings:
     return Settings.construct()
 
 
-def get_default_settings_yaml() -> str:
-    header = dedent("""\
-        # yaml-language-server: $schema=schema.json
-        # ^ This links to the JSON Schema that provides auto-completion support
-        #   and dynamically checks the input. For this to work, your editor must have
-        #   support for the `yaml-language-server`
-        #   - <https://github.com/redhat-developer/yaml-language-server>
-        #
-        #   Check the `Clients` section for more information:
-        #   - <https://github.com/redhat-developer/yaml-language-server?tab=readme-ov-file#clients>
-        #
-        # To create a fresh `config.yaml` file with the defaults,
-        # simply delete this file. It will be re-created when `isd` starts.
-
-    """)
+def get_default_settings_yaml(as_comments: bool) -> str:
     text = render_model_as_yaml(get_default_settings())
-    return header + text
+
+    def comment_line(line: str) -> str:
+        """
+        Leave empty lines as they are.
+        If line is already a comment make it `##`.
+        Otherwise, prefix it with `# `
+        """
+        if line.strip() == "":
+            prefix = ""
+        elif line.startswith("#"):
+            prefix = "#"
+        else:
+            prefix = "# "
+        return prefix + line
+
+    if as_comments:
+        text = "\n".join(comment_line(line) for line in text.splitlines())
+    return SETTINGS_YAML_HEADER + text
 
 
 def is_root() -> bool:
@@ -2298,7 +2316,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 # propagate the exception to the app.
                 fp.parent.mkdir(parents=True, exist_ok=True)
                 self.update_schema()
-                fp.write_text(get_default_settings_yaml())
+                fp.write_text(get_default_settings_yaml(as_comments=True))
             except Exception as e:
                 self.notify(f"Error while creating default config.yaml: {e}")
         else:
@@ -2429,8 +2447,7 @@ def render_field(key, field, level: int = 0) -> str:
         else:
             text += f"{key}: \n"
             for el in default_value:
-                # remove last
-                # get the indentation right
+                # Get the indentation right
                 indentation = "  " * (level + 1)
                 if isinstance(el, SystemctlCommand):
                     text += indentation + "- " + f'command: "{el.command}"' + "\n"
@@ -2466,17 +2483,20 @@ def render_field(key, field, level: int = 0) -> str:
     # add empty line between top-level keys
     if level == 0:
         text += "\n"
+    # HERE: Fix the underlying issue, where an item like
+    # navigation_keybindings returns text with a prefixed comment
+    # and then is intended _with_ the comment right here.
     return indent(text, "  " * level)
 
 
 def render_model_as_yaml(model: Settings) -> str:
     """
     My custom pydantic Settings yaml renderer.
-    I had a very bloated implementation with PyYAML
-    with custom a `Dumper` and with ruamel.yaml to inject comments
+    I had a very bloated implementation with `PyYAML`
+    with a custom `Dumper` and with `ruamel.yaml` to inject comments
     but it was unnecessarily complex and hard to configure.
 
-    Instead, I simply wrote a simple, custom renderer for my pydantic Settings.
+    Instead, I simply wrote a simple, custom renderer for my `pydantic.Settings`.
     It will only work for this code-base but it gives me full control over the
     rendering process without having code with so much hidden functionality.
     """

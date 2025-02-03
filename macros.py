@@ -6,6 +6,7 @@ from isd_tui.isd import (
     get_default_settings,
     RESERVED_KEYBINDINGS,
 )
+from typing import Dict, Any
 
 
 def value_str(value) -> str:
@@ -42,7 +43,10 @@ def define_env(env):
     )
     env.variables["poster_markers"] = format_timestamps(env.variables["timestamps"])
     env.variables["default_settings"] = get_default_settings()
-    env.variables["default_config_data"] = get_default_settings_yaml()
+    env.variables["default_config_data"] = get_default_settings_yaml(as_comments=False)
+    env.variables["default_commented_config_data"] = get_default_settings_yaml(
+        as_comments=True
+    )
     env.variables["reserved_keys_list"] = "\n".join(
         f"- ++{k}++" for k in RESERVED_KEYBINDINGS.keys()
     )
@@ -59,7 +63,7 @@ def define_env(env):
     @env.macro
     def asciinema(file, **kwargs):
         html = ""
-        opts = {
+        opts: Dict[str, Any] = {
             "autoPlay": False,
             "controls": True,
             "loop": False,
