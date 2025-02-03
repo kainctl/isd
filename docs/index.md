@@ -131,6 +131,15 @@ If you are interested, read on and take a look at the [recorded terminal session
         If you have `nix` installed, this `AppImage` will _not_ work!
         Either use the `nix` or `uv` installation instructions!
 
+??? warning "Warning for Windows WSL users"
+
+    The `systemd` support of WSL seems to be quite buggy (also for WSL 2).
+    See these GitHub issues for more details
+
+    - <https://github.com/microsoft/WSL/issues/8842>
+    - <https://github.com/microsoft/WSL/issues/10205>
+    - <https://github.com/nix-community/NixOS-WSL/issues/375>
+
 
 ## Working with `isd`
 

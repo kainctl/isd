@@ -9,3 +9,4 @@
 *[YAML]: a human-readable, space-sensitive markup language.
 *[TUI]: Terminal User Interface
 *[Ghostty]: The recommended terminal
+*[WSL]: Windows Subsystem for Linux
