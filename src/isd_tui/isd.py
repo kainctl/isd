@@ -519,12 +519,17 @@ DEFAULT_COMMANDS = [
     SystemctlCommand(
         modal_keybinding="e",
         command="edit",
-        description="Edit unit(s) with configured editor",
+        description="Edit highlighted unit via drop-in with configured editor",
+    ),
+    SystemctlCommand(
+        modal_keybinding="f",
+        command="edit --full",
+        description="Edit highlighted unit source with configured editor",
     ),
     SystemctlCommand(
         modal_keybinding="r",
         command="edit --runtime",
-        description="Edit unit(s) only for current runtime",
+        description="Edit highlighted unit only for current runtime",
     ),
     SystemctlCommand(
         modal_keybinding="d",
