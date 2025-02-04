@@ -667,7 +667,7 @@ class Settings(BaseSettings):
             Seconds to wait before computing state updates (default 0.05s).
             For example, time after input has changed before updating the selection.
             Or time to wait to update preview window after highlighting new value.
-            The idea is to minimize the number of 'irrelvant' updated during fast
+            The idea is to minimize the number of 'irrelevant' updated during fast
             scrolling through the unit list or quick typing."""),
     )
 
