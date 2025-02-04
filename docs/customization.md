@@ -41,8 +41,8 @@ To not get too bored by the wall 🧱 of text, let's have a look
 at the different options individually.
 As smaller walls 🧱 of text...
 Though, I don't know how exciting
-these section will be 😅.
-Some section will contain more context or additional information.
+these sections will be 😅.
+Some sections will contain more context or additional information.
 
 Just jump to the sections that sound interesting:
 
