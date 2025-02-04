@@ -28,7 +28,7 @@ This tool is for you!
 But `isd` is not only designed for `systemd` power-users!
 `isd` lowers the bar to interact with `systemd` units and provides a unified
 interface that only shows _relevant_ information and commands.
-If you only ever run `systemctl status <unit>`, then `isd` is _might still_ be for you,
+If you only ever run `systemctl status <unit>`, then `isd` _might still_ be for you,
 since `isd` will auto-refresh the output.
 
 If you are interested, read on and take a look at the [recorded terminal session](#working-with-isd).
