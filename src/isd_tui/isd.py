@@ -1133,7 +1133,21 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     )
     stdout, stderr = await proc.communicate()
     # proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    parsed_units: List[Dict[str, str]] = json.loads(stdout)
+    try:
+        parsed_units: List[Dict[str, str]] = json.loads(stdout)
+    except json.JSONDecodeError:
+        parsed_units = []
+        lines = stdout.decode('utf-8').splitlines()
+        for line in lines[1:-7]:
+            fields = line.split()
+            unit = {
+                "unit": fields[0],
+                "load": fields[1],
+                "active": fields[2],
+                "sub": fields[3],
+                "description": " ".join(fields[4:])
+            }
+            parsed_units.append(unit)
 
     proc = await asyncio.create_subprocess_exec(
         *list_unit_files,
@@ -1144,7 +1158,19 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     )
     stdout, stderr = await proc.communicate()
     # proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    parsed_unit_files: List[Dict[str, str]] = json.loads(stdout)
+    try:
+        parsed_unit_files: List[Dict[str, str]] = json.loads(stdout)
+    except json.JSONDecodeError:
+        parsed_unit_files = []
+        for line in stdout.decode('utf-8').splitlines()[1:-3]:
+            fields = line.split()
+            unit = {
+                "unit_file": fields[0],
+                "state": fields[1] if len(fields) == 3 else "alias",
+                "preset": None
+            }
+            parsed_unit_files.append(unit)
+
     # So I am simply appending one after the other, so that the more specific color
     # information is stored. A uniqueness test would just be unnecessary
     merged_units = [{"unit": d["unit_file"]} for d in parsed_unit_files]
