@@ -1315,6 +1315,12 @@ async def journalctl_async(
 
 
 class Preview(RichLog, inherit_bindings=False):
+    """
+    `RichLog` with custom bindings and 'captive' scrolling.
+    If the output fits onto the presented screen, scrolling does _not_
+    bubble to the parent.
+    """
+
     def __init__(self, navigation_keybindings: NavigationKeybindings, **kwargs):
         super().__init__(**kwargs)
         for keys, action, description in [
@@ -1335,6 +1341,18 @@ class Preview(RichLog, inherit_bindings=False):
                 description=description,
                 show=False,
             )
+
+    @property
+    def allow_vertical_scroll(self) -> bool:
+        if self._check_disabled():
+            return False
+        return True
+
+    @property
+    def allow_horizontal_scroll(self) -> bool:
+        if self._check_disabled():
+            return False
+        return True
 
 
 class PreviewArea(Container):
@@ -1377,9 +1395,23 @@ class PreviewArea(Container):
     def on_tabbed_content_tab_activated(self, _tab) -> None:
         self.update_preview_window()
 
+    def focus_preview(self) -> None:
+        """
+        Focuses the current `Preview` output.
+
+        Note: If `action_next_tab` is called within the same
+        update cycle, calling this function will see the _old_
+        pane. In this instance, you probably want to call it via
+        `call_after_refresh`.
+        """
+        tabbed_content: TabbedContent = self.query_one(TabbedContent)
+        cur_pane = tabbed_content.active_pane
+
+        if cur_pane:
+            cur_pane.query_one(Preview).focus()
+
     def action_next_tab(self) -> None:
         tabs: Tabs = self.query_one(Tabs)
-        # may add tabs.has_focus():
         tabs.action_next_tab()
 
     def action_previous_tab(self) -> None:
@@ -1647,11 +1679,22 @@ class MainScreen(Screen):
     # FUTURE: Figure out how to work with/handle --global
     # FUTURE: Add option to list the most recently failed units.
     #         -> This should be a global option, as this is a frequent use-case.
+
+    def _step_preview_tab(self, *, next: bool):
+        prev_focus = self.focused
+        preview_area = self.query_one(PreviewArea)
+        if next:
+            preview_area.action_next_tab()
+        else:
+            preview_area.action_previous_tab()
+        if prev_focus and isinstance(prev_focus, Preview):
+            self.call_after_refresh(preview_area.focus_preview)
+
     def action_next_preview_tab(self) -> None:
-        self.query_one(PreviewArea).action_next_tab()
+        self._step_preview_tab(next=True)
 
     def action_previous_preview_tab(self) -> None:
-        self.query_one(PreviewArea).action_previous_tab()
+        self._step_preview_tab(next=False)
 
     def action_clear_input(self) -> None:
         """
@@ -2483,9 +2526,6 @@ def render_field(key, field, level: int = 0) -> str:
     # add empty line between top-level keys
     if level == 0:
         text += "\n"
-    # HERE: Fix the underlying issue, where an item like
-    # navigation_keybindings returns text with a prefixed comment
-    # and then is intended _with_ the comment right here.
     return indent(text, "  " * level)
 
 
