@@ -27,6 +27,17 @@ PreviewArea:focus-within {
   border: tall $border;
 }
 
+PreviewArea:focus-within Tab.-active {
+  text-style: $block-cursor-text-style;
+  color: $block-cursor-foreground;
+  background: $block-cursor-background;
+}
+
+Preview:focus {
+  background: $boost 50%;
+}
+
+
 #unit-selection > .selection-list--button {
   background: $boost 100% !important;
 }

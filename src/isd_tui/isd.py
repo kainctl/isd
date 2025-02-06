@@ -1370,9 +1370,9 @@ class PreviewArea(Container):
 
     def __init__(
         self,
+        *args,
         max_lines: int,
         navigation_keybindings: NavigationKeybindings,
-        *args,
         journalctl_args: list[str],
         **kwargs,
     ) -> None:
@@ -1385,6 +1385,18 @@ class PreviewArea(Container):
 
     def on_mount(self) -> None:
         self.last_output = Text("")
+        # Disable `can_focus` on `ContentTabs` or to avoid loading
+        # from a private module `Tabs`
+        # (though it is `ContentTabs` if one looks at the `console log` output).
+        # This ensure that the header itself cannot be focused.
+        # This also implies that the first child widget of the
+        # `TabbedContent` is focused!
+        # Requires `on_click`
+        self.query_one(Tabs).can_focus = False
+
+    def on_click(self, event: events.Click):
+        if isinstance(event.widget, Tab):
+            self.focus_preview()
 
     def watch_mode(self, mode: str) -> None:
         self.update_preview_window()
@@ -1587,8 +1599,8 @@ def cached_search_term() -> str:
 
 class MainScreen(Screen):
     # Zellij writes some weird output to the input otherwise.
-    # If this is `None` it may lead to weird flashes in the foote
-    # below but Zellij users have to live with it until the bug is
+    # If this is `None` it may lead to weird flashes in the footer.
+    # Zellij users have to live with it until the bug is
     # fixed: https://github.com/zellij-org/zellij/issues/3959
     AUTO_FOCUS = "CustomInput" if os.getenv("ZELLIJ") is None else None
 
@@ -2420,8 +2432,6 @@ class InteractiveSystemd(App, inherit_bindings=False):
 
     def action_show_version(self) -> None:
         self.notify(f"isd version: {__version__}", timeout=30)
-
-    # AUTO_FOCUS = None
 
     def on_mount(self) -> None:
         # always make sure to use the latest schema
