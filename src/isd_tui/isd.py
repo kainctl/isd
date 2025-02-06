@@ -47,7 +47,7 @@ from typing import (
 )
 
 from pfzy.match import fuzzy_match
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, PositiveInt
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -60,7 +60,7 @@ from textual import on, work, events
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
-from textual.events import Resize
+import textual.events
 from textual.reactive import reactive
 from textual.screen import Screen, ModalScreen
 
@@ -70,12 +70,14 @@ from textual.screen import Screen, ModalScreen
 from textual.theme import BUILTIN_THEMES
 
 # from textual.scrollbar import ScrollBarRender
+from textual.widget import Widget
 from textual.widgets import (
     Footer,
     Header,
     Input,
     RichLog,
     SelectionList,
+    Tab,
     TabbedContent,
     TabPane,
     Tabs,
@@ -490,6 +492,12 @@ class MainKeybindings(KeybindingModel):
         description="Open in editor",
     )
     toggle_mode: str = Field(default="ctrl+t", description="Toggle mode")
+    increase_widget_height: str = Field(
+        default="plus", description="Increase height of currently focused widget"
+    )
+    decrease_widget_height: str = Field(
+        default="minus", description="Decrease height of currently focused widget"
+    )
 
 
 class NavigationKeybindings(KeybindingModel):
@@ -715,6 +723,9 @@ class Settings(BaseSettings):
     theme: Theme = Field(
         default=Theme("textual-dark"), description="The theme of the application."
     )
+
+    search_results_height_fraction: PositiveInt = 1
+    preview_height_fraction: PositiveInt = 2
 
     # FUTURE: Allow option to select if multi-select is allowed or not.
     generic_keybindings: GenericKeybinding = Field(
@@ -945,7 +956,7 @@ class Fluid(Horizontal):
         self.min_width = min_width
         super().__init__(**kwargs)
 
-    def on_resize(self, event: Resize) -> None:
+    def on_resize(self, event: events.Resize) -> None:
         """Adjust layout based on terminal width."""
         self.is_horizontal = event.size.width >= self.min_width
         self.update_layout()
@@ -1724,6 +1735,42 @@ class MainScreen(Screen):
         inp = cast(CustomInput, self.query_one(CustomInput))
         inp.focus()
 
+    def _change_widget_height_fraction(self, value: int):
+        """
+        Change the height fraction of the widget if possible.
+        Will increase/decrease the fraction by the given value.
+        This function ensures that the mininum value is 1.
+        """
+
+        def __change_widget_height_fraction(widget: Widget, value: int):
+            if widget.styles.height is not None:
+                if widget.styles.height.is_fraction is not None:
+                    height = widget.styles.height
+                    new_value = max(height.value + value, 1)
+                    widget.styles.height = height.copy_with(value=new_value)
+
+        search_results = self.query_one(CustomSelectionList)
+        preview_area = self.query_one(PreviewArea)
+
+        if preview_area.has_focus or preview_area.has_focus_within:
+            __change_widget_height_fraction(preview_area, value)
+        if search_results.has_focus or search_results.has_focus_within:
+            __change_widget_height_fraction(search_results, value)
+
+    def action_increase_widget_height(self) -> None:
+        """
+        Increase the height of the search results or preview
+        widget. Depending if one of them is focused or not.
+        """
+        self._change_widget_height_fraction(+1)
+
+    def action_decrease_widget_height(self) -> None:
+        """
+        Decrease the height of the search results or preview
+        widget. Depending if one of them is focused or not.
+        """
+        self._change_widget_height_fraction(-1)
+
     def store_state(self) -> None:
         """
         Store the current application state.
@@ -2011,6 +2058,12 @@ class MainScreen(Screen):
         self.mode = derive_startup_mode(self.settings.startup_mode)
         await self.new_unit_to_state_dict()
         self.search_results = await self.search_units(self.search_term)
+        self.query_one(
+            CustomSelectionList
+        ).styles.height = f"{self.settings.search_results_height_fraction}fr"
+        self.query_one(
+            PreviewArea
+        ).styles.height = f"{self.settings.preview_height_fraction}fr"
 
     def on_input_changed(self, event: CustomInput.Changed) -> None:
         self.search_term = event.value

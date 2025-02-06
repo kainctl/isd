@@ -19,7 +19,7 @@ PreviewArea {
   background: $surface;
   padding: 0 1;
   width: 1fr;
-  height: 2fr;
+  height: 1fr;
   border: tall $border-blurred;
 }
 
