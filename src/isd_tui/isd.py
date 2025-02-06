@@ -511,8 +511,8 @@ class NavigationKeybindings(KeybindingModel):
 
     down: str = Field(default="down,j", description="Down")
     up: str = Field(default="up,k", description="Up")
-    page_down: str = Field(default="ctrl+down,pagedown", description="Page down")
-    page_up: str = Field(default="ctrl+up,pageup", description="Page up")
+    page_down: str = Field(default="ctrl+down,ctrl+f,pagedown", description="Page down")
+    page_up: str = Field(default="ctrl+up,ctrl+b,pageup", description="Page up")
     top: str = Field(default="home", description="Goto top")
     bottom: str = Field(default="end", description="Goto bottom")
     # These are probably only needed for the preview output!
