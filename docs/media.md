@@ -15,7 +15,9 @@
 `isd` has made the following appearances in the media:
 
 - [#1 on `HackerNews` for a few hours](https://news.ycombinator.com/item?id=42749402)
+- [Terminal Trove Tool of the Week](https://terminaltrove.com/isd/)
 - [Dedicated pick on episode 598](https://linuxunplugged.com/598) of the [Linux Unplugged Podcast](https://linuxunplugged.com/)
-- [Phoronix Article](https://www.phoronix.com/news/ISD-Interactive-Systemd)
+- [Phoronix article](https://www.phoronix.com/news/ISD-Interactive-Systemd)
+- [Recommended on episode 319](https://latenightlinux.com/late-night-linux-episode-319/) of the [Late Night Linux Podcast](https://latenightlinux.com/category/lnl/)
 
 
