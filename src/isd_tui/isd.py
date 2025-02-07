@@ -1396,18 +1396,14 @@ class PreviewArea(Container):
 
     def on_mount(self) -> None:
         self.last_output = Text("")
-        # Disable `can_focus` on `ContentTabs` or to avoid loading
+        # Could disable `can_focus` on `ContentTabs` or to avoid loading
         # from a private module `Tabs`
         # (though it is `ContentTabs` if one looks at the `console log` output).
         # This ensure that the header itself cannot be focused.
         # This also implies that the first child widget of the
         # `TabbedContent` is focused!
-        # Requires `on_click`
-        self.query_one(Tabs).can_focus = False
-
-    def on_click(self, event: events.Click):
-        if isinstance(event.widget, Tab):
-            self.focus_preview()
+        # Requires `on_click` to forward the focus to the preview.
+        # self.query_one(Tabs).can_focus = False
 
     def watch_mode(self, mode: str) -> None:
         self.update_preview_window()

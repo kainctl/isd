@@ -3,6 +3,18 @@ OptionList > .option-list--option-highlighted {
   background: $primary;
 }
 
+TabbedContent > ContentTabs {
+  dock: bottom;
+}
+
+TabbedContent > ContentTabs #tabs-list {
+  offset: 0 1;
+}
+
+TabbedContent > ContentTabs Underline {
+  offset: 0 -1;
+}
+
 /* center middle is an amazing feature! */
 SystemctlActionScreen {
   align: center middle;
@@ -27,14 +39,16 @@ PreviewArea:focus-within {
   border: tall $border;
 }
 
+/*
 PreviewArea:focus-within Tab.-active {
   text-style: $block-cursor-text-style;
   color: $block-cursor-foreground;
   background: $block-cursor-background;
 }
+*/
 
 Preview:focus {
-  background: $boost 50%;
+  background: $boost 75%;
 }
 
 
