@@ -1005,13 +1005,27 @@ class CustomSelectionList(SelectionList, inherit_bindings=False):
 
         Args:
             event: The click event.
+
+        Copied logic from `_option_list.py` file `_on_click`.
         """
+        clicked_option: int | None = event.style.meta.get("option")
+        if (
+            clicked_option is not None
+            and clicked_option >= 0
+            and not self._options[clicked_option].disabled
+        ):
+            self.highlighted = clicked_option
+
         if event.ctrl or event.meta or event.shift:
-            # do nothing special if a modifier is pressed
-            pass
+            # Only actually select the unit if it was
+            self.action_select()
         else:
             # if no modifier is pressed, deselect the other ones!
             self.deselect_all()
+
+        await super()._on_click(event)
+
+        event.stop()
 
 
 def unit_sort_priority(unit: str) -> int:
