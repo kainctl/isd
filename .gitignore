@@ -7,6 +7,7 @@ result
 __pycache__
 squashfs-root/
 /_version.py
+tests/quickemu/*/
 # config should be automatically generated when running vhs!
 docs/config/*
 *.AppImage
