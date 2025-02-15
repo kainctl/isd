@@ -443,6 +443,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "bump-my-version" },
+    { name = "memray" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-textual-snapshot" },
@@ -469,6 +470,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "bump-my-version", specifier = ">=0.30.1" },
+    { name = "memray", specifier = ">=1.15.0" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
     { name = "pytest-textual-snapshot", specifier = ">=1.1.0" },
@@ -614,6 +616,39 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba", size = 8729 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979 },
+]
+
+[[package]]
+name = "memray"
+version = "1.15.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "rich" },
+    { name = "textual" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e8/d3/b2a01137e2391917928187c4c2837c2750cc832c99a6aecd6e0d6ea07c58/memray-1.15.0.tar.gz", hash = "sha256:1beffa2bcba3dbe0f095d547927286eca46e272798b83026dd1b5db58e16ed56", size = 1025344 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f9/a0/9c56b524fe5adfc642b8fe4db70625f061d791f5112de71f9a02ea62f153/memray-1.15.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:cb8997e113378b9ac8bbd9b17f4f867fc5c1eea1980d873be3ebe4c2f1176784", size = 927483 },
+    { url = "https://files.pythonhosted.org/packages/53/ec/e5baba698b616276006a027f020d9d62ce17ea8cded8b46d422e8d0a4b62/memray-1.15.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:8ee45d919d81bfeb33677357dd5d248f3cad1d56be2ebd1853d4615a9f965b11", size = 901485 },
+    { url = "https://files.pythonhosted.org/packages/1d/2b/ebda2035c3c5512a0ace12fd0ef7bc05ea3fd34b4088492ebbb54e3b326d/memray-1.15.0-cp311-cp311-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:a6b740aad69e7e5f82ffff53a8edef1313ff0b5e9b7253912da16e905dcb1dcb", size = 8437653 },
+    { url = "https://files.pythonhosted.org/packages/76/55/f01ab44fa26d41ea2dd3b24423886b47959c03daad5d86248809e0bdf521/memray-1.15.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0045611f2da496e35d37a5ddfa2b6a74bbc82e47087924c07b3f520448297b26", size = 8065095 },
+    { url = "https://files.pythonhosted.org/packages/53/a4/c4765074938fe605941f36aa5bc7e0ccc709c8bf5e96dbf2839fe981324e/memray-1.15.0-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ca5688e33a833de604d0e2de01b5bf11a4ac1d768998f8831a375a343dc7acaf", size = 8160735 },
+    { url = "https://files.pythonhosted.org/packages/40/d4/af8c74a8a4c8dc6ae83e46e018309ea41db1595720081ee1ffe8704e81e2/memray-1.15.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4bbad938c3fdcebe0cf3c568fb8f8633ab37ab08ad4db167e0991e214d6f595b", size = 8441391 },
+    { url = "https://files.pythonhosted.org/packages/36/43/a156f7c7aa27603e5fe1e0d0ce43d4d9864c47ca9160f87e675727ad07df/memray-1.15.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:f4eb50295bd87a091a85ec71f0ee612c5d709df490fea8a3adc4410f5da4f695", size = 8405459 },
+    { url = "https://files.pythonhosted.org/packages/46/87/9c62e12fa59967852d41df32fe5a0117d2bcd789b72960051c22a2052782/memray-1.15.0-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:d13554a25129593872b5fbcd55ac34453239e51d9b6ace258329596ccce22bb3", size = 927561 },
+    { url = "https://files.pythonhosted.org/packages/0a/9e/8f88ef0e037ca9f11fd1e25e5abcc220bd368adfd9185630b37c405e6aa7/memray-1.15.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:8cfe15962a9002ede8b1f8b4f045d95855100a8a60a9bf0d9f2b92950f914189", size = 899042 },
+    { url = "https://files.pythonhosted.org/packages/06/ae/107ce4d557b6a6598c6a037108b5591abcdde48d92470d722b4a63e82cac/memray-1.15.0-cp312-cp312-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:e84b39adca05e720bdbf950cc92ef4bafefa2d6160111e5fc427cf59c6c16d1a", size = 8417003 },
+    { url = "https://files.pythonhosted.org/packages/46/35/151684bd2635f955f3381e0739e3abd13baa621e855bc3cc8a336f5e9587/memray-1.15.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:d7745d2c58dfc33ef77f8827053cb957131420051b67e2d5642b605d0e65a586", size = 8015335 },
+    { url = "https://files.pythonhosted.org/packages/e9/17/b30e0bcb799bf2b7383d2133067ee50aee7312cdd785c3a7347b7a7db6bf/memray-1.15.0-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:412225d85db0ec22142a82646d85ecc1e8680d33adbfd15789c7eaa356ad4107", size = 8133111 },
+    { url = "https://files.pythonhosted.org/packages/03/13/71ad108bece1c13e876a8d103dfafb9cebef66f799719ff2c12d1d5f5446/memray-1.15.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d25ab7a7e32fedab46219121dfb6ec3e42c66984b217572fdd4cddc37359c521", size = 8405380 },
+    { url = "https://files.pythonhosted.org/packages/6f/01/eafaa4f9fed4d03c5817965f22dac280de0f1e58f9c0c9654c119ab42ad3/memray-1.15.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:fb885f92833279d34addc607831352e91267b8e547ea861ad561a3dba64f6757", size = 8357767 },
+    { url = "https://files.pythonhosted.org/packages/b9/c2/a4b5cabfe1389dffbc724e21dac2b454cf76e4e9446e2ec50d74124fd666/memray-1.15.0-cp313-cp313-macosx_10_14_x86_64.whl", hash = "sha256:c1308e6a5fc5bc4e183bc0fdf5e241ddd9fb374338f32d77a4d5e74ccf611ef1", size = 922782 },
+    { url = "https://files.pythonhosted.org/packages/53/5d/c2968656dc33cc7ef9121b6b30da5a37a0497fe526ff0818d3ce06418085/memray-1.15.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:0794227dfa4b86a56137211fd5b8ec131e0bc4a5dc41c2f5a318ca56a22c9331", size = 894514 },
+    { url = "https://files.pythonhosted.org/packages/8a/59/10efbb5e35221fe2097717391bece4bcc089f0c7cdc77c7d285f9dc0a4b0/memray-1.15.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f184e82debd4f0c8ecf8e6034efddccdd9fac22909553a7f094eabf0902cd53f", size = 8006898 },
+    { url = "https://files.pythonhosted.org/packages/3e/96/7cc05356c2e4e1b1965c2fcd6ad89307dadb7bc531c8da44abcea94b213e/memray-1.15.0-cp313-cp313-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3493c5ac1ae1353fd0d24481bc9f30da8960ef703bf4af966cefff9dd1234d38", size = 8126116 },
+    { url = "https://files.pythonhosted.org/packages/fa/ba/7056f86ee16b8598288f652edc5c3c7df51eda15d3ecfc5c9f5bf7c578d3/memray-1.15.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:145a3062d8bf631aa8dc4b0928585e201282634afc369799dae1a0b9ece59fd4", size = 8397263 },
+    { url = "https://files.pythonhosted.org/packages/c5/30/8410d26b9ea64c942a23fcd9e46c6daae841bc7b451676e5b671346d4955/memray-1.15.0-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:59a4ade09cfe46e85cdb3a1976e9768e4674a6e448533c415dbe84e5a834f7c3", size = 8340658 },
 ]
 
 [[package]]
