@@ -1092,6 +1092,7 @@ def parse_units_to_state_dict(
     """
     state_mapper: Dict[str, UnitReprState] = dict()
     # first create unit to state mapping
+    # {"unit":"app4rs-queue-info.service","load":"not-found","active":"inactive","sub":"dead","description":"app4rs-queue-info.service"}
     for d in dicts:
         if d.get("active") == "active":
             state = UnitReprState.active
@@ -1173,6 +1174,7 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     # So I am simply appending one after the other, so that the more specific color
     # information is stored. A uniqueness test would just be unnecessary
     merged_units = [{"unit": d["unit_file"]} for d in parsed_unit_files]
+    # HERE: Fix this rendering issue!
     merged_units.extend(parsed_units)
     return parse_units_to_state_dict(merged_units)
 

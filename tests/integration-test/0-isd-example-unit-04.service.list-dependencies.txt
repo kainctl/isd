@@ -1,0 +1,67 @@
+0-isd-example-unit-04.service
+[0;1;32m●[0m ├─app.slice
+[0;1;32m●[0m ├─basic.target
+[0;1;32m●[0m │ ├─systemd-tmpfiles-setup.service
+[0;1;32m●[0m │ ├─paths.target
+[0;1;32m●[0m │ ├─sockets.target
+[0;1;32m●[0m │ │ ├─dbus.socket
+[0;1;32m●[0m │ │ ├─pipewire-pulse.socket
+[0;1;32m●[0m │ │ ├─pipewire.socket
+[0;1;32m●[0m │ │ └─podman.socket
+[0;1;32m●[0m │ └─timers.target
+[0;1;32m●[0m │   └─nix-gc.timer
+[0;1;32m●[0m └─default.target
+[0;1;32m●[0m   ├─0-isd-example-unit-01.service
+[0m○[0m   ├─0-isd-example-unit-02.service
+[0m○[0m   ├─0-isd-example-unit-03.service
+[0;1;32m●[0m   ├─0-isd-example-unit-05.service
+[0;1;32m●[0m   ├─0-isd-example-unit-06.service
+[0;1;32m●[0m   ├─0-isd-example-unit-07.service
+[0;1;32m●[0m   ├─0-isd-example-unit-08.service
+[0;1;32m●[0m   ├─0-isd-example-unit-09.service
+[0;1;32m●[0m   ├─0-isd-example-unit-10.service
+[0;1;32m●[0m   ├─0-isd-example-unit-11.service
+[0;1;32m●[0m   ├─0-isd-example-unit-12.service
+[0;1;32m●[0m   ├─0-isd-example-unit-13.service
+[0;1;32m●[0m   ├─0-isd-example-unit-14.service
+[0;1;32m●[0m   ├─0-isd-example-unit-15.service
+[0;1;32m●[0m   ├─0-isd-example-unit-16.service
+[0;1;32m●[0m   ├─0-isd-example-unit-17.service
+[0;1;32m●[0m   ├─0-isd-example-unit-18.service
+[0;1;32m●[0m   ├─0-isd-example-unit-19.service
+[0;1;32m●[0m   ├─0-isd-example-unit-20.service
+[0;1;32m●[0m   ├─0-isd-example-unit-21.service
+[0;1;32m●[0m   ├─0-isd-example-unit-22.service
+[0;1;32m●[0m   ├─0-isd-example-unit-23.service
+[0;1;32m●[0m   ├─0-isd-example-unit-24.service
+[0;1;32m●[0m   ├─0-isd-example-unit-25.service
+[0m○[0m   ├─0-isd-example-unit-template@default.service
+[0m○[0m   ├─app4rs-queue-info.service
+[0m○[0m   ├─hello.service
+[0m○[0m   ├─isd-example-unit-01.service
+[0m○[0m   ├─isd-example-unit-02.service
+[0m○[0m   ├─isd-example-unit-03.service
+[0m○[0m   ├─isd-example-unit-04.service
+[0m○[0m   ├─isd-example-unit-05.service
+[0m○[0m   ├─isd-example-unit-06.service
+[0m○[0m   ├─isd-example-unit-07.service
+[0m○[0m   ├─isd-example-unit-08.service
+[0m○[0m   ├─isd-example-unit-09.service
+[0m○[0m   ├─isd-example-unit-10.service
+[0m○[0m   ├─isd-example-unit.service
+[0m○[0m   ├─nixos-activation.service
+[0;1;32m●[0m   ├─pueued.service
+[0;1;32m●[0m   ├─shpool.service
+[0m○[0m   ├─sops-nix.service
+[0;1;32m●[0m   ├─ssh-agent.service
+[0;1;32m●[0m   ├─basic.target
+[0;1;32m●[0m     ├─systemd-tmpfiles-setup.service
+[0;1;32m●[0m     ├─paths.target
+[0;1;32m●[0m     ├─sockets.target
+[0;1;32m●[0m     │ ├─dbus.socket
+[0;1;32m●[0m     │ ├─pipewire-pulse.socket
+[0;1;32m●[0m     │ ├─pipewire.socket
+[0;1;32m●[0m     │ └─podman.socket
+[0;1;32m●[0m     └─timers.target
+[0;1;32m●[0m       └─nix-gc.timer
+    └─...

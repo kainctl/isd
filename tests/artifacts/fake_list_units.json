@@ -1,0 +1,177 @@
+[
+  {
+    "unit": "0-isd-example-unit-01.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-01"
+  },
+  {
+    "unit": "0-isd-example-unit-02.service",
+    "load": "loaded",
+    "active": "inactive",
+    "sub": "dead",
+    "description": "0-isd-example-unit-02"
+  },
+  {
+    "unit": "0-isd-example-unit-04.service",
+    "load": "loaded",
+    "active": "failed",
+    "sub": "failed",
+    "description": "0-isd-example-unit-04"
+  },
+  {
+    "unit": "0-isd-example-unit-05.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-05"
+  },
+  {
+    "unit": "0-isd-example-unit-06.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-06"
+  },
+  {
+    "unit": "0-isd-example-unit-07.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-07"
+  },
+  {
+    "unit": "0-isd-example-unit-08.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-08"
+  },
+  {
+    "unit": "0-isd-example-unit-09.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-09"
+  },
+  {
+    "unit": "0-isd-example-unit-10.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-10"
+  },
+  {
+    "unit": "0-isd-example-unit-11.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-11"
+  },
+  {
+    "unit": "0-isd-example-unit-12.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-12"
+  },
+  {
+    "unit": "0-isd-example-unit-13.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-13"
+  },
+  {
+    "unit": "0-isd-example-unit-14.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-14"
+  },
+  {
+    "unit": "0-isd-example-unit-15.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-15"
+  },
+  {
+    "unit": "0-isd-example-unit-16.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-16"
+  },
+  {
+    "unit": "0-isd-example-unit-17.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-17"
+  },
+  {
+    "unit": "0-isd-example-unit-18.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-18"
+  },
+  {
+    "unit": "0-isd-example-unit-19.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-19"
+  },
+  {
+    "unit": "0-isd-example-unit-20.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-20"
+  },
+  {
+    "unit": "0-isd-example-unit-21.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-21"
+  },
+  {
+    "unit": "0-isd-example-unit-22.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-22"
+  },
+  {
+    "unit": "0-isd-example-unit-23.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-23"
+  },
+  {
+    "unit": "0-isd-example-unit-24.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-24"
+  },
+  {
+    "unit": "0-isd-example-unit-25.service",
+    "load": "loaded",
+    "active": "active",
+    "sub": "exited",
+    "description": "0-isd-example-unit-25"
+  },
+  {
+    "unit": "0-isd-example-unit-template@default.service",
+    "load": "not-found",
+    "active": "inactive",
+    "sub": "dead",
+    "description": "0-isd-example-unit-template@default.service"
+  }
+]

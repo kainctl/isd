@@ -1,0 +1,17 @@
+[0;1;32m●[0m systemd-timesyncd.service - Network Time Synchronization
+   Loaded: loaded (/lib/systemd/system/systemd-timesyncd.service; enabled; vendor preset: enabled)
+  Drop-In: /lib/systemd/system/systemd-timesyncd.service.d
+           └─disable-with-time-daemon.conf
+   Active: [0;1;32mactive (running)[0m since Sat 2025-02-15 14:21:54 CET; 5min ago
+     Docs: man:systemd-timesyncd.service(8)
+ Main PID: 639 (systemd-timesyn)
+   Status: "Synchronized to time server 185.125.190.56:123 (ntp.ubuntu.com)."
+    Tasks: 2
+   Memory: 1.0M
+      CPU: 6ms
+   CGroup: /system.slice/systemd-timesyncd.service
+           └─639 /lib/systemd/systemd-timesyncd
+
+Feb 15 14:21:54 ubuntu-server-16 systemd[1]: Starting Network Time Synchronization...
+Feb 15 14:21:54 ubuntu-server-16 systemd[1]: Started Network Time Synchronization.
+Feb 15 14:22:24 ubuntu-server-16 systemd-timesyncd[639]: Synchronized to time server 185.125.190.56:123 (ntp.ubuntu.com).

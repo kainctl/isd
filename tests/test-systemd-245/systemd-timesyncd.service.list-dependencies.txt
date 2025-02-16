@@ -1,0 +1,6 @@
+systemd-timesyncd.service
+[0;1;32m●[0m ├─-.mount
+[0;1;32m●[0m ├─system.slice
+[0;1;32m●[0m ├─time-set.target
+[0;1;32m●[0m └─time-sync.target
+[0;1;32m●[0m   └─time-set.target

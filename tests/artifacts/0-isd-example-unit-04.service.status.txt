@@ -1,0 +1,16 @@
+[0;1;31m×[0m 0-isd-example-unit-04.service - 0-isd-example-unit-04
+     Loaded: loaded (]8;;file://nixos-laptop/home/kai/.config/systemd/user/0-isd-example-unit-04.service\/home/kai/.config/systemd/user/0-isd-example-unit-04.service]8;;\; alias)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Mon 2025-02-10 21:44:23 CET; 2min 31s ago
+   Duration: 23ms
+ Invocation: eba26e0ba221404aa1e630816095c3c4
+       Docs: ]8;;man:python\man:python]8;;\
+   Main PID: 124105 (code=exited, status=2)
+   Mem peak: 1.6M
+        CPU: 7ms
+
+Feb 10 21:44:23 nixos-laptop systemd[2223]: Started 0-isd-example-unit-04.
+Feb 10 21:44:23 nixos-laptop python3.13[124105]: Unknown option: -a
+Feb 10 21:44:23 nixos-laptop python3.13[124105]: usage: /nix/store/29a6wlyr860xg3i9n3pzavrlggmyxzkr-python3-3.13.1/bin/python3.13 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Feb 10 21:44:23 nixos-laptop python3.13[124105]: Try `python -h' for more information.
+Feb 10 21:44:23 nixos-laptop systemd[2223]: [0;1;39m[0;1;31m[0;1;39m0-isd-example-unit-04.service: Main process exited, code=exited, status=2/INVALIDARGUMENT[0m
+Feb 10 21:44:23 nixos-laptop systemd[2223]: [0;1;38:5:185m[0;1;39m[0;1;38:5:185m0-isd-example-unit-04.service: Failed with result 'exit-code'.[0m

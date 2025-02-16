@@ -1,0 +1,18 @@
+○ 0-isd-example-unit-02.service - 0-isd-example-unit-02
+     Loaded: loaded (]8;;file://nixos-laptop/home/kai/.config/systemd/user/0-isd-example-unit-02.service\/home/kai/.config/systemd/user/0-isd-example-unit-02.service]8;;\; alias)
+     Active: inactive (dead) since Sat 2025-02-15 14:16:54 CET; 305ms ago
+   Duration: 358ms
+ Invocation: 8a809c58a59d4771bd374c7f7dd596d0
+       Docs: ]8;;man:python\man:python]8;;\
+   Main PID: 42731 (code=exited, status=0/SUCCESS)
+
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:15:26.039326 121 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:15:33.058261 61457 hello.py:123] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:15:41.027741 124 some_other_bin:6782] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:15:49.018493 121 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:16:06.078440 121 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:16:26.020220 61457 isd_tester.py:552] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:16:42.010570 123 isd_tester.py:552] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:16:48.000574 61456 isd_tester.py:13] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 15 14:16:53 nixos-laptop python3.13[42731]: I20170322 15:16:58.019767 61456 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 15 14:16:54 nixos-laptop systemd[2372]: Stopped 0-isd-example-unit-02.

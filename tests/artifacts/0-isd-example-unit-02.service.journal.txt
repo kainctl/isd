@@ -1,0 +1,116 @@
+Feb 10 20:34:34 nixos-laptop systemd[2223]: Started 0-isd-example-unit-02.
+[0;38;5;245m░░ [0m[0;32mSubject: A start job for unit UNIT has finished successfully[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: https://lists.freedesktop.org/mailman/listinfo/systemd-devel[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mA start job for unit UNIT has finished successfully.[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe job identifier is 7359.[0m
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:58:52.047025 123 some_other_bin:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:58:55.083991 61456 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:59:10.081719 121 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:59:21.026252 61456 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:59:30.034213 123 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 14:59:47.040780 123 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:00:06.053448 61456 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:00:21.087666 123 some_other_bin:6782] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:00:27.050347 123 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:00:39.050513 123 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:00:43.020825 123 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:03.077144 123 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:12.045098 61456 isd_tester.py:13] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:27.072711 124 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:36.060077 61456 some_other_bin:6782] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:37.055863 124 some_other_bin:6782] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:39.001539 123 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:01:58.096728 123 isd_tester.py:552] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:02:14.025820 61456 hello.py:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:02:31.003854 61457 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:02:47.086611 61457 some_other_bin:352] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:02:58.077345 123 some_other_bin:112] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:03:19.097076 123 isd_tester.py:552] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:03:24.026749 123 hello.py:123] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:03:31.005927 121 isd_tester.py:13] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:03:40.031248 123 some_other_bin:6782] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:03:56.037693 61456 some_other_bin:112] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:02.022932 123 hello.py:352] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:15.009898 121 some_other_bin:6782] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:18.031374 124 isd_tester.py:13] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:23.006590 121 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:44.083556 124 some_other_bin:352] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:04:57.000354 124 isd_tester.py:552] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:07.094790 61456 isd_tester.py:13] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:23.078556 61457 some_other_bin:352] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:32.005979 61456 some_other_bin:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:36.016632 123 some_other_bin:112] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:37.058377 123 hello.py:123] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:05:51.008656 123 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:04.090380 121 some_other_bin:6782] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:09.009498 121 isd_tester.py:13] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:10.055103 123 hello.py:123] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:16.003413 124 isd_tester.py:552] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:21.045826 124 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:33.037595 123 isd_tester.py:13] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:40.018814 61456 some_other_bin:6782] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:50.043229 61456 some_other_bin:112] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:06:56.092730 61456 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:07:05.084886 61457 isd_tester.py:13] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:07:25.000739 61456 isd_tester.py:13] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:07:37.097877 61457 isd_tester.py:13] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:07:46.092658 123 isd_tester.py:552] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:07:47.023834 123 hello.py:123] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:04.012684 123 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:25.037870 123 hello.py:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:34.088606 123 some_other_bin:112] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:41.086232 123 some_other_bin:352] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:46.084114 123 isd_tester.py:552] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:47.060517 123 isd_tester.py:552] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:08:58.027841 123 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:09:13.080254 123 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:09:25.026933 123 isd_tester.py:13] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:09:34.016800 61457 some_other_bin:112] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:09:55.007414 61456 some_other_bin:6782] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:10:04.033410 123 hello.py:123] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:10:12.014079 123 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:10:25.098530 123 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:10:36.059038 123 isd_tester.py:13] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:10:53.046471 121 isd_tester.py:13] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:11:13.032065 121 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:11:29.051941 61457 hello.py:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:11:38.099768 121 some_other_bin:112] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:11:52.030976 61456 hello.py:123] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:03.077980 123 some_other_bin:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:07.034411 123 isd_tester.py:13] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:10.073455 123 hello.py:352] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:22.089798 61457 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:38.009879 123 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:40.073323 123 hello.py:352] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:42.051664 123 isd_tester.py:552] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:48.024910 121 some_other_bin:6782] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:12:57.071141 123 some_other_bin:352] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:13:16.075371 61456 some_other_bin:112] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:13:37.055244 123 isd_tester.py:552] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:13:51.077450 61456 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:13:57.042898 123 isd_tester.py:552] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:13:59.022458 124 hello.py:123] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:08.039379 123 some_other_bin:112] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:14.030018 123 some_other_bin:6782] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:28.093371 61456 some_other_bin:352] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:30.043183 123 isd_tester.py:552] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:37.072453 124 some_other_bin:6782] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:14:49.098008 123 some_other_bin:6782] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:06.079547 124 some_other_bin:112] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:10.041476 61456 some_other_bin:112] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:19.012698 124 some_other_bin:352] Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:24.096852 123 hello.py:352] Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:33.070334 61457 some_other_bin:6782] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:54.083583 123 isd_tester.py:552] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:34 nixos-laptop python3.13[113179]: I20170322 15:15:58.068285 124 some_other_bin:112] Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Feb 10 20:34:36 nixos-laptop systemd[2223]: Stopped 0-isd-example-unit-02.
+[0;38;5;245m░░ [0m[0;32mSubject: A stop job for unit UNIT has finished[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: https://lists.freedesktop.org/mailman/listinfo/systemd-devel[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mA stop job for unit UNIT has finished.[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe job identifier is 7496 and the job result is done.[0m

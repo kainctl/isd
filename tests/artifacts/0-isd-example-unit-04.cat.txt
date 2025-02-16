@@ -1,0 +1,14 @@
+[0;1;34m# ]8;;file://nixos-laptop/home/kai/.config/systemd/user/0-isd-example-unit-04.service\/home/kai/.config/systemd/user/0-isd-example-unit-04.service]8;;\[0m
+[0;1;36m[Unit][0m
+[0;1;32mAfter=[0mdefault.target
+[0;1;32mDescription=[0m0-isd-example-unit-04
+[0;1;32mDocumentation=[0mman:python
+[0;1;32mWants=[0mdefault.target
+[0;1;38:5:245m[0m
+[0;1;36m[Service][0m
+[0;1;32mEnvironment=[0m"LOCALE_ARCHIVE=/nix/store/y1v99kjfz78cwa74d9xc22gibryxjpi3-glibc-locales-2.40-36/lib/locale/locale-archive"
+[0;1;32mEnvironment=[0m"PATH=/nix/store/pw26z7msfmv291jq1qpp8bbaprs5hkfk-coreutils-9.5/bin:/nix/store/pvl69q0l5fiiblvsqz3l424617b7lw89-findutils-4.10.0/bin:/nix/store/01dri6m7g4bx0kkd39pkgfpzpj3i7y86-gnugrep-3.11/bin:/nix/store/v93bdqf52x2r2lqijv0f7x3yhylwy957-gnused-4.9/bin:/nix/store/b5nslvx24h0b1m4iml7cykg4dwwf8b7k-systemd-257.2/bin:/nix/store/pw26z7msfmv291jq1qpp8bbaprs5hkfk-coreutils-9.5/sbin:/nix/store/pvl69q0l5fiiblvsqz3l424617b7lw89-findutils-4.10.0/sbin:/nix/store/01dri6m7g4bx0kkd39pkgfpzpj3i7y86-gnugrep-3.11/sbin:/nix/store/v93bdqf52x2r2lqijv0f7x3yhylwy957-gnused-4.9/sbin:/nix/store/b5nslvx24h0b1m4iml7cykg4dwwf8b7k-systemd-257.2/sbin"
+[0;1;32mEnvironment=[0m"TZDIR=/nix/store/i1lligvkms3cgz8wcb05px5xzlnnpzxb-tzdata-2024b/share/zoneinfo"
+[0;1;32mExecStart=[0m/nix/store/29a6wlyr860xg3i9n3pzavrlggmyxzkr-python3-3.13.1/bin/python3.13 -asdf
+[0;1;32mRemainAfterExit=[0mtrue
+[0;1;32mType=[0msimple

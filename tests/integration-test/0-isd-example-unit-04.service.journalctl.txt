@@ -1,0 +1,25 @@
+Feb 15 14:15:07 nixos-laptop systemd[2372]: Started 0-isd-example-unit-04.
+[0;38;5;245m░░ [0m[0;32mSubject: A start job for unit UNIT has finished successfully[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: https://lists.freedesktop.org/mailman/listinfo/systemd-devel[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mA start job for unit UNIT has finished successfully.[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe job identifier is 1665.[0m
+Feb 15 14:15:07 nixos-laptop python3.13[42378]: Unknown option: -a
+Feb 15 14:15:07 nixos-laptop python3.13[42378]: usage: /nix/store/29a6wlyr860xg3i9n3pzavrlggmyxzkr-python3-3.13.1/bin/python3.13 [option] ... [-c cmd | -m mod | file | -] [arg] ...
+Feb 15 14:15:07 nixos-laptop python3.13[42378]: Try `python -h' for more information.
+Feb 15 14:15:07 nixos-laptop systemd[2372]: [0;1;39m[0;1;31m[0;1;39m0-isd-example-unit-04.service: Main process exited, code=exited, status=2/INVALIDARGUMENT[0m
+[0;38;5;245m░░ [0m[0;32mSubject: Unit process exited[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: https://lists.freedesktop.org/mailman/listinfo/systemd-devel[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mAn ExecStart= process belonging to unit UNIT has exited.[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe process' exit code is 'exited' and its exit status is 2.[0m
+Feb 15 14:15:07 nixos-laptop systemd[2372]: [0;1;38:5:185m[0;1;39m[0;1;38:5:185m0-isd-example-unit-04.service: Failed with result 'exit-code'.[0m
+[0;38;5;245m░░ [0m[0;32mSubject: Unit failed[0m
+[0;38;5;245m░░[0m [0;32mDefined-By: systemd[0m
+[0;38;5;245m░░[0m [0;32mSupport: https://lists.freedesktop.org/mailman/listinfo/systemd-devel[0m
+[0;38;5;245m░░[0m [0;32m[0m
+[0;38;5;245m░░[0m [0;32mThe unit UNIT has entered the 'failed' state with result 'exit-code'.[0m

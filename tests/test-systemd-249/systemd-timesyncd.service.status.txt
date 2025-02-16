@@ -1,0 +1,18 @@
+[0;1;32m●[0m systemd-timesyncd.service - Network Time Synchronization
+     Loaded: loaded (]8;;file://ubuntu2204/lib/systemd/system/systemd-timesyncd.service/lib/systemd/system/systemd-timesyncd.service]8;;; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Sat 2025-02-15 13:42:32 UTC; 47s ago
+       Docs: ]8;;man:systemd-timesyncd.service(8)man:systemd-timesyncd.service(8)]8;;
+   Main PID: 631 (systemd-timesyn)
+     Status: "Initial synchronization to time server 185.125.190.58:123 (ntp.ubuntu.com)."
+      Tasks: 2 (limit: 4557)
+     Memory: 1.4M
+        CPU: 44ms
+     CGroup: /system.slice/systemd-timesyncd.service
+             └─631 /lib/systemd/systemd-timesyncd
+
+Feb 15 13:42:32 ubuntu2204 systemd[1]: Starting Network Time Synchronization...
+Feb 15 13:42:32 ubuntu2204 systemd[1]: Started Network Time Synchronization.
+Feb 15 13:42:32 ubuntu2204 systemd-timesyncd[631]: Network configuration changed, trying to establish connection.
+Feb 15 13:42:33 ubuntu2204 systemd-timesyncd[631]: Network configuration changed, trying to establish connection.
+Feb 15 13:42:35 ubuntu2204 systemd-timesyncd[631]: Network configuration changed, trying to establish connection.
+Feb 15 13:43:05 ubuntu2204 systemd-timesyncd[631]: Initial synchronization to time server 185.125.190.58:123 (ntp.ubuntu.com).
