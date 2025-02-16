@@ -60,7 +60,6 @@ from textual import on, work, events
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical
-import textual.events
 from textual.reactive import reactive
 from textual.screen import Screen, ModalScreen
 
@@ -77,7 +76,6 @@ from textual.widgets import (
     Input,
     RichLog,
     SelectionList,
-    Tab,
     TabbedContent,
     TabPane,
     Tabs,
@@ -166,6 +164,9 @@ RESERVED_KEYBINDINGS: Dict[str, str] = {
     "ctrl+z": "Suspend App",
     "ctrl+p": "Open Command Palette",
     "escape": "Close modal",
+    "tab": "Focus next",
+    "shift+tab": "Focus previous",
+    "space": "Select",
 }
 
 
@@ -431,7 +432,7 @@ class KeybindingModel(BaseModel):
         Raises a ValueError if there conflicts
         """
         d: Dict[str, str] = {}
-        for attr, keys in self.dict().items():
+        for attr, keys in self.model_dump().items():
             for unformatted_key in keys.split(","):
                 key = unformatted_key.strip().lower()
                 if key in d:
@@ -1038,11 +1039,24 @@ def unit_sort_priority(unit: str) -> int:
 
 
 class UnitReprState(Enum):
+    # derived from the value of the "active" column
     active = auto()
+    reloading = auto()
+    refreshing = auto()
+    deactivating = auto()
+    activating = auto()
+    maintenance = auto()
     failed = auto()
+    # These are custom values that try to be more
+    # specific than simply returning "inactive".
     not_found = auto()
-    dead = auto()
-    other = auto()
+    bad_setting = auto()
+    masked = auto()
+    error = auto()
+    inactive = auto()
+    # state for unit files that are only listed in
+    # the output of `list-unit-files`
+    file = auto()
 
     def render_state(
         self, unit: str, highlight_indices: Optional[List[int]] = None
@@ -1051,24 +1065,43 @@ class UnitReprState(Enum):
         Given a `unit` and an optional list of indices, highlight them depending
         on the state.
         Return a rich `Text` object with the correct styling.
+
+        Use mapping from upstream:
+        https://github.com/systemd/systemd/blob/78056ba850fbe0606c3e264f5af68ac3eb52c9e7/src/basic/unit-def.c#L361-L378
         """
         if self == UnitReprState.active:
             prefix = "●"
             style = "green"
+        elif self == UnitReprState.reloading or self == UnitReprState.refreshing:
+            prefix = "↻"
+            style = "green"
         elif self == UnitReprState.failed:
             prefix = "×"
             style = "red"
-        elif self == UnitReprState.not_found:
+        elif self == UnitReprState.activating or self == UnitReprState.deactivating:
+            prefix = "●"
+            style = "yellow"  # This is custom
+        elif self == UnitReprState.inactive or self == UnitReprState.maintenance:
+            prefix = "○"
+            style = ""
+        # until here, I am following the settings from upstream:
+        # https://github.com/systemd/systemd/blob/78056ba850fbe0606c3e264f5af68ac3eb52c9e7/src/basic/unit-def.c#L361-L378
+        # The following a more custom visualization that I provide for "more detailed"
+        # `inactive` units. The parser needs to take care of mapping those to the more specialized cases.
+        # To link the meaning closer to the `inactive` state, the following should re-use the same
+        # symbol as `inactive`.
+        elif self == UnitReprState.not_found or self == UnitReprState.masked:
             prefix = "○"
             style = "yellow"
-        elif unit.rsplit(".", maxsplit=1)[0][-1] == "@":
-            # a template service does not have a 'valid' status output
+        elif self == UnitReprState.error or self == UnitReprState.bad_setting:
+            prefix = "○"
+            style = "red"
+        elif auto:
             # -> this is a visual indication that it is "different"
             prefix = "○"
             style = "#878787"  # gray
         else:
-            prefix = "○"
-            style = ""  # plain
+            raise NotImplementedError("Unknown render state")
 
         text = Text(unit)
         if highlight_indices is not None and len(highlight_indices) > 0:
@@ -1080,36 +1113,88 @@ class UnitReprState(Enum):
         return Text.assemble(prefix, " ", text, style=style)
 
 
-def parse_units_to_state_dict(
-    dicts: List[Dict[str, str]],
-) -> Dict[str, UnitReprState]:
+def parse_list_unit_files_lines(lines: str) -> dict[str, UnitReprState]:
     """
-    Given a list of dictionaries that is derived by
-    `systemctl list-units --output=json` extract the
-    `unit` entry and map it to a `ServiceReprState`.
-    The key ordering is customized to have more relevant units
-    in the beginning of the list.
+    This output seems to be quite a bit less stable over different
+    `systemd` versions.
+    From what I can tell, the unit-files can be one of
+    (v229) static, enabled, disabled, masked, or
+    (v233) enabled, generated, linked, alias, masked, enabled-runtime.
+    -> I will simply map those to a special `UnitReprState` and use
+    that as a fall back if the actual `list-units` call does not
+    provide any actual info.
     """
-    state_mapper: Dict[str, UnitReprState] = dict()
-    # first create unit to state mapping
-    # {"unit":"app4rs-queue-info.service","load":"not-found","active":"inactive","sub":"dead","description":"app4rs-queue-info.service"}
-    for d in dicts:
-        if d.get("active") == "active":
-            state = UnitReprState.active
-        elif d.get("active") == "failed":
-            state = UnitReprState.failed
-        elif d.get("load") == "not-found":
-            state = UnitReprState.not_found
-        # inactive
+    d = {}
+    for i, line in enumerate(lines.splitlines()):
+        # if i == 0:
+        #     columns = line.split()
+        #     # May receive an empty input if no user units exist!
+        #     if columns == "":
+        #         return {}
+        #     # strictly speaking it should be "UNIT FILE"
+        #     assert columns[0] == "UNIT"
+        #     assert columns[1] == "FILE"
+        #     continue
+        if line == "":
+            # End of structured output.
+            # The remaining lines contain the legend description.
+            break
+        #
+        fields = line.split(maxsplit=1)
+        unit_file_name = fields[0]
+        d[unit_file_name] = UnitReprState.file
+    return d
+
+
+def parse_list_units_lines(lines: str) -> dict[str, UnitReprState]:
+    """
+    Parses data that was generated with `systemctl list-units --full --all --plain`.
+    Skips the first row and stop after seeing the first empty line.
+
+    Throughput notes:
+    Generating the mappings for a file that is over
+    100'000 lines long with > 21MB of data, the runtime
+    is about 170 ms. I won't optimize this further.
+    If necessary, optimize reading the data from the pipe
+    to process the data in chunks. Using `re` was slower.
+    """
+    d = {}
+    for i, line in enumerate(lines.splitlines()):
+        if line == "":
+            # End of structured output.
+            break
+
+        fields = line.split()
+        unit = fields[0]
+        load_value = fields[1]
+        active_value = fields[2]
+
+        if active_value in (
+            "active",
+            "reloading",
+            "refreshing",
+            "deactivating",
+            "activating",
+            "maintenance",
+            "failed",
+        ):
+            d[unit] = UnitReprState[active_value]
+        elif active_value == "inactive":
+            if load_value == "loaded":
+                # If the value is `loaded` fall back to the
+                # default `invalid` state.
+                # For example, a crashed unit falls into `invalid`
+                # with `loaded` and has the sub state failed.
+                d[unit] = UnitReprState["inactive"]
+            else:
+                # Try to derive custom, more concrete value from `load_value`
+                # If it is something different than 'loaded' I can
+                # provide more information.
+                # This should be one of `masked`, `bad-setting`, `not-found`, `error`
+                d[unit] = UnitReprState[load_value.replace("-", "_")]
         else:
-            state = UnitReprState.other
-        state_mapper[d["unit"]] = state
-    # second find desired order of dict
-    sorted_units = sorted(
-        state_mapper.keys(), key=lambda unit: (unit_sort_priority(unit), unit.lower())
-    )
-    # Generate sorted state mapping
-    return {unit: state_mapper[unit] for unit in sorted_units}
+            raise NotImplementedError("Reached an unknown unit state.")
+    return d
 
 
 async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitReprState]:
@@ -1130,11 +1215,9 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     """
     list_units = [
         get_systemctl_bin(),
-        # "systemctl",
         "list-units",
     ]
     list_unit_files = [
-        # "systemctl",
         get_systemctl_bin(),
         "list-unit-files",
     ]
@@ -1146,7 +1229,8 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     args = mode_arg + [
         "--all",
         "--full",
-        "--output=json",
+        "--plain",
+        "--no-legend",
         "--",
         *pattern,
     ]
@@ -1159,7 +1243,7 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     )
     stdout, stderr = await proc.communicate()
     # proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    parsed_units: List[Dict[str, str]] = json.loads(stdout)
+    parsed_units = parse_list_units_lines(stdout.decode())
 
     proc = await asyncio.create_subprocess_exec(
         *list_unit_files,
@@ -1169,14 +1253,12 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
         stdin=subprocess.DEVNULL,
     )
     stdout, stderr = await proc.communicate()
-    # proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    parsed_unit_files: List[Dict[str, str]] = json.loads(stdout)
-    # So I am simply appending one after the other, so that the more specific color
-    # information is stored. A uniqueness test would just be unnecessary
-    merged_units = [{"unit": d["unit_file"]} for d in parsed_unit_files]
-    # HERE: Fix this rendering issue!
-    merged_units.extend(parsed_units)
-    return parse_units_to_state_dict(merged_units)
+
+    # Ignore if there is an issue with ancient `systemd` versions
+    # that do not have `systemctl list-unit-files` as a sub-command.
+    if proc.returncode == 0:
+        parsed_unit_files = parse_list_unit_files_lines(stdout.decode())
+    return {**parsed_unit_files, **parsed_units}
 
 
 def show_command(*args: str) -> None:
@@ -2366,14 +2448,18 @@ class InteractiveSystemd(App, inherit_bindings=False):
         ),
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, force_defaults: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
-        try:
-            self.settings = Settings()
-            self.settings_error = None
-        except Exception as e:
+        if force_defaults:
             self.settings = Settings.model_construct()
-            self.settings_error = e
+            self.settings_error = None
+        else:
+            try:
+                self.settings = Settings()
+                self.settings_error = None
+            except Exception as e:
+                self.settings = Settings.model_construct()
+                self.settings_error = e
         # only show the following bindings in the footer
         show_bindings = ["toggle_systemctl_modal"]
         for action, field in GenericKeybinding.model_fields.items():
