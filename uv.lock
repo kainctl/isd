@@ -1489,7 +1489,7 @@ wheels = [
 
 [[package]]
 name = "textual"
-version = "2.0.1"
+version = "2.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py", extra = ["linkify", "plugins"] },
@@ -1497,9 +1497,9 @@ dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/ee/c279280f592c379431e2e86c06849ec87c9be503f67d6f80402082aebd97/textual-2.0.1.tar.gz", hash = "sha256:bbb0968234d94eaf8e75270aa1d84b422affb03b367ad5170a51f1de12ac1d74", size = 1591680 }
+sdist = { url = "https://files.pythonhosted.org/packages/6e/d7/b45464bf3e8362190b817e1fa60cce3d7004369e4a2ec0f0d28c7fa3d83d/textual-2.0.4.tar.gz", hash = "sha256:128177fc6d63d0f3236e374e28d68f4343bd2e996825da2a6f122d9fbf017d31", size = 1591729 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/d0/b9b52475900e312068ff53672aeb7f18ceff0641fa86e8a70317a54ebec4/textual-2.0.1-py3-none-any.whl", hash = "sha256:6ca475c24c14fcf9ff285c66ab53280f02950a959fa7aa2b99b5111fc08c5688", size = 679478 },
+    { url = "https://files.pythonhosted.org/packages/93/68/7f26c55e7c5818eed5c1912106e1392bf1edfb1b7ef342b35930fa559f2d/textual-2.0.4-py3-none-any.whl", hash = "sha256:0a151c060586eb4fb091584fab58f0706daa51cf27330efef548bc14f3c6aa66", size = 679459 },
 ]
 
 [[package]]
