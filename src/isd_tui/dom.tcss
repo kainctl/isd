@@ -20,6 +20,25 @@ SystemctlActionScreen {
   align: center middle;
 }
 
+DonationScreen {
+  align: center middle;
+}
+
+DonationScreen VerticalGroup {
+  max-width: 75%;
+  min-width: 50%;
+}
+
+DonationScreen Markdown {
+  text-style: bold;
+  padding: 1 2;
+  width: 1fr;
+}
+
+DonationScreen Button {
+  width: 1fr;
+}
+
 SystemctlActionScreen CustomOptionList {
   padding: 1 2;
   border: tall $primary;

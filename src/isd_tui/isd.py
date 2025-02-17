@@ -59,7 +59,7 @@ from rich.text import Text
 from textual import on, work, events
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import Container, Horizontal, Vertical, VerticalGroup
 from textual.reactive import reactive
 from textual.screen import Screen, ModalScreen
 
@@ -75,14 +75,16 @@ from textual.widgets import (
     Header,
     Input,
     RichLog,
+    Button,
     SelectionList,
     TabbedContent,
     TabPane,
     Tabs,
     OptionList,
+    Markdown,
 )
 from textual.widgets._toggle_button import ToggleButton
-from xdg_base_dirs import xdg_cache_home, xdg_config_home
+from xdg_base_dirs import xdg_cache_home, xdg_config_home, xdg_data_home
 from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
 
@@ -350,6 +352,45 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
     @on(CustomOptionList.OptionSelected)
     def command_selected(self, event: CustomOptionList.OptionSelected):
         self.dismiss(event.option_id)
+
+
+class DonationScreen(ModalScreen[Optional[None]]):
+    """
+    Present a screen with the donation information.
+    """
+
+    BINDINGS = [Binding("enter", "select", "Select", show=True)]
+
+    def __init__(
+        self,
+        startup_count: int,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self._bindings.bind(ensure_reserved("escape"), "close", "Close")
+        self.startup_count = startup_count
+
+    def compose(self) -> ComposeResult:
+        with VerticalGroup():
+            yield Markdown(
+                f"# 🎉🎉🎉 You have opened isd more than {self.startup_count} times! 🎉🎉🎉\n"
+                + "We are proud this tool is useful to you! "
+                + "We build this app with love (and a lot of caffeine). "
+                + "If our work adds value to your day, consider supporting us to keep the project sustainable. "
+                + "Every contribution, big or small, powers future updates! \n"
+                + "- [ko-fi.com/isdproject](https://ko-fi.com/isdproject)\n\n"
+                + "# 💙 Thank you 💙"
+            )
+            yield Button(
+                label="Close",
+            )
+        yield Footer()
+
+    def on_button_pressed(self) -> None:
+        self.action_close()
+
+    def action_close(self) -> None:
+        self.dismiss(None)
 
 
 def get_default_pager_args_presets(pager: str) -> list[str]:
@@ -921,6 +962,21 @@ def isd_cache_dir() -> Path:
     return cache_dir
 
 
+def isd_data_dir() -> Path:
+    """
+    Return the path to persistent isd data directory.
+    The function will try to create the directory if it doesn't exist
+    but will skip any errors.
+    """
+    assert __package__ is not None
+    isd_data_dir = xdg_data_home() / __package__
+    try:
+        isd_data_dir.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        print(f"Exception: {e} while creating directory: {isd_data_dir}")
+    return isd_data_dir
+
+
 def isd_config_dir() -> Path:
     """
     Return the path to the isd config directory.
@@ -935,9 +991,14 @@ def isd_config_dir() -> Path:
     return config_dir
 
 
-def get_isd_state_json_file_path() -> Path:
+def get_isd_cached_state_json_file_path() -> Path:
     cache_dir = isd_cache_dir()
     return cache_dir / "state.json"
+
+
+def get_isd_persistent_json_file_path() -> Path:
+    data_dir = isd_data_dir()
+    return data_dir / "persistent_state.json"
 
 
 def get_config_file_path() -> Path:
@@ -1666,7 +1727,7 @@ def derive_startup_mode(startup_mode: StartupMode) -> str:
         return "system"
     if startup_mode == StartupMode("auto"):
         fallback: StartupMode = StartupMode("user")
-        fp = get_isd_state_json_file_path()
+        fp = get_isd_cached_state_json_file_path()
         if fp.exists():
             return json.loads(fp.read_text()).get("mode", fallback)
         else:
@@ -1676,7 +1737,7 @@ def derive_startup_mode(startup_mode: StartupMode) -> str:
 
 
 def cached_search_term() -> str:
-    fp = get_isd_state_json_file_path()
+    fp = get_isd_cached_state_json_file_path()
     if fp.exists():
         return json.loads(fp.read_text()).get("search_term", "")
     return ""
@@ -1871,13 +1932,14 @@ class MainScreen(Screen):
         """
         json_state = json.dumps({"mode": self.mode, "search_term": self.search_term})
 
-        fp = get_isd_state_json_file_path()
-        # directory may not exist if there was a previous issue while creating them
-        if not is_root() and fp.parent.exists():
-            try:
-                fp.write_text(json_state)
-            except Exception as e:
-                print(f"Exception: {e} while writing state to: {fp}")
+        if not is_root():
+            fp_cache_state = get_isd_cached_state_json_file_path()
+            # directory may not exist if there was a previous issue while creating them
+            if fp_cache_state.parent.exists():
+                try:
+                    fp_cache_state.write_text(json_state)
+                except Exception as e:
+                    print(f"Exception: {e} while writing state to: {fp_cache_state}")
 
     # There isn't really any additional foreground commands apart from
     # edit that are useful. All the other ones are encoded as preview windows.
@@ -2448,7 +2510,13 @@ class InteractiveSystemd(App, inherit_bindings=False):
         ),
     ]
 
-    def __init__(self, *args, force_defaults: bool = False, **kwargs):
+    def __init__(
+        self,
+        *args,
+        force_defaults: bool = True,
+        fake_startup_count: Optional[int] = 1,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         if force_defaults:
             self.settings = Settings.model_construct()
@@ -2460,7 +2528,26 @@ class InteractiveSystemd(App, inherit_bindings=False):
             except Exception as e:
                 self.settings = Settings.model_construct()
                 self.settings_error = e
-        # only show the following bindings in the footer
+        _persistent_json_fp = get_isd_persistent_json_file_path()
+
+        _persistent_data = (
+            json.loads(_persistent_json_fp.read_text())
+            if _persistent_json_fp.exists()
+            else {}
+        )
+        if fake_startup_count is None:
+            _startup_count = _persistent_data.get("startup_count")
+            self.startup_count = 1 if _startup_count is None else _startup_count + 1
+            try:
+                _persistent_data["startup_count"] = self.startup_count
+                _persistent_json_fp.write_text(json.dumps(_persistent_data))
+                print("Written to ", _persistent_json_fp)
+            except Exception as e:
+                print(e)
+        else:
+            self.startup_count = fake_startup_count
+
+        # Only show the following bindings in the footer
         show_bindings = ["toggle_systemctl_modal"]
         for action, field in GenericKeybinding.model_fields.items():
             keys = getattr(self.settings.generic_keybindings, action)
@@ -2585,7 +2672,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
         self.notify(f"isd version: {__version__}", timeout=30)
 
     def on_mount(self) -> None:
-        # always make sure to use the latest schema
+        # Always make sure to use the latest schema
         self.update_schema()
         self.install_screen(MainScreen(self.settings), "main")
         if self.settings_error is not None:
@@ -2605,6 +2692,16 @@ class InteractiveSystemd(App, inherit_bindings=False):
             n.write(str(self.settings_error))
             n.close()
         self.push_screen("main")
+
+        if self.startup_count % 100 == 0:
+            self.call_after_refresh(self.show_donation_screen)
+
+    @work
+    async def show_donation_screen(self) -> None:
+        prev_focus = self.focused
+        self.set_focus(None)
+        await self.push_screen_wait(DonationScreen(startup_count=self.startup_count))
+        self.set_focus(prev_focus)
 
     @work
     async def action_toggle_systemctl_modal(self) -> None:
@@ -2710,7 +2807,7 @@ def render_model_as_yaml(model: Settings) -> str:
 
 
 def main():
-    app = InteractiveSystemd()
+    app = InteractiveSystemd(force_defaults=False, fake_startup_count=None)
     # In theory, I could trigger a custom exit code for the application
     # if a change is detected and then restart the application here.
     # But let's keep it simple for now. If somebody actually asks for this

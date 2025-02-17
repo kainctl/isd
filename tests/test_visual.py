@@ -1,15 +1,18 @@
 import pytest
 from functools import partial
 import os
+import json
 from isd_tui.isd import (
     CustomInput,
     CustomSelectionList,
+    DonationScreen,
     InteractiveSystemd,
     MainScreen,
 )
 from pathlib import Path
 from textual.pilot import Pilot
 from textual.widgets import RichLog, TabbedContent, Tabs
+from xdg_base_dirs import xdg_data_home
 
 os.environ["PATH"] = str(Path(__file__).parent.resolve()) + ":" + os.environ["PATH"]
 
@@ -28,7 +31,7 @@ async def click_and_wait(pilot: Pilot, selector) -> None:
 
 
 async def test_focus_ordering():
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     async with app.run_test() as pilot:
         assert isinstance(pilot.app.screen, MainScreen)
         assert isinstance(pilot.app.focused, CustomInput)
@@ -50,7 +53,7 @@ async def test_focus_ordering():
 
 
 async def test_navigation_tabbed_content():
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     settings = app.settings
     nav = settings.navigation_keybindings
 
@@ -86,7 +89,7 @@ async def test_navigation_custom_selection():
     `MainScreen`.
     If this test succeeds, I can be fairly certain that
     """
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     settings = app.settings
 
     async with app.run_test() as pilot:
@@ -120,7 +123,7 @@ async def test_navigation_custom_selection():
 
 
 async def test_main_keybindings_change_preview_tab():
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     settings = app.settings
     main_kbs = settings.main_keybindings
     async with app.run_test() as pilot:
@@ -142,7 +145,7 @@ async def test_main_keybindings_change_preview_tab():
 
 
 async def test_main_keybindings_input_shortcuts():
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     settings = app.settings
     main_kbs = settings.main_keybindings
     async with app.run_test() as pilot:
@@ -161,7 +164,7 @@ async def test_main_keybindings_input_shortcuts():
 
 
 async def test_selection_click():
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     async with app.run_test() as pilot:
         pilot.app.query_exactly_one(CustomSelectionList).focus()
         assert isinstance(app.screen, MainScreen)
@@ -178,6 +181,44 @@ async def test_selection_click():
         )
 
 
+async def test_donation_screen_interaction():
+    app = InteractiveSystemd(fake_startup_count=100)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        assert isinstance(app.screen, DonationScreen)
+        await pilot.press("enter")
+        assert isinstance(app.screen, DonationScreen)
+        await pilot.press(first_key(app.settings.navigation_keybindings.down))
+        assert isinstance(app.screen, DonationScreen)
+        await pilot.press("enter")
+        assert isinstance(app.screen, DonationScreen)
+        await pilot.press("tab")
+        await pilot.press("enter")
+        assert isinstance(app.screen, MainScreen)
+
+
+async def test_usage_counter(monkeypatch, tmp_path):
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
+    assert xdg_data_home() == Path(tmp_path)
+
+    p = Path(tmp_path) / "isd_tui" / "persistent_state.json"
+    assert not p.exists()
+
+    # The initialization updates the `startup_count`
+    InteractiveSystemd(fake_startup_count=None)
+
+    assert p.exists()
+    assert json.loads(p.read_text())["startup_count"] == 1
+
+    InteractiveSystemd(fake_startup_count=None)
+
+    assert json.loads(p.read_text())["startup_count"] == 2
+
+    # Using a fake startup counter should not change anything
+    InteractiveSystemd(fake_startup_count=100)
+    assert json.loads(p.read_text())["startup_count"] == 2
+
+
 @pytest.mark.parametrize(
     "click_target",
     [
@@ -191,27 +232,34 @@ async def test_selection_click():
 )
 def test_snap_preview(snap_compare, click_target: str):
     assert snap_compare(
-        InteractiveSystemd(force_defaults=True),
+        InteractiveSystemd(),
         run_before=partial(click_and_wait, selector=click_target),
     )
 
 
+def test_snap_donation_screen(snap_compare):
+    assert snap_compare(
+        InteractiveSystemd(fake_startup_count=100),
+        run_before=lambda pilot: pilot.pause(),
+    )
+
+
 def test_snap_systemctl_action(snap_compare):
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     assert snap_compare(
         app, press=[first_key(app.settings.generic_keybindings.toggle_systemctl_modal)]
     )
 
 
 def test_snap_toggled_mode(snap_compare):
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
     assert snap_compare(
         app, press=[first_key(app.settings.main_keybindings.toggle_mode)]
     )
 
 
 def test_snap_height(snap_compare):
-    app = InteractiveSystemd(force_defaults=True)
+    app = InteractiveSystemd()
 
     async def run_before(pilot: Pilot):
         pilot.app.query_exactly_one(CustomSelectionList).focus()
