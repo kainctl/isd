@@ -60,7 +60,7 @@ Limiting the functionality of the preview window is an explicit design decision 
 `isd` should be seen as the gateway to interact and work with `systemd` units while
 seamlessly integrating with other, purpose-built tools.
 By integrating with other tools, `isd` limits the scope of the application
-(reducing feature creep) and gives users full control since it is easy to configure
+(reducing feature creep), and gives you, the user, full control since it is easy to configure
 your favorite pager/editor.
 
 The main _goal_ of the preview window is to give quick feedback about the selected/highlighted

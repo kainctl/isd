@@ -58,6 +58,7 @@ Just jump to the sections that sound interesting:
 - [Journal Pager](#journal-pager)
 - [Journal Pager Arguments](#journal-pager-arguments)
 - [Theme](#theme)
+- [Layout](#layout)
 - [Keybindings](#keybindings)
     - [Generic Keybindings](#generic-keybindings)
     - [Main Keybindings](#main-keybindings)
@@ -179,6 +180,18 @@ But to persist the changes you _must_ update the configuration file.
 <!-- [ansi escape codes](https://github.com/tinted-theming/home) -->
 <!-- you --> 
 
+### Layout
+
+`isd` allows you to customize the layout.
+Currently, the relative heights between the search results and preview widgets
+can be adjusted:
+
+{{ config_block(11) }}
+
+{{ config_block(12) }}
+
+By default the preview widget is about twice as tall as the search results widget.
+
 ### Keybindings
 
 > With great flexibility comes great responsibility.
@@ -208,25 +221,25 @@ for keybindings:
 
 #### Generic Keybindings
 
-{{ config_block(11) }}
+{{ config_block(13) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### Main Keybindings
 
-{{ config_block(12) }}
+{{ config_block(14) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### Navigation Keybindings
 
-{{ config_block(13) }}
+{{ config_block(15) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### `systemctl` Keybindings
 
-{{ config_block(14) }}
+{{ config_block(16) }}
 
 This allows you to configure the `systemctl` commands and keybindings.
 It is important to note that the `command` key may contain spaces (like `edit --runtime`)
@@ -250,21 +263,21 @@ the [shell injection section](security.md/#shell-injection).
 
 ### Pager Arguments
 
-{{ config_block(15) }}
+{{ config_block(17) }}
 
 If you have to customize the pager arguments for a common pager,
 please open an issue!
 
 ### Journal Pager Arguments
 
-{{ config_block(16) }}
+{{ config_block(18) }}
 
 If you have to customize the pager arguments for a common pager,
 please open an issue!
 
 ### Maximum Preview Lines
 
-{{ config_block(17) }}
+{{ config_block(19) }}
 
 This value can mainly be configured if opening the journal preview
 window takes too long. Though, it should usually not be required

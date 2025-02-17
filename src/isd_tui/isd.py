@@ -766,8 +766,12 @@ class Settings(BaseSettings):
         default=Theme("textual-dark"), description="The theme of the application."
     )
 
-    search_results_height_fraction: PositiveInt = 1
-    preview_height_fraction: PositiveInt = 2
+    search_results_height_fraction: PositiveInt = Field(
+        default=1, description="Relative height compared to preview height."
+    )
+    preview_height_fraction: PositiveInt = Field(
+        default=2, description="Relative height compared to search result height."
+    )
 
     # FUTURE: Allow option to select if multi-select is allowed or not.
     generic_keybindings: GenericKeybinding = Field(
@@ -916,7 +920,7 @@ class Settings(BaseSettings):
 
 
 def get_default_settings() -> Settings:
-    return Settings.construct()
+    return Settings.model_construct()
 
 
 def get_default_settings_yaml(as_comments: bool) -> str:
@@ -2520,6 +2524,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
         super().__init__(*args, **kwargs)
         if force_defaults:
             self.settings = Settings.model_construct()
+            self.settings.cache_input = False
             self.settings_error = None
         else:
             try:
@@ -2541,7 +2546,6 @@ class InteractiveSystemd(App, inherit_bindings=False):
             try:
                 _persistent_data["startup_count"] = self.startup_count
                 _persistent_json_fp.write_text(json.dumps(_persistent_data))
-                print("Written to ", _persistent_json_fp)
             except Exception as e:
                 print(e)
         else:

@@ -74,7 +74,8 @@ Set FontSize 16
 Set Width 1280
 Set Height 720
 
-Type@10ms "systemctl start --user '0-isd-example-unit-01.service' '0-isd-example-unit-03.service'" Enter
+# Should first run `./result/bin/generate-doc-test-data`.
+Type@10ms "systemctl start --user '0-isd-example-unit-01.service' '0-isd-example-unit-05.service'" Enter
 # do not full refresh during recording -> Set it to a very large value
 # normal refresh should use the default value!
 Type@10ms "ISD_CACHE_INPUT=false ISD_STARTUP_MODE=user ISD_JOURNAL_PAGER=lnav ISD_DEFAULT_PAGER=moar ISD_PREVIEW_AND_SELECTION_REFRESH_INTERVAL_SEC=2.5 ISD_FULL_REFRESH_INTERVAL_SEC=1000 asciinema rec --overwrite --quiet --command isd ./docs/assets/images/isd.cast"
@@ -92,7 +93,7 @@ Type "0-isd exmpl u 0"
 Sleep 2s Type "]"
 
 Tab
-Sleep 2s Space Down Down
+Sleep 2s Space Down@750ms 4
 # Multi-selection marker
 Sleep 1s Type "]" Sleep 1s
 
@@ -123,7 +124,7 @@ Type "q"
 Sleep 2s
 
 # show journal preview marker
-Tab Sleep 0.5s Right
+Tab Sleep 0.5s Tab Sleep 0.5s Right
 Sleep 3s Type "]"
 Sleep 1s Ctrl+p Type "open pag" Sleep 1.5s
 Enter

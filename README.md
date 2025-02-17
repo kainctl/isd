@@ -31,7 +31,7 @@ for power-users and newcomers alike.
 
 ## Demo
 
-https://github.com/user-attachments/assets/1f82a5c6-d6ef-4293-aa2f-347113209882
+https://github.com/user-attachments/assets/a22868c0-fc01-4973-86ea-410b80b188a8
 
 [Click here for a higher quality recording](https://isd-project.github.io/isd/#working-with-isd).
 
@@ -52,6 +52,7 @@ Refer to the [official installation documentation](https://isd-project.github.io
 A collection of some _unordered_ ideas that could improve `isd`:
 
 - [x] Add icon for project and application menu
+- [x] Support old `systemd` version
 - [ ] Option to view the security rating of units
 - [ ] Improve highlighting of `systemd` units (tree-sitter grammar)
 - [ ] Write a custom, more secure `$EDITOR` integration (more secure `sytemctl edit`)
