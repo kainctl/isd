@@ -1319,10 +1319,13 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     )
     stdout, stderr = await proc.communicate()
 
-    # Ignore if there is an issue with ancient `systemd` versions
-    # that do not have `systemctl list-unit-files` as a sub-command.
-    if proc.returncode == 0:
-        parsed_unit_files = parse_list_unit_files_lines(stdout.decode())
+    # If there are no matches for the selected pattern,
+    # `systemctl list-unit-files` returns a non-zero exit code!
+    # Better to check `stderr`.
+    if stderr.decode() != "":
+        raise Exception(proc.stderr)
+
+    parsed_unit_files = parse_list_unit_files_lines(stdout.decode())
     return {**parsed_unit_files, **parsed_units}
 
 
@@ -2525,6 +2528,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
         if force_defaults:
             self.settings = Settings.model_construct()
             self.settings.cache_input = False
+            self.settings.startup_mode = StartupMode("user")
             self.settings_error = None
         else:
             try:

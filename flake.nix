@@ -87,13 +87,12 @@
       # python = pkgs.python313;
 
       # Construct package set
-      pythonSet311For = eachSystem (
-        system:
+      pythonSet311 = (
+        pkgs:
         let
           # injecting cairosvg from upstream nixpkgs, as it is currently not
           # supported by the uv2nix_hammer project and is still in the todo list.
           # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
-          pkgs = pkgsFor.${system};
           # python = pkgs.python312;
           python = pkgs.python311;
           hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
@@ -117,16 +116,19 @@
                   prev = prev.cairocffi;
                 };
               })
+              # (_final: prev: {
+              #   pythonPkgsBuildHost = prev.pythonPkgsBuildHost.overrideScope pyprojectOverrides;
+              # })
             ]
           )
       );
-      pythonSet313For = eachSystem (
-        system:
+      pythonSet313 = (
+        pkgs:
         let
           # injecting cairosvg from upstream nixpkgs, as it is currently not
           # supported by the uv2nix_hammer project and is still in the todo list.
           # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
-          pkgs = pkgsFor.${system};
+          # pkgs = pkgsFor.${system};
           # python = pkgs.python312;
           python = pkgs.python313;
           hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
@@ -176,8 +178,10 @@
       packages = eachSystem (
         system:
         let
+          # https://pyproject-nix.github.io/uv2nix/patterns/cross/index.html
           pkgs = pkgsFor.${system};
-          pythonSet = pythonSet313For.${system};
+          # pkgs = pkgsFor.${system}.pkgsCross.aarch64-multiplatform;
+          pythonSet = pythonSet313 pkgs;
           version = (builtins.fromTOML (builtins.readFile ./pyproject.toml)).project.version;
           gen_unit =
             name:
@@ -330,7 +334,7 @@
         system:
         let
           pkgs = pkgsFor.${system};
-          pythonSet = pythonSet311For.${system};
+          pythonSet = pythonSet311 pkgs;
           lib = pkgs.lib;
         in
         {
