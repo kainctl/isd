@@ -47,15 +47,15 @@ If you are interested, read on and take a look at the [recorded terminal session
     To install [uv] have a look at the [official uv installation documentation](https://docs.astral.sh/uv/).
 
     After installing [uv], you can _try_ `isd` by running:
-    `uvx --python=3.12 isd-tui`
+    `uvx --python=3.11 isd-tui`
 
     To install and manage `isd` via [uv], run:
-    `uv tool install --python=3.12 isd-tui`
+    `uv tool install --python=3.11 isd-tui`
 
     After installing the tool, the program `isd` and its alias[^alias] `isd-tui`
     will be available.
 
-    `isd` requires `--python` to be set `>=3.12` and would fail
+    `isd` requires `--python` to be set `>=3.11` and would fail
     if the default Python version is older.
     For more details regarding the tool management, see the upstream
     [uv] tool documentation:
