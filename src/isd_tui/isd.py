@@ -18,6 +18,8 @@ to removing/restructuring large parts of the code base, as it was "looking good"
 
 from __future__ import annotations
 
+from . import __version__
+
 import asyncio
 import json
 import os
@@ -56,7 +58,7 @@ from pydantic_settings import (
 )
 from rich.style import Style
 from rich.text import Text
-from textual import on, work, events
+from textual import on, work, events, log
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalGroup
@@ -88,7 +90,6 @@ from xdg_base_dirs import xdg_cache_home, xdg_config_home, xdg_data_home
 from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
 
-from . import __version__
 
 # make type checker happy.
 assert __package__ is not None
@@ -2539,11 +2540,21 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 self.settings_error = e
         _persistent_json_fp = get_isd_persistent_json_file_path()
 
-        _persistent_data = (
-            json.loads(_persistent_json_fp.read_text())
-            if _persistent_json_fp.exists()
-            else {}
-        )
+        try:
+            _persistent_data = (
+                json.loads(_persistent_json_fp.read_text())
+                if _persistent_json_fp.exists()
+                else {}
+            )
+        except Exception as e:
+            # if there are any other issues, log it and assume that we are
+            # creating a new file
+            log.error(
+                f"Exception while trying to read persistent data from: {_persistent_json_fp}",
+                e,
+            )
+            _persistent_data = {}
+
         if fake_startup_count is None:
             _startup_count = _persistent_data.get("startup_count")
             self.startup_count = 1 if _startup_count is None else _startup_count + 1
@@ -2551,7 +2562,10 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 _persistent_data["startup_count"] = self.startup_count
                 _persistent_json_fp.write_text(json.dumps(_persistent_data))
             except Exception as e:
-                print(e)
+                log.error(
+                    f"Exception while trying to write persistent data to: {_persistent_json_fp}",
+                    e,
+                )
         else:
             self.startup_count = fake_startup_count
 
