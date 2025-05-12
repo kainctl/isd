@@ -4,7 +4,7 @@
     <img src="./share/icons/hicolor/512x512/apps/isd.png" alt="isd logo" style="max-width: 50vh;">
 </center>
 
-<!-- --8<-- [start:tagline] -->
+<!-- --8<-- [start:tagline]  -->
 > `isd` – a better way to work with `systemd` units
 
 Simplify `systemd` management with `isd`!

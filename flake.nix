@@ -2,9 +2,8 @@
   description = "interactive systemd flake";
 
   inputs = {
-    # 24.11 does _not_ contain asciinema_3
-    # nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
@@ -33,9 +32,10 @@
       inputs.nixpkgs.follows = "nixpkgs"; # Make sure the nixpkgs version matches
     };
     nix-appimage = {
-      url = "github:ralismark/nix-appimage";
-      # nix-appimage cannot track nixos-unstable until this issue is resolved:
-      # - <https://github.com/ralismark/nix-appimage/issues/23>
+      # I am not sure why 25.05 fails to build `squashfuse` in `nix-appimage` even if
+      # they are identical on release-25.05 and unstable...
+      # url = "github:ralismark/nix-appimage";
+      url = "github:ralismark/nix-appimage/extra-files";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
   };
