@@ -24,13 +24,20 @@ def value_str(value) -> str:
     return value
 
 
-def extract_timestamps(file) -> list[str]:
-    return [
-        m.group("timestamp")
-        for m in re.finditer(
-            r'^\[(?P<timestamp>[\d.]+), "m",', Path(file).read_text(), re.MULTILINE
-        )
-    ]
+def extract_marker_timestamps(file) -> list[str]:
+    # In the latest `asciinema` version, the markers are relative to the previous row.
+    # To correctly track the timestamps, I have to sum up the timestamps up to the marker!
+    cur_time = 0.0
+    marker_timestamps = []
+    for row in Path(file).read_text().splitlines():
+        if not row.startswith("["):
+            continue
+        # skip over `[`
+        time_offset, type = row[1:].split(", ")[:2]
+        cur_time += float(time_offset)
+        if "m" in type:
+            marker_timestamps.append(cur_time)
+    return marker_timestamps
 
 
 def format_timestamps(timestamps: list[str]) -> list[str]:
@@ -38,7 +45,7 @@ def format_timestamps(timestamps: list[str]) -> list[str]:
 
 
 def define_env(env):
-    env.variables["timestamps"] = extract_timestamps(
+    env.variables["timestamps"] = extract_marker_timestamps(
         Path(env.project_dir) / "docs/assets/images/isd.cast"
     )
     env.variables["poster_markers"] = format_timestamps(env.variables["timestamps"])

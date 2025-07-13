@@ -196,14 +196,14 @@
           isd-tui = isd;
           player =
             let
-              version = "v3.8.2";
+              version = "v3.10.0";
               css = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.css";
-                sha256 = "sha256:19jl4ps46cmn31lxccvmza9igpqv66hpg60kd4rc9mp0a677nfsc";
+                sha256 = "sha256:1w9p24jpf1nbsr8jsf20ggpgqbrg5zrgzq0dv9g57wxvaxibrdm6";
               };
               js = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.min.js";
-                sha256 = "sha256:1ganjf704k6hm2pvjxyx7jnppvjyhak16m50wxrfbig61gvri8i2";
+                sha256 = "sha256:070563ii4hglg5xjajvf3rb5spsbm0kql92j5xl6jy7ff4pzglwk";
               };
             in
             pkgs.runCommand "combine-player" { } ''
@@ -211,6 +211,25 @@
               cp ${css} $out/asciinema-player.css
               cp ${js} $out/asciinema-player.min.js
             '';
+
+          my_asciinema = pkgs.stdenvNoCC.mkDerivation {
+            pname = "my_asciinema";
+            version = "1.0.0";
+            buildInputs = [ pkgs.makeBinaryWrapper ];
+            propagatedBuildInputs = [ pkgs.asciinema_3 ];
+            dontUnpack = true;
+            installPhase = ''
+              mkdir -p $out/bin
+              mkdir -p $out/config/asciinema
+              cp ${pkgs.asciinema_3}/bin/asciinema $out/bin/my_asciinema
+              cat > $out/config/asciinema/config.toml <<EOF
+              [recording]
+              add_marker_key = "]"
+              EOF
+              # Wrap the binary to set XDG_CONFIG_HOME
+              wrapProgram $out/bin/my_asciinema --set ASCIINEMA_CONFIG_HOME "$out/config/asciinema"
+            '';
+          };
         }
       );
 
@@ -266,6 +285,8 @@
                 virtualenv
                 pkgs.uv
                 pkgs.asciinema_3
+                self.packages.${system}.my_asciinema
+
                 pkgs.lnav
                 pkgs.moar
                 # pkgs.nushell

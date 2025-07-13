@@ -54,9 +54,12 @@
 # Display:
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
+# 
+# FUTURE: Maybe try out the new "wait" feature.
+# 
 
 # Output demo.gif
-Output demo.webm
+# Output demo.webm
 
 Require echo
 Require isd
@@ -74,11 +77,12 @@ Set FontSize 16
 Set Width 1280
 Set Height 720
 
-# Should first run `./result/bin/generate-doc-test-data`.
+# Should first run  `nix run ./result/bin/generate-doc-test-data`.
 Type@10ms "systemctl start --user '0-isd-example-unit-01.service' '0-isd-example-unit-05.service'" Enter
 # do not full refresh during recording -> Set it to a very large value
 # normal refresh should use the default value!
-Type@10ms "ISD_CACHE_INPUT=false ISD_STARTUP_MODE=user ISD_JOURNAL_PAGER=lnav ISD_DEFAULT_PAGER=moar ISD_PREVIEW_AND_SELECTION_REFRESH_INTERVAL_SEC=2.5 ISD_FULL_REFRESH_INTERVAL_SEC=1000 asciinema rec --overwrite --quiet --command isd ./docs/assets/images/isd.cast"
+# `my_asciinema` is simply `asciinema_3` wrapped in a bash script, where a custom `config.toml` is utilized.
+Type@10ms "ISD_CACHE_INPUT=false ISD_STARTUP_MODE=user ISD_JOURNAL_PAGER=lnav ISD_DEFAULT_PAGER=moar ISD_PREVIEW_AND_SELECTION_REFRESH_INTERVAL_SEC=2.5 ISD_FULL_REFRESH_INTERVAL_SEC=1000 my_asciinema rec --overwrite --quiet --command isd ./docs/assets/images/isd.cast"
 Enter
 
 # # Sleep 2s
