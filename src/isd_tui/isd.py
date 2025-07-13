@@ -64,6 +64,7 @@ from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, VerticalGroup
 from textual.reactive import reactive
 from textual.screen import Screen, ModalScreen
+from textual.keys import format_key
 
 # FUTURE: Fix the settings for the default themes!
 # Issue is that the default green/yellow/red colors may not
@@ -166,6 +167,8 @@ RESERVED_KEYBINDINGS: Dict[str, str] = {
     "ctrl+c": "Close App",
     "ctrl+z": "Suspend App",
     "ctrl+p": "Open Command Palette",
+    "ctrl+minus": "Reduce Size",
+    "ctrl+plus": "Increase Size",
     "escape": "Close modal",
     "tab": "Focus next",
     "shift+tab": "Focus previous",
@@ -272,6 +275,19 @@ def rich_underline_key(inp_str: str, key: str) -> Text:
     return Text.from_markup(txt)
 
 
+def render_keybinding(inp_str: str) -> str:
+    *modifiers, key = inp_str.split("+")
+    key = format_key(key)
+
+    # Convert ctrl modifier to caret
+    if "ctrl" in modifiers:
+        modifiers.pop(modifiers.index("ctrl"))
+        key = f"^{key}"
+    # Join everything with +
+    key_tokens = modifiers + [key]
+    return "+".join(key_tokens)
+
+
 class SystemctlActionScreen(ModalScreen[Optional[str]]):
     """
     Present a screen with the configured systemctl actions.
@@ -300,8 +316,12 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
         )
 
     def build_options(self) -> List[Option]:
-        longest_keybinding = max(
-            len(cmd.modal_keybinding) for cmd in self.systemctl_commands
+        rendered_keys_map = {
+            cmd.modal_keybinding: render_keybinding(cmd.modal_keybinding)
+            for cmd in self.systemctl_commands
+        }
+        longest_rendered_keybinding = max(
+            len(key) for key in rendered_keys_map.values()
         )
 
         accent = self.app.theme_variables.get("accent")
@@ -309,7 +329,7 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
         opts = []
         for cmd in self.systemctl_commands:
             k = Text.from_markup(
-                f"[b]{cmd.modal_keybinding:>{longest_keybinding}}[/b]",
+                f"[b]{rendered_keys_map[cmd.modal_keybinding]:>{longest_rendered_keybinding}}[/b]",
             )
             if accent is not None:
                 k.stylize(accent, start=0)
@@ -608,6 +628,11 @@ DEFAULT_COMMANDS = [
         description="Enable unit(s)",
     ),
     SystemctlCommand(
+        modal_keybinding="i",
+        command="disable",
+        description="Disable unit(s).",
+    ),
+    SystemctlCommand(
         modal_keybinding="m",
         command="mask",
         description="Mask/Disable starting unit(s)",
@@ -616,6 +641,11 @@ DEFAULT_COMMANDS = [
         modal_keybinding="u",
         command="unmask",
         description="Undo masking of unit(s)",
+    ),
+    SystemctlCommand(
+        modal_keybinding="-",
+        command="reset-failed",
+        description="Reset failed state of unit(s), including the restart counter.",
     ),
 ]
 
@@ -891,9 +921,9 @@ class Settings(BaseSettings):
             "main_keybindings": main_keys,
         }
 
-        # what combinations are not allowed?
-        # navigation with ANY
-        # direct_keybinding with ANY
+        # What combinations are not allowed?
+        # `navigation` with ANY.
+        # `direct_keybinding` with ANY
         # global with ANY
         # atm only modal_keybinding and main_keybindings may overlap
         # Remember: The reason why modal_keybindings should be unique
