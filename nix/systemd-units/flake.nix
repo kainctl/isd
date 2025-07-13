@@ -32,13 +32,13 @@
             name:
             inputs.systemd-nix.lib.${system}.mkUserService name {
               description = name;
-              documentation = [ "man:python" ];
+              documentation = [ "man:${pkgs.python3Full}/share/man/man1/python3.1.gz" ];
               wants = [ "default.target" ];
               after = [ "default.target" ];
               serviceConfig = {
                 Type = "simple"; # or oneshot for multiple ExecStart
                 # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pkgs.python3} ${../../docs/loggen.py} 100";
+                ExecStart = "${lib.getExe pkgs.python3Full} ${../../docs/loggen.py} 100";
                 # --number <number-of-messages>
                 # --interval <number of seconds loggen will run>
                 # --rate message per second
@@ -49,13 +49,13 @@
             name:
             inputs.systemd-nix.lib.${system}.mkUserService name {
               description = name;
-              documentation = [ "man:python" ];
+              documentation = [ "man:${pkgs.python3Full}/share/man/man1/python3.1.gz" ];
               wants = [ "default.target" ];
               after = [ "default.target" ];
               serviceConfig = {
                 Type = "simple"; # or oneshot for multiple ExecStart
                 # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pkgs.python3} -asdf";
+                ExecStart = "${lib.getExe pkgs.python3Full} -asdf";
                 # --number <number-of-messages>
                 # --interval <number of seconds loggen will run>
                 # --rate message per second
