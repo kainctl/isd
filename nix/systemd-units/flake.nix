@@ -100,6 +100,8 @@
           '';
 
           generate-doc-test-data = pkgs.writeScriptBin "generate-doc-test-data" ''
+            #!${pkgs.lib.getExe pkgs.bash}
+
             set -e
             ${lib.getExe (gen_unit "0-isd-example-unit-01")}
             ${lib.getExe (gen_unit "0-isd-example-unit-02")}
