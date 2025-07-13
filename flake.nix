@@ -2,8 +2,8 @@
   description = "interactive systemd flake";
 
   inputs = {
-    # nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+    # nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
@@ -25,19 +25,6 @@
 
     # Supports linux x86_64 and aarch64.
     systems.url = "github:nix-systems/default-linux";
-    nix-filter.url = "github:numtide/nix-filter";
-    # pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
-    systemd-nix = {
-      url = "github:serokell/systemd-nix";
-      inputs.nixpkgs.follows = "nixpkgs"; # Make sure the nixpkgs version matches
-    };
-    nix-appimage = {
-      # I am not sure why 25.05 fails to build `squashfuse` in `nix-appimage` even if
-      # they are identical on release-25.05 and unstable...
-      # url = "github:ralismark/nix-appimage";
-      url = "github:ralismark/nix-appimage/extra-files";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   # Disclaimer: Uv2nix is new and experimental.
@@ -183,40 +170,6 @@
           # pkgs = pkgsFor.${system}.pkgsCross.aarch64-multiplatform;
           pythonSet = pythonSet313 pkgs;
           version = (builtins.fromTOML (builtins.readFile ./pyproject.toml)).project.version;
-          gen_unit =
-            name:
-            inputs.systemd-nix.lib.${system}.mkUserService name {
-              description = name;
-              documentation = [ "man:python" ];
-              wants = [ "default.target" ];
-              after = [ "default.target" ];
-              serviceConfig = {
-                Type = "simple"; # or oneshot for multiple ExecStart
-                # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pythonSet.python} ${./docs/loggen.py} 100";
-                # --number <number-of-messages>
-                # --interval <number of seconds loggen will run>
-                # --rate message per second
-                RemainAfterExit = true;
-              };
-            };
-          gen_broken_unit =
-            name:
-            inputs.systemd-nix.lib.${system}.mkUserService name {
-              description = name;
-              documentation = [ "man:python" ];
-              wants = [ "default.target" ];
-              after = [ "default.target" ];
-              serviceConfig = {
-                Type = "simple"; # or oneshot for multiple ExecStart
-                # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pythonSet.python} -asdf";
-                # --number <number-of-messages>
-                # --interval <number of seconds loggen will run>
-                # --rate message per second
-                RemainAfterExit = true;
-              };
-            };
         in
         rec {
           default =
@@ -241,19 +194,6 @@
             };
           isd = default;
           isd-tui = isd;
-          "isd-AppImage" = inputs.nix-appimage.lib.${system}.mkAppImage {
-            pname = "isd.${system}";
-            program = pkgs.lib.getExe (
-              isd.overrideAttrs (oldAttrs: {
-                buildInputs = oldAttrs.buildInputs or [ ] ++ [ pkgs.makeBinaryWrapper ];
-                postInstall =
-                  oldAttrs.postInstall or ""
-                  + ''
-                    wrapProgram $out/bin/isd --set SYSTEMD_IGNORE_CHROOT yes
-                  '';
-              })
-            );
-          };
           player =
             let
               version = "v3.8.2";
@@ -271,57 +211,6 @@
               cp ${css} $out/asciinema-player.css
               cp ${js} $out/asciinema-player.min.js
             '';
-          isd-example-templated-unit =
-            inputs.systemd-nix.lib.${system}.mkUserService "0-isd-example-unit-template@"
-              {
-                description = "isd-example instantiated unit %i";
-                documentation = [ "man:python" ];
-                serviceConfig = {
-                  Type = "oneshot";
-                  ExecStart = "${lib.getExe' pkgs.coreutils "echo"} 'I am unit %i'";
-                  RemainAfterExit = true;
-                };
-              };
-
-          generate-integration-test-data = pkgs.writeScriptBin "generate-integration-test-data" ''
-            set -e
-            ${lib.getExe (gen_unit "0-isd-example-unit-01")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-02")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-03")}
-            ${lib.getExe (gen_broken_unit "0-isd-example-unit-04")}
-
-            systemctl --user stop "0-isd-example-unit-02.service"
-            systemctl --user stop "0-isd-example-unit-03.service"
-            ln -s /tmp/__wrong_path_that_does_not_exist --force "$HOME/.config/systemd/user/0-isd-example-unit-03.service"
-            # 4 is broken by default
-            systemctl --user daemon-reload
-
-            # Now generate the sample data from the above generated state.
-            export _SYSTEMD_USER_MODE=1
-            export OUT_DIR="$(git rev-parse --show-toplevel)/tests/integration-test/"
-            ${lib.getExe pkgs.bash} ${./tests/test_data_generator.sh} generate_list_data "0-isd*"
-            ${lib.getExe pkgs.bash} ${./tests/test_data_generator.sh} generate_unit_data "0-isd-example-unit-01.service"
-            ${lib.getExe pkgs.bash} ${./tests/test_data_generator.sh} generate_unit_data "0-isd-example-unit-02.service"
-            ${lib.getExe pkgs.bash} ${./tests/test_data_generator.sh} generate_unit_data "0-isd-example-unit-03.service"
-            ${lib.getExe pkgs.bash} ${./tests/test_data_generator.sh} generate_unit_data "0-isd-example-unit-04.service"
-          '';
-
-          generate-doc-test-data = pkgs.writeScriptBin "generate-doc-test-data" ''
-            set -e
-            ${lib.getExe (gen_unit "0-isd-example-unit-01")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-02")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-03")}
-            ${lib.getExe (gen_broken_unit "0-isd-example-unit-04")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-05")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-06")}
-            ${lib.getExe (gen_unit "0-isd-example-unit-07")}
-
-            systemctl --user stop "0-isd-example-unit-02.service"
-            systemctl --user stop "0-isd-example-unit-03.service"
-            ln -s /tmp/__wrong_path_that_does_not_exist --force "$HOME/.config/systemd/user/0-isd-example-unit-03.service"
-            # 4 is broken by default
-            systemctl --user daemon-reload
-          '';
         }
       );
 
@@ -335,7 +224,6 @@
         let
           pkgs = pkgsFor.${system};
           pythonSet = pythonSet311 pkgs;
-          lib = pkgs.lib;
         in
         {
           # It is of course perfectly OK to keep using an impure virtualenv workflow and only use uv2nix to build packages.

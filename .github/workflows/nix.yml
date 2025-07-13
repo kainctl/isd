@@ -21,7 +21,7 @@ jobs:
       - name: Run `nix fmt`
         run: nix fmt -- --check *
       - name: Build all packages supported by the current architecture
-        run: nix flake check -L
+        run: nix flake check -L && nix flake check -L ./?dir=nix/appimage && nix flake check -L ./?dir=nix/systemd-units
       # Leads to:
       # `cannot write uid_map: Operation not permitted`
       # - name: Test appimage

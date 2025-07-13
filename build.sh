@@ -27,11 +27,11 @@ rm -f "$REPO_ROOT/isd.aarch64-linux.AppImage"
 uv build
 
 echo "Building x86-64 isd-AppImage"
-nix build .#isd-AppImage
+nix build ./?dir=nix/appimage#packages.x86_64-linux.default
 cp "$(readlink -f ./result)" isd.x86_64-linux.AppImage
 
 echo "Building aarch64 isd-AppImage"
-nix build .#packages.aarch64-linux.isd-AppImage
+nix build .#packages.aarch64-linux.default
 cp "$(readlink -f ./result)" isd.aarch64-linux.AppImage
 
 # publish latest docs
