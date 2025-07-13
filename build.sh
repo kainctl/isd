@@ -17,7 +17,7 @@ touch "$REPO_ROOT/flake.nix"
 
 # ensure that everything works as expected
 mkdocs build --clean
-pytest
+pytest "$REPO_ROOT/tests/"
 
 rm -rf "$REPO_ROOT/dist"
 rm -f "$REPO_ROOT/isd.x86_64-linux.AppImage"
