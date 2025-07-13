@@ -787,7 +787,7 @@ class Settings(BaseSettings):
     )
 
     journalctl_args: list[str] = Field(
-        default=["--catalog"],
+        default=["--catalog", "--lines=1000"],
         description=dedent("""\
             Default arguments for `journalctl` to generate the
             output of the `Journal` preview window."""),
