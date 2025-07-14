@@ -121,12 +121,30 @@ If you are interested, read on and take a look at the [recorded terminal session
     for better desktop integration support (application icon & entry) and in-app
     update functionality.
 
-    !!! warning
+    ??? warning "Ubuntu 24.04 Additional Requirements"
 
         If you are using Ubuntu 24.04, extra installation steps are required.
-        Please see the [open issue #10](https://github.com/isd-project/isd/issues/10).
+        Please see the [issue #10 for more details](https://github.com/isd-project/isd/issues/10).
 
-    !!! warning
+        In short, you have to create an `apparmor` profile by creating the file: `/etc/apparmor.d/isd-appimage` with:
+
+        ```
+        # This profile allows everything and only exists to give the
+        # application a name instead of having the label "unconfined"
+        abi <abi/4.0>,
+        include <tunables/global>
+
+        profile isd /home/{USER}/Applications/isd*.AppImage flags=(unconfined) {
+          userns,
+        }
+        ```
+
+        where you have to replace `{USER}` with your username, create the `Applications` directory if it does not exist,
+        and move the `AppImage` into that directory.
+
+        To update the `AppArmor` profile, run `sudo apparmor_parser -r /etc/apparmor.d/isd-appimage`
+
+    !!! warning "AppImage with `nix` installed causes issues"
 
         If you have `nix` installed, this `AppImage` will _not_ work!
         Either use the `nix` or `uv` installation instructions!
