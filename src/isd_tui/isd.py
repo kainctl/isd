@@ -66,7 +66,6 @@ from textual.containers import (
     Horizontal,
     Vertical,
     VerticalGroup,
-    HorizontalGroup,
 )
 
 from textual.reactive import reactive
@@ -293,49 +292,6 @@ def render_keybinding(inp_str: str) -> str:
     # Join everything with +
     key_tokens = modifiers + [key]
     return "+".join(key_tokens)
-
-
-class RootUserBusModal(ModalScreen[bool]):
-    """
-    Present a simple screen to inform the user that they
-    are about to access the `root --user` service bus,
-    which usually leads to a crash.
-
-    Returns their selection.
-    """
-
-    BINDINGS = [
-        Binding("escape", "close", "Close", show=True),
-    ]
-    AUTO_FOCUS = "#no"
-
-    def __init__(
-        self,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-
-    def compose(self) -> ComposeResult:
-        with VerticalGroup():
-            yield Markdown(
-                "# About to access **root --user** bus\n"
-                + "Usually the `root` user does _not_ have a dedicated `--user` bus. "
-                + "The application will crash if you try to connect to a non-existing bus. "
-                + "Are you sure you want to connect to it?\n\n"
-                + "You can update the settings to auto-accept this question if this is what you want."
-            )
-            with HorizontalGroup():
-                yield Button("No", id="no", variant="primary")
-                yield Button("Yes", id="yes", variant="warning")
-        yield Footer()
-
-    def action_close(self) -> None:
-        self.dismiss(False)
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "no":
-            self.dismiss(False)
-        self.dismiss(True)
 
 
 class SystemctlActionScreen(ModalScreen[Optional[str]]):
@@ -921,15 +877,6 @@ class Settings(BaseSettings):
             Usually the default should be left as is.
 
             Note: The output is not trimmed when a pager or editor is opened!"""),
-    )
-
-    auto_accept_connection_to_root_user_bus: bool = Field(
-        default=False,
-        description=dedent("""\
-            By default, the user is asked if they actually want to connect
-            to the `root --user` bus, as this usually crashes the running program.
-            If this option is `True`, the question is skipped.
-        """),
     )
 
     # https://github.com/tinted-theming/home?tab=readme-ov-file
@@ -1818,20 +1765,25 @@ class PreviewArea(Container):
                 )
 
 
-# FUTURE: Maybe call it 'allowed' mode?
 def derive_startup_mode(startup_mode: StartupMode) -> str:
-    if is_root():
-        # if user == `root` then only system is allowed
-        return "system"
+    mode: str
     if startup_mode == StartupMode("auto"):
         fallback: StartupMode = StartupMode("user")
         fp = get_isd_cached_state_json_file_path()
         if fp.exists():
-            return json.loads(fp.read_text()).get("mode", fallback)
+            mode = json.loads(fp.read_text()).get("mode", fallback)
         else:
-            return fallback
+            mode = fallback
     else:
-        return startup_mode
+        mode = startup_mode
+    if mode == "user" and is_root():
+        if systemctl_is_system_running(mode="user").returncode == 0:
+            return "user"
+        else:
+            # If it is not possible to connect to the `root` users `--user` bus,
+            # fallback to system
+            return "system"
+    return mode
 
 
 def cached_search_term() -> str:
@@ -1839,6 +1791,14 @@ def cached_search_term() -> str:
     if fp.exists():
         return json.loads(fp.read_text()).get("search_term", "")
     return ""
+
+
+def systemctl_is_system_running(*, mode: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        systemctl_args_builder("is-system-running", mode=mode, units=[]),
+        capture_output=True,
+        text=True,
+    )
 
 
 # class SettingsError(ModalScreen):
@@ -2183,20 +2143,7 @@ class MainScreen(Screen):
         self.app.copy_to_clipboard(path)
         self.notify(f"Copied '{path}' to the clipboard.")
 
-    async def wants_root_user_bus(self) -> bool:
-        """
-        Ask the user if they know what they actually want to connect to the
-        user-bus of the `root` user.
-        """
-        prev_focus = self.focused
-        self.set_focus(None)
-        do_switch = await self.app.push_screen_wait(RootUserBusModal())
-        self.set_focus(prev_focus)
-        return do_switch
-
-    # `work` is required to push the screen for `wants_root_user_bus`.
-    @work
-    async def action_toggle_mode(self) -> None:
+    def action_toggle_mode(self) -> None:
         """
         Toggle the current `bus`.
         Try to protect the user from accidentally crashing the program by trying
@@ -2205,12 +2152,18 @@ class MainScreen(Screen):
 
         - <https://github.com/isd-project/isd/issues/30>
         """
-        if (
-            is_root()
-            and self.mode == "system"
-            and not self.settings.auto_accept_connection_to_root_user_bus
-        ):
-            if not (await self.wants_root_user_bus()):
+        if is_root() and self.mode == "system":
+            # Test if `root` user can actually connect to a `--user` bus.
+            proc = systemctl_is_system_running(mode="user")
+            if proc.returncode != 0:
+                self.notify(
+                    "Could not connect to `root` users `--user` bus.\n"
+                    + "Usually, this does not work, as the `root` user does not have any `user` services.\n"
+                    + "The connection was tested via `systemctl --user is-system-running` as `root` user with the full error message below:\n\n"
+                    + proc.stderr,
+                    severity="error",
+                    timeout=60,
+                )
                 return
 
         self.mode = "system" if self.mode == "user" else "user"

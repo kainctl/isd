@@ -8,7 +8,6 @@ from isd_tui.isd import (
     DonationScreen,
     InteractiveSystemd,
     MainScreen,
-    RootUserBusModal,
 )
 from pathlib import Path
 from textual.pilot import Pilot
@@ -198,17 +197,17 @@ async def test_donation_screen_interaction():
         assert isinstance(app.screen, MainScreen)
 
 
-async def test_root_user_screen_interaction(monkeypatch):
-    monkeypatch.setattr("os.getuid", lambda: 0)
-    app = InteractiveSystemd()
-    # ensure `no` is the default
-    async with app.run_test() as pilot:
-        await pilot.pause()
-        await pilot.press("ctrl+t")
-        assert isinstance(app.screen, RootUserBusModal)
-        await pilot.press("enter")
-        assert isinstance(app.screen, MainScreen)
-        assert app.screen.mode == "system"
+# async def test_root_user_screen_interaction(monkeypatch):
+#     monkeypatch.setattr("os.getuid", lambda: 0)
+#     app = InteractiveSystemd()
+#     # ensure `no` is the default
+#     async with app.run_test() as pilot:
+#         await pilot.pause()
+#         await pilot.press("ctrl+t")
+#         assert isinstance(app.screen, RootUserBusModal)
+#         await pilot.press("enter")
+#         assert isinstance(app.screen, MainScreen)
+#         assert app.screen.mode == "system"
 
 
 async def test_usage_counter(monkeypatch, tmp_path):
@@ -259,7 +258,17 @@ def test_snap_donation_screen(snap_compare):
 
 
 def test_snap_root_user_bus_screen(snap_compare, monkeypatch):
+    class MockCompletedProcess:
+        def __init__(self):
+            # generated via `sudo su; systemctl --user`
+            self.stderr = "Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)"
+            self.returncode = 1
+
+    def mock_run(*args, **kwargs):
+        return MockCompletedProcess()
+
     monkeypatch.setattr("os.getuid", lambda: 0)
+    monkeypatch.setattr("subprocess.run", mock_run)
 
     app = InteractiveSystemd()
     assert snap_compare(
