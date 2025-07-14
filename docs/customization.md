@@ -285,3 +285,9 @@ to lower this value.
 
 To view the entire output, open the output in the pager.
 
+### Auto Accept Connection to `root --user` Bus
+
+{{ config_block(20) }}
+
+Usually this is _not_ what you should do, but I am supporting it for now.
+

@@ -8,6 +8,7 @@ from isd_tui.isd import (
     DonationScreen,
     InteractiveSystemd,
     MainScreen,
+    RootUserBusModal,
 )
 from pathlib import Path
 from textual.pilot import Pilot
@@ -197,6 +198,19 @@ async def test_donation_screen_interaction():
         assert isinstance(app.screen, MainScreen)
 
 
+async def test_root_user_screen_interaction(monkeypatch):
+    monkeypatch.setattr("os.getuid", lambda: 0)
+    app = InteractiveSystemd()
+    # ensure `no` is the default
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        await pilot.press("ctrl+t")
+        assert isinstance(app.screen, RootUserBusModal)
+        await pilot.press("enter")
+        assert isinstance(app.screen, MainScreen)
+        assert app.screen.mode == "system"
+
+
 async def test_usage_counter(monkeypatch, tmp_path):
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
     assert xdg_data_home() == Path(tmp_path)
@@ -241,6 +255,15 @@ def test_snap_donation_screen(snap_compare):
     assert snap_compare(
         InteractiveSystemd(fake_startup_count=100),
         run_before=lambda pilot: pilot.pause(),
+    )
+
+
+def test_snap_root_user_bus_screen(snap_compare, monkeypatch):
+    monkeypatch.setattr("os.getuid", lambda: 0)
+
+    app = InteractiveSystemd()
+    assert snap_compare(
+        app, press=[first_key(app.settings.main_keybindings.toggle_mode)]
     )
 
 

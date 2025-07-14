@@ -20,22 +20,22 @@ SystemctlActionScreen {
   align: center middle;
 }
 
-DonationScreen {
+DonationScreen, RootUserBusModal {
   align: center middle;
 }
 
-DonationScreen VerticalGroup {
+DonationScreen VerticalGroup, RootUserBusModal VerticalGroup {
   max-width: 75%;
   min-width: 50%;
 }
 
-DonationScreen Markdown {
+DonationScreen Markdown, RootUserBusModal Markdown {
   text-style: bold;
   padding: 1 2;
   width: 1fr;
 }
 
-DonationScreen Button {
+DonationScreen Button, RootUserBusModal Button {
   width: 1fr;
 }
 

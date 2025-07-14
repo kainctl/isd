@@ -61,7 +61,14 @@ from rich.text import Text
 from textual import on, work, events, log
 from textual.app import App, ComposeResult, SystemCommand
 from textual.binding import Binding
-from textual.containers import Container, Horizontal, Vertical, VerticalGroup
+from textual.containers import (
+    Container,
+    Horizontal,
+    Vertical,
+    VerticalGroup,
+    HorizontalGroup,
+)
+
 from textual.reactive import reactive
 from textual.screen import Screen, ModalScreen
 from textual.keys import format_key
@@ -286,6 +293,49 @@ def render_keybinding(inp_str: str) -> str:
     # Join everything with +
     key_tokens = modifiers + [key]
     return "+".join(key_tokens)
+
+
+class RootUserBusModal(ModalScreen[bool]):
+    """
+    Present a simple screen to inform the user that they
+    are about to access the `root --user` service bus,
+    which usually leads to a crash.
+
+    Returns their selection.
+    """
+
+    BINDINGS = [
+        Binding("escape", "close", "Close", show=True),
+    ]
+    AUTO_FOCUS = "#no"
+
+    def __init__(
+        self,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+
+    def compose(self) -> ComposeResult:
+        with VerticalGroup():
+            yield Markdown(
+                "# About to access **root --user** bus\n"
+                + "Usually the `root` user does _not_ have a dedicated `--user` bus. "
+                + "The application will crash if you try to connect to a non-existing bus. "
+                + "Are you sure you want to connect to it?\n\n"
+                + "You can update the settings to auto-accept this question if this is what you want."
+            )
+            with HorizontalGroup():
+                yield Button("No", id="no", variant="primary")
+                yield Button("Yes", id="yes", variant="warning")
+        yield Footer()
+
+    def action_close(self) -> None:
+        self.dismiss(False)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "no":
+            self.dismiss(False)
+        self.dismiss(True)
 
 
 class SystemctlActionScreen(ModalScreen[Optional[str]]):
@@ -873,6 +923,15 @@ class Settings(BaseSettings):
             Note: The output is not trimmed when a pager or editor is opened!"""),
     )
 
+    auto_accept_connection_to_root_user_bus: bool = Field(
+        default=False,
+        description=dedent("""\
+            By default, the user is asked if they actually want to connect
+            to the `root --user` bus, as this usually crashes the running program.
+            If this option is `True`, the question is skipped.
+        """),
+    )
+
     # https://github.com/tinted-theming/home?tab=readme-ov-file
     @classmethod
     def settings_customise_sources(
@@ -1425,8 +1484,9 @@ def systemctl_args_builder(
         # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
     if mode == "user":
-        if sudo or is_root():
-            raise ValueError("user mode is not allowed when running as root!")
+        # `root` user _may_ have user services (https://github.com/isd-project/isd/issues/30)
+        # if sudo or is_root():
+        #     raise ValueError("user mode is not allowed when running as root!")
         sys_cmd.extend(
             [
                 get_systemctl_bin(),
@@ -2123,14 +2183,36 @@ class MainScreen(Screen):
         self.app.copy_to_clipboard(path)
         self.notify(f"Copied '{path}' to the clipboard.")
 
-    def action_toggle_mode(self) -> None:
-        # only allow changing mode if current user isn't root user
-        if is_root():
-            self.notify(
-                "Cannot change to `user` mode if program is running as `root` user!",
-                severity="warning",
-            )
-            return
+    async def wants_root_user_bus(self) -> bool:
+        """
+        Ask the user if they know what they actually want to connect to the
+        user-bus of the `root` user.
+        """
+        prev_focus = self.focused
+        self.set_focus(None)
+        do_switch = await self.app.push_screen_wait(RootUserBusModal())
+        self.set_focus(prev_focus)
+        return do_switch
+
+    # `work` is required to push the screen for `wants_root_user_bus`.
+    @work
+    async def action_toggle_mode(self) -> None:
+        """
+        Toggle the current `bus`.
+        Try to protect the user from accidentally crashing the program by trying
+        to access the `--user` bus from the `root` user. But I still have to
+        allow access, as some have user services configured for the `root` user:
+
+        - <https://github.com/isd-project/isd/issues/30>
+        """
+        if (
+            is_root()
+            and self.mode == "system"
+            and not self.settings.auto_accept_connection_to_root_user_bus
+        ):
+            if not (await self.wants_root_user_bus()):
+                return
+
         self.mode = "system" if self.mode == "user" else "user"
 
     # FUTURE: Maybe split out this logic and make it easier to retrieve the output
