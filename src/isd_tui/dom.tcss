@@ -1,42 +1,20 @@
-/* Even if it isn't in focus, keep the highlight up */
-OptionList > .option-list--option-highlighted {
-  background: $primary;
-}
-
-TabbedContent > ContentTabs {
+TabbedContent>ContentTabs {
   dock: bottom;
 }
 
-TabbedContent > ContentTabs #tabs-list {
+TabbedContent>ContentTabs #tabs-list {
   offset: 0 1;
 }
 
-TabbedContent > ContentTabs Underline {
+TabbedContent>ContentTabs Underline {
   offset: 0 -1;
 }
 
 /* center middle is an amazing feature! */
-SystemctlActionScreen {
+SystemctlActionScreen,
+DonationScreen,
+ConnectRemote {
   align: center middle;
-}
-
-DonationScreen, RootUserBusModal {
-  align: center middle;
-}
-
-DonationScreen VerticalGroup, RootUserBusModal VerticalGroup {
-  max-width: 75%;
-  min-width: 50%;
-}
-
-DonationScreen Markdown, RootUserBusModal Markdown {
-  text-style: bold;
-  padding: 1 2;
-  width: 1fr;
-}
-
-DonationScreen Button, RootUserBusModal Button {
-  width: 1fr;
 }
 
 SystemctlActionScreen CustomOptionList {
@@ -44,6 +22,71 @@ SystemctlActionScreen CustomOptionList {
   border: tall $primary;
   width: auto;
   min-width: 75vw;
+}
+
+DonationScreen VerticalGroup,
+ConnectRemote>VerticalGroup {
+  max-width: 85%;
+  min-width: 50%;
+}
+
+ConnectRemote>VerticalGroup {
+  background: $surface;
+}
+
+ConnectRemote Button {
+  width: 100%;
+}
+
+/* Maybe disable this for the RadioButtons */
+ConnectRemote RadioSet {
+  border: none;
+}
+
+ConnectRemote OptionList>.option-list--option-highlighted {
+  background: $surface;
+}
+
+ConnectRemote OptionList:focus>.option-list--option-highlighted {
+  background: $primary;
+}
+
+/* This icky CSS happens due to the abuse of &: CSS pre-processors. */
+ConnectRemote RadioSet>RadioButton.-selected {
+  background: $surface;
+}
+
+ConnectRemote RadioSet:focus>RadioButton.-selected {
+  background: $primary;
+}
+
+/* Not quite sure why I have to account */
+/* for additional space here: */
+ConnectRemote CustomOptionList {
+  max-height: 90%;
+}
+
+ConnectRemote>HorizontalGroup {
+  padding: 1 0;
+  max-height: 95%;
+}
+
+ConnectRemote Input {
+  width: 1fr;
+}
+
+DonationScreen Markdown {
+  text-style: bold;
+  padding: 1 2;
+  width: 1fr;
+}
+
+DonationScreen Button {
+  width: 1fr;
+}
+
+ConnectRemote Markdown {
+  padding: 1 0 0 1;
 }
 
 PreviewArea {
@@ -71,37 +114,43 @@ Preview:focus {
 }
 
 
-#unit-selection > .selection-list--button {
+#unit-selection>.selection-list--button {
   background: $boost 100% !important;
 }
 
-#unit-selection > .option-list--separator {
+#unit-selection>.option-list--separator {
   background: $primary;
 }
 
-#unit-selection > .option-list--option-hover {
+/* Even if it isn't in focus, keep the highlight up; TODO: switch this back to OptionList if necessary! */
+#unit-selection>.option-list--option-highlighted {
+  background: $primary;
+}
+
+#unit-selection>.option-list--option-hover {
   background: $boost 100%;
 }
 
-#unit-selection > .selection-list--button {
+#unit-selection>.selection-list--button {
   color: $primary;
   background: $primary;
 }
 
-#unit-selection:focus > .selection-list--button,
-#unit-selection > .selection-list--button-selected,
-#unit-selection:focus > .selection-list--button-selected,
- {
-  color: $primary;
-  background: $accent;
+#unit-selection:focus>.selection-list--button,
+#unit-selection>.selection-list--button-selected,
+#unit-selection:focus>.selection-list--button-selected,
+{
+color: $primary;
+background: $accent;
 }
 
-#unit-selection:focus > .selection-list--button-highlighted,
-#unit-selection > .selection-list--button-highlighted,
-#unit-selection > .selection-list--button-selected-highlighted {
+#unit-selection:focus>.selection-list--button-highlighted,
+#unit-selection>.selection-list--button-highlighted,
+#unit-selection>.selection-list--button-selected-highlighted {
   color: $accent;
   background: $accent;
 }
+
 
 Fluid {
   border-top: $primary heavy 50%;
@@ -111,7 +160,8 @@ Fluid {
 }
 
 Input {
-  height: 3; /* Fix the height */
+  height: 3;
+  /* Fix the height */
   width: 100%;
 }
 
@@ -124,4 +174,3 @@ MainScreen OptionList {
 * {
   scrollbar-size: 0 1;
 }
-

@@ -17,6 +17,7 @@ to removing/restructuring large parts of the code base, as it was "looking good"
 """
 
 from __future__ import annotations
+from dataclasses import dataclass
 
 from . import __version__
 
@@ -64,8 +65,10 @@ from textual.binding import Binding
 from textual.containers import (
     Container,
     Horizontal,
+    HorizontalGroup,
     Vertical,
     VerticalGroup,
+    Grid,
 )
 
 from textual.reactive import reactive
@@ -83,6 +86,8 @@ from textual.widgets import (
     Footer,
     Header,
     Input,
+    RadioButton,
+    RadioSet,
     RichLog,
     Button,
     SelectionList,
@@ -152,6 +157,7 @@ _CACHE_DIR = xdg_cache_home() / __package__ / __version__
 _CONFIG_DIR = xdg_config_home() / __package__
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
+RemoteType = StrEnum("RemoteType", ["host", "machine", "capsule"])
 
 SETTINGS_YAML_HEADER = dedent("""\
         # yaml-language-server: $schema=schema.json
@@ -242,6 +248,30 @@ PRESET_LNAV_JOURNAL_ARGS: list[str] = PRESET_LNAV_DEFAULT_ARGS + [
 ]
 
 assert PRESET_LESS_DEFAULT_ARGS is not PRESET_LESS_JOURNAL_ARGS
+
+
+@dataclass
+class Remote:
+    type: RemoteType
+    arg: str
+
+
+class CustomRadioSet(RadioSet, inherit_bindings=False):
+    def __init__(self, navigation_keybindings: NavigationKeybindings, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for keys, action, description in [
+            (navigation_keybindings.down, "next_button", "Next option"),
+            (navigation_keybindings.up, "previous_button", "Previous option"),
+            # (navigation_keybindings.top, "first", "First"),
+            # (navigation_keybindings.bottom, "last", "Last"),
+            ("enter,space", "toggle_button", "Toggle"),
+        ]:
+            self._bindings.bind(
+                keys=keys,
+                action=action,
+                description=description,
+                show=False,
+            )
 
 
 class CustomOptionList(OptionList, inherit_bindings=False):
@@ -375,6 +405,141 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
 
     def action_close(self) -> None:
         self.dismiss(None)
+
+    @on(CustomOptionList.OptionSelected)
+    def command_selected(self, event: CustomOptionList.OptionSelected):
+        self.dismiss(event.option_id)
+
+
+class ConnectRemote(ModalScreen[Optional[str]]):
+    """
+    Present a screen with possible targets.
+    Uses the common navigation style with enter and uses the modal specific
+    shortcuts.
+
+    Assumes that the keybindings aren't conflicting.
+
+    Let's stick with `--host`, as this should be the toughest one to implement!
+    """
+
+    BINDINGS = [Binding("enter", "select", "Select", show=True)]
+
+    def __init__(
+        self,
+        close_modal_key: str,
+        navigation_keybindings: NavigationKeybindings,
+        # configured hosts/capsules/machines
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+        self.navigation_keybindings = navigation_keybindings
+        self.new_remote_type: Optional[str] = None
+        # only the first keybinding will be shown!
+        self._bindings.bind(
+            ensure_reserved("escape") + "," + close_modal_key, "close", "Close"
+        )
+
+    def build_options(self) -> List[Option]:
+        # - Show a dedicated icon for the "type"
+        # - Name: user@.host (maybe WITH `--user`)
+        # - -H/M/C user@nixos-workstation
+        # - order based on which one was accessed last, maybe with number for quick select
+        # - _After_ selection try to connect to it, maybe inform user that it didn't work, and then
+        #   stay on this screen. Only after it was successful the users should remain on the same screen.
+        # - When connected to a different "target" include the name in the top-right corner!
+        # - OR allow connection to new target -> Ideally on same screen with user-input
+        #
+
+        # accent = self.app.theme_variables.get("accent")
+        #
+        opts = []
+        opts.extend(
+            [
+                Option(
+                    Text("Option 1"),
+                ),
+                Option(
+                    Text("Option 2"),
+                ),
+            ]
+        )
+        opts.append(
+            Option(
+                Text("Option 2"),
+                # id=
+            )
+        )
+        return opts
+
+    def compose(self) -> ComposeResult:
+        opts = self.build_options()
+        # with HorizontalGroup():
+        with VerticalGroup(id="group"):
+            # TODO: disable if `None` are available.
+            yield Markdown("Select previous connection:")
+            yield CustomOptionList(self.navigation_keybindings, *opts)
+            yield Button("Create new connection")
+        yield Footer()
+
+    @on(Button.Pressed)
+    def add_connection_options(self, event: Button.Pressed):
+        inp = Input(placeholder="New remote", disabled=True)
+        inp.border_title = "Inactive"
+        radio_set = CustomRadioSet(
+            self.navigation_keybindings,
+            RadioButton("--host"),
+            RadioButton("--machine"),
+            RadioButton("--capsule"),
+        )
+        item = VerticalGroup(
+            Markdown("Configure new connection:"),
+            HorizontalGroup(
+                radio_set,
+                inp,
+            ),
+            Markdown("", id="desc"),
+        )
+        self.query_one("#group").mount(item)
+        self.query_one(Button).disabled = True
+        self.notify(str(radio_set.focusable))
+        radio_set.focus()
+        # TODO: Add explanation text below!
+
+    @on(RadioSet.Changed)
+    def changed_remote(self, event: RadioSet.Changed):
+        lbl = str(event.pressed.label).lstrip("--").title()
+        inp = self.query_one(Input)
+        inp.disabled = False
+        inp.border_title = f"{lbl}"
+        self.new_remote_type = str(event.pressed.label)
+        self.notify(f"{lbl}")
+
+    # TODO:
+    @on(Input.Submitted)
+    def new_configuration(self, event: Input.Submitted):
+        assert self.new_remote_type is not None
+        new_remote = Remote(
+            type=RemoteType(self.new_remote_type.lstrip("--")), arg=event.value
+        )
+        # TODO: Allow user to enter data in foreground.
+        args = systemctl_args_builder(
+            "is-system-running", mode="system", units=[], remote=new_remote
+        )
+        self.notify(f"{args}")
+        proc = subprocess.run(
+            args,
+            capture_output=True,
+            text=True,
+        )
+        # TODO: Store and add to history if successful
+        self.notify(f"{proc.stdout}\n\n{proc.stderr}")
+
+    def action_close(self) -> None:
+        self.dismiss(None)
+
+    def action_select(self) -> None:
+        opt_list = cast(CustomOptionList, self.query_one(CustomOptionList))
+        opt_list.action_select()
 
     @on(CustomOptionList.OptionSelected)
     def command_selected(self, event: CustomOptionList.OptionSelected):
@@ -527,6 +692,9 @@ class GenericKeybinding(KeybindingModel):
         # confi*g*ure; there are just too few safe keybindings :(
         default="ctrl+g",
         description="Open config in editor",
+    )
+    toggle_connect_remote_modal: str = Field(
+        default="ctrl+r", description="Connect remote"
     )
 
 
@@ -1416,8 +1584,14 @@ async def systemctl_async(
     return return_code, stdout, stderr
 
 
+# HERE: Add support for "Remote"
+# though this should be a `dataclass`, where the remote _contains_ the data and wraps the type.
 def systemctl_args_builder(
-    *cmd: str, mode: str, units: Iterable[str], sudo: bool = False
+    *cmd: str,
+    mode: str,
+    units: Iterable[str],
+    sudo: bool = False,
+    remote: Optional[Remote] = None,
 ) -> List[str]:
     sys_cmd: List[str] = list()
     if sudo and not is_root():
@@ -1440,7 +1614,6 @@ def systemctl_args_builder(
                 # "systemctl",
                 "--user",
                 *cmd,
-                "--",
             ]
         )
     else:
@@ -1449,10 +1622,12 @@ def systemctl_args_builder(
                 get_systemctl_bin(),
                 # "systemctl",
                 *cmd,
-                "--",
             ]
         )
-    sys_cmd.extend(units)
+    # TODO: Check if this is allowed:
+    if remote is not None:
+        sys_cmd.extend([f"--{str(remote.type)}", remote.arg])
+    sys_cmd.extend(["--", *units])
     return sys_cmd
 
 
@@ -2635,7 +2810,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
             self.startup_count = fake_startup_count
 
         # Only show the following bindings in the footer
-        show_bindings = ["toggle_systemctl_modal"]
+        show_bindings = ["toggle_systemctl_modal", "toggle_connect_remote_modal"]
         for action, field in GenericKeybinding.model_fields.items():
             keys = getattr(self.settings.generic_keybindings, action)
             self.bind(
@@ -2782,6 +2957,20 @@ class InteractiveSystemd(App, inherit_bindings=False):
 
         if self.startup_count % 100 == 0:
             self.call_after_refresh(self.show_donation_screen)
+
+        self.call_after_refresh(self.action_toggle_connect_remote_modal)
+
+    @work
+    async def action_toggle_connect_remote_modal(self) -> None:
+        prev_focus = self.focused
+        self.set_focus(None)
+        await self.push_screen_wait(
+            ConnectRemote(
+                self.settings.generic_keybindings.toggle_connect_remote_modal,
+                self.settings.navigation_keybindings,
+            )
+        )
+        self.set_focus(prev_focus)
 
     @work
     async def show_donation_screen(self) -> None:
