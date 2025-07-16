@@ -303,7 +303,10 @@
                 # Prevent uv from downloading managed Python's
                 export UV_PYTHON_DOWNLOADS=never
 
-                export VENV=.venv/
+                # needs to be linked to the pythonset one from above.
+                export UV_PYTHON=${pkgs.python311.interpreter}
+
+                export VIRTUAL_ENV=${virtualenv}
 
                 # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
                 export REPO_ROOT=$(git rev-parse --show-toplevel)

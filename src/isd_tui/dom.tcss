@@ -34,29 +34,19 @@ ConnectRemote>VerticalGroup {
   background: $surface;
 }
 
-ConnectRemote Button {
-  width: 100%;
+/* I cannot really find the options I am looking for,
+ConnectRemote CustomSelectionList,
+ConnectRemote Input {
+  border-title-color: $text-disabled;
 }
+*/
 
-/* Maybe disable this for the RadioButtons */
-ConnectRemote RadioSet {
-  border: none;
-}
 
 ConnectRemote OptionList>.option-list--option-highlighted {
   background: $surface;
 }
 
 ConnectRemote OptionList:focus>.option-list--option-highlighted {
-  background: $primary;
-}
-
-/* This icky CSS happens due to the abuse of &: CSS pre-processors. */
-ConnectRemote RadioSet>RadioButton.-selected {
-  background: $surface;
-}
-
-ConnectRemote RadioSet:focus>RadioButton.-selected {
   background: $primary;
 }
 
@@ -73,6 +63,19 @@ ConnectRemote>HorizontalGroup {
 
 ConnectRemote Input {
   width: 1fr;
+}
+
+ConnectRemote CustomOptionList {
+  margin: 0 0 1 0;
+}
+
+ConnectRemote Button {
+  width: 1fr;
+  border: tall $primary-muted;
+}
+
+ConnectRemote Button:focus {
+  border: tall $primary;
 }
 
 DonationScreen Markdown {
@@ -101,52 +104,44 @@ PreviewArea:focus-within {
   border: tall $border;
 }
 
-/*
-PreviewArea:focus-within Tab.-active {
-  text-style: $block-cursor-text-style;
-  color: $block-cursor-foreground;
-  background: $block-cursor-background;
-}
-*/
-
 Preview:focus {
   background: $boost 75%;
 }
 
 
-#unit-selection>.selection-list--button {
+CustomSelectionList>.selection-list--button {
   background: $boost 100% !important;
 }
 
-#unit-selection>.option-list--separator {
+CustomSelectionList>.option-list--separator {
   background: $primary;
 }
 
 /* Even if it isn't in focus, keep the highlight up; TODO: switch this back to OptionList if necessary! */
-#unit-selection>.option-list--option-highlighted {
+CustomSelectionList>.option-list--option-highlighted {
   background: $primary;
 }
 
-#unit-selection>.option-list--option-hover {
+CustomSelectionList>.option-list--option-hover {
   background: $boost 100%;
 }
 
-#unit-selection>.selection-list--button {
+CustomSelectionList>.selection-list--button {
   color: $primary;
   background: $primary;
 }
 
-#unit-selection:focus>.selection-list--button,
-#unit-selection>.selection-list--button-selected,
-#unit-selection:focus>.selection-list--button-selected,
+CustomSelectionList:focus>.selection-list--button,
+CustomSelectionList>.selection-list--button-selected,
+CustomSelectionList:focus>.selection-list--button-selected,
 {
 color: $primary;
 background: $accent;
 }
 
-#unit-selection:focus>.selection-list--button-highlighted,
-#unit-selection>.selection-list--button-highlighted,
-#unit-selection>.selection-list--button-selected-highlighted {
+CustomSelectionList:focus>.selection-list--button-highlighted,
+CustomSelectionList>.selection-list--button-highlighted,
+CustomSelectionList>.selection-list--button-selected-highlighted {
   color: $accent;
   background: $accent;
 }

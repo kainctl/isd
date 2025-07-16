@@ -68,7 +68,6 @@ from textual.containers import (
     HorizontalGroup,
     Vertical,
     VerticalGroup,
-    Grid,
 )
 
 from textual.reactive import reactive
@@ -87,7 +86,6 @@ from textual.widgets import (
     Header,
     Input,
     RadioButton,
-    RadioSet,
     RichLog,
     Button,
     SelectionList,
@@ -157,7 +155,7 @@ _CACHE_DIR = xdg_cache_home() / __package__ / __version__
 _CONFIG_DIR = xdg_config_home() / __package__
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
-RemoteType = StrEnum("RemoteType", ["host", "machine", "capsule"])
+RemoteType = StrEnum("RemoteType", ["host", "machine", "capsule", "machine --user"])
 
 SETTINGS_YAML_HEADER = dedent("""\
         # yaml-language-server: $schema=schema.json
@@ -250,21 +248,33 @@ PRESET_LNAV_JOURNAL_ARGS: list[str] = PRESET_LNAV_DEFAULT_ARGS + [
 assert PRESET_LESS_DEFAULT_ARGS is not PRESET_LESS_JOURNAL_ARGS
 
 
+# TODO: Move this bad boy to remote
 @dataclass
 class Remote:
     type: RemoteType
     arg: str
 
 
-class CustomRadioSet(RadioSet, inherit_bindings=False):
-    def __init__(self, navigation_keybindings: NavigationKeybindings, *args, **kwargs):
+class CustomInput(Input):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class CustomSelectionList(SelectionList, inherit_bindings=False):
+    def __init__(
+        self,
+        navigation_keybindings: NavigationKeybindings,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         for keys, action, description in [
-            (navigation_keybindings.down, "next_button", "Next option"),
-            (navigation_keybindings.up, "previous_button", "Previous option"),
-            # (navigation_keybindings.top, "first", "First"),
-            # (navigation_keybindings.bottom, "last", "Last"),
-            ("enter,space", "toggle_button", "Toggle"),
+            (navigation_keybindings.down, "cursor_down", "Down"),
+            (navigation_keybindings.up, "cursor_up", "Up"),
+            (navigation_keybindings.page_up, "page_up", "Page Up"),
+            (navigation_keybindings.page_down, "page_down", "Page Down"),
+            (navigation_keybindings.top, "first", "First"),
+            (navigation_keybindings.bottom, "last", "Last"),
         ]:
             self._bindings.bind(
                 keys=keys,
@@ -272,6 +282,40 @@ class CustomRadioSet(RadioSet, inherit_bindings=False):
                 description=description,
                 show=False,
             )
+
+        self._bindings.bind(
+            keys="space",
+            action="select",
+            description="Select",
+            show=True,
+        )
+
+    async def on_click(self, event: events.Click) -> None:
+        """React to the mouse being clicked on an item.
+
+        Args:
+            event: The click event.
+
+        Copied logic from `_option_list.py` file `_on_click`.
+        """
+        clicked_option: int | None = event.style.meta.get("option")
+        if (
+            clicked_option is not None
+            and clicked_option >= 0
+            and not self._options[clicked_option].disabled
+        ):
+            self.highlighted = clicked_option
+
+        if event.ctrl or event.meta or event.shift:
+            # Only actually select the unit if it was
+            self.action_select()
+        else:
+            # if no modifier is pressed, deselect the other ones!
+            self.deselect_all()
+
+        await super()._on_click(event)
+
+        event.stop()
 
 
 class CustomOptionList(OptionList, inherit_bindings=False):
@@ -423,6 +467,7 @@ class ConnectRemote(ModalScreen[Optional[str]]):
     """
 
     BINDINGS = [Binding("enter", "select", "Select", show=True)]
+    AUTO_FOCUS = "CustomOptionList"
 
     def __init__(
         self,
@@ -476,63 +521,190 @@ class ConnectRemote(ModalScreen[Optional[str]]):
         # with HorizontalGroup():
         with VerticalGroup(id="group"):
             # TODO: disable if `None` are available.
-            yield Markdown("Select previous connection:")
+            yield Markdown("Select existing connection:")
             yield CustomOptionList(self.navigation_keybindings, *opts)
-            yield Button("Create new connection")
+            with HorizontalGroup():
+                yield Button("Create new connection", id="create")
+                yield Button("Connect", disabled=True, id="connect-previous")
         yield Footer()
 
-    @on(Button.Pressed)
+    @on(Button.Pressed, "#connect-previous")
+    def connect_previous(self, event: Button.Pressed):
+        self.notify(f"{event.button.label}")
+        # self.query_one("#connect-prev").disabled = False
+
+    @on(CustomOptionList.OptionHighlighted)
+    def new_previous_option_highlighted(
+        self, event: CustomOptionList.OptionHighlighted
+    ):
+        self.query_one("#connect-previous").disabled = False
+        self.existing_connection = event.option.prompt
+        self.notify("new highlight")
+
+    @on(Button.Pressed, "#create")
     def add_connection_options(self, event: Button.Pressed):
-        inp = Input(placeholder="New remote", disabled=True)
-        inp.border_title = "Inactive"
-        radio_set = CustomRadioSet(
-            self.navigation_keybindings,
-            RadioButton("--host"),
-            RadioButton("--machine"),
-            RadioButton("--capsule"),
+        inp = Input(placeholder="Enter remote connection data")
+
+        sel = CustomSelectionList(self.navigation_keybindings)
+
+        sel.border_title = "Connection Type"
+        # TODO: Disable capsule or machine if these options are not supported.
+        sel.add_options(
+            [
+                Selection(Text.from_markup("--host [dim][i]REMOTE[/i][/dim]"), "host"),
+                Selection(
+                    Text.from_markup("--machine [dim][i]REMOTE[/i][/dim]"), "machine"
+                ),
+                Selection(
+                    Text.from_markup("--machine [dim][i]REMOTE[/i][/dim] --user"),
+                    "machine --user",
+                ),
+                Selection(
+                    Text.from_markup("--capsule [dim][i]REMOTE[/i][/dim]"), "capsule"
+                ),
+            ]
         )
+        info_txt = Markdown(
+            "_Additional information about the remote._",
+            id="desc",
+        )
+        btn_create = Button("Create & Connect", id="connection-create")
+        btn_cancel = Button("Cancel", id="connection-cancel")
         item = VerticalGroup(
             Markdown("Configure new connection:"),
             HorizontalGroup(
-                radio_set,
+                sel,
                 inp,
             ),
-            Markdown("", id="desc"),
+            info_txt,
+            HorizontalGroup(btn_cancel, btn_create),
         )
+        self.query_one("#group").remove_children()
         self.query_one("#group").mount(item)
-        self.query_one(Button).disabled = True
-        self.notify(str(radio_set.focusable))
-        radio_set.focus()
-        # TODO: Add explanation text below!
+        sel.highlighted = 0
+        self.call_after_refresh(sel.focus)
 
-    @on(RadioSet.Changed)
-    def changed_remote(self, event: RadioSet.Changed):
-        lbl = str(event.pressed.label).lstrip("--").title()
-        inp = self.query_one(Input)
-        inp.disabled = False
-        inp.border_title = f"{lbl}"
-        self.new_remote_type = str(event.pressed.label)
-        self.notify(f"{lbl}")
+    @on(Button.Pressed, "#connection-cancel")
+    def cancel(self):
+        self.dismiss(None)
 
-    # TODO:
-    @on(Input.Submitted)
-    def new_configuration(self, event: Input.Submitted):
+    @on(Button.Pressed, "#connection-create")
+    def try_creating(self):
+        pass
+
+    @on(CustomSelectionList.SelectionHighlighted)
+    def new_remote(self, event: CustomSelectionList.SelectionHighlighted):
+        remote_type = event.selection.value
+        # disable other selections and only "select" the current one
+        event.selection_list.deselect_all()
+        event.selection_list.select(event.selection)
+        # TODO: add the information via the RemoteType
+        md = cast(Markdown, self.query_one("#desc"))
+        md.update(f"Information about: {remote_type}")
+        self.new_remote_type = remote_type
+
+    async def try_new_remote(self, data):
         assert self.new_remote_type is not None
-        new_remote = Remote(
-            type=RemoteType(self.new_remote_type.lstrip("--")), arg=event.value
-        )
+        new_remote = Remote(type=RemoteType(self.new_remote_type), arg=data)
         # TODO: Allow user to enter data in foreground.
-        args = systemctl_args_builder(
-            "is-system-running", mode="system", units=[], remote=new_remote
+        # Let me think... What cases do we have to support?
+        #
+        # 1. `--host` is configured via `ssh`, which means that a user _might_ have to enter
+        #    the SSH password BUT this would mean that they have to enter the password _every time_
+        #    which is not what I can support.
+        #    -> I need inform the user that they have to be able to connect to it without having to enter a password.
+        # 2. `--machine` may be configured for the current user -> No need for `sudo`.
+        #    BUT it might actually require `sudo`! I am quite certain that I can treat it similarly
+        #    to the current `systemctl` execution case, where I first try silently with the current user
+        #    and then try again with `root`.
+        #
+        # Should I differentiate between the host and machine path? I definitely have to inform the user
+        # that the `--host` path relies on the CURRENT user! Trying to be smart with the `root` user is icky.
+        # Plus, then I can also support some nice suggestions by reading the `~/.ssh/config` file.
+        # I guess, I _have_ to split the paths, since it is NOT allowed to execute `--host --user` but it _is_
+        # allowed to execute `--user --machine`. But how does the user communicate the wish to connect via `--user` ???
+        # I also _cannot_ forget that this is allowed for `sudo`.
+        # Or should I simply allow switching the mode? Then the current mode is used.
+        mode = "user" if self.new_remote_type == "machine --user" else "system"
+        # TODO: Change the test command as `degraded` also results in non-zero exit code...
+        # TODO: Fix the odd behavor where it tries to wait for user input even if I have no user input configured.
+        test_command = "show"
+
+        # machine --user
+        # $ systemctl --machine klara@.host is-system-running
+        #   Failed to connect to system scope bus via machine transport: Permission denied
+        # $ systemctl --machine klara@wrong.local is-system-running
+        #   Failed to connect to system scope bus via machine transport: Host is down
+        # $ systemctl --machine klara@.local is-system-running
+        #   Failed to connect to system scope bus via machine transport: Invalid argument
+        # -> These error messages should be propagated to the main app.
+        #    If the error includes the "Permission denied" part, then I can try again with `sudo`
+        #
+        # I am really not sure how to handle the `--host` option...
+        # It seems like the only _reliable_ option is to manually run `ssh -o BatchMode=yes <host>` first.
+        # Only if that works, I can be sure that follow-up runs work as expected.
+        # For `--machine/--capsule` I somehow need to
+
+        return_code, stdout, stderr = await systemctl_async(
+            test_command,
+            mode=mode,
+            units=[],
+            remote=new_remote,
+            sudo=False,
         )
-        self.notify(f"{args}")
-        proc = subprocess.run(
-            args,
-            capture_output=True,
-            text=True,
-        )
+        # if it fails, check if there was an authentication issue
+        # and prefix it with sudo or explicitly wait for polkit authentication.
+        if return_code != 0:
+            if "auth" in stderr or "Permission denied" in stderr:
+                # if AUTHENTICATION_MODE == "sudo":
+                if True:
+                    # first try again with sudo and see
+                    # if previous cached password works
+                    # invalidate with sudo --reset-timestamp
+                    return_code, stdout, stderr = await systemctl_async(
+                        test_command,
+                        mode=mode,
+                        units=[],
+                        remote=new_remote,
+                        sudo=True,
+                        foreground=False,
+                    )
+                    if return_code == 1:
+                        with self.app.suspend():
+                            return_code, stdout, stderr = await systemctl_async(
+                                test_command,
+                                mode=mode,
+                                units=[],
+                                remote=new_remote,
+                                sudo=True,
+                                foreground=True,
+                            )
+                else:
+                    with self.app.suspend():
+                        return_code, stdout, stderr = await systemctl_async(
+                            test_command,
+                            mode=mode,
+                            units=[],
+                            remote=new_remote,
+                            sudo=False,
+                            foreground=True,
+                        )
+            else:
+                self.notify(
+                    f"Unexpected error:\n{Text.from_ansi(stderr)}",
+                    severity="error",
+                    timeout=30,
+                )
+
         # TODO: Store and add to history if successful
-        self.notify(f"{proc.stdout}\n\n{proc.stderr}")
+        self.notify(f"{stdout}\n\n{stderr}")
+
+    # TODO: History enter different than enter on connection type
+    # TODO: Also trigger on button event!
+    @on(Input.Submitted)
+    async def new_configuration(self, event: Input.Submitted):
+        # TODO: Change this to the actual `RemoteType` class directly
+        await self.try_new_remote(event.value)
 
     def action_close(self) -> None:
         self.dismiss(None)
@@ -1237,68 +1409,6 @@ class Fluid(Horizontal):
         self.styles.layout = "horizontal" if self.is_horizontal else "vertical"
 
 
-class CustomInput(Input):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class CustomSelectionList(SelectionList, inherit_bindings=False):
-    def __init__(
-        self,
-        navigation_keybindings: NavigationKeybindings,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        for keys, action, description in [
-            (navigation_keybindings.down, "cursor_down", "Down"),
-            (navigation_keybindings.up, "cursor_up", "Up"),
-            (navigation_keybindings.page_up, "page_up", "Page Up"),
-            (navigation_keybindings.page_down, "page_down", "Page Down"),
-            (navigation_keybindings.top, "first", "First"),
-            (navigation_keybindings.bottom, "last", "Last"),
-        ]:
-            self._bindings.bind(
-                keys=keys,
-                action=action,
-                description=description,
-                show=False,
-            )
-
-        self._bindings.bind(
-            keys="space",
-            action="select",
-            description="Select",
-            show=True,
-        )
-
-    async def on_click(self, event: events.Click) -> None:
-        """React to the mouse being clicked on an item.
-
-        Args:
-            event: The click event.
-
-        Copied logic from `_option_list.py` file `_on_click`.
-        """
-        clicked_option: int | None = event.style.meta.get("option")
-        if (
-            clicked_option is not None
-            and clicked_option >= 0
-            and not self._options[clicked_option].disabled
-        ):
-            self.highlighted = clicked_option
-
-        if event.ctrl or event.meta or event.shift:
-            # Only actually select the unit if it was
-            self.action_select()
-        else:
-            # if no modifier is pressed, deselect the other ones!
-            self.deselect_all()
-
-        await super()._on_click(event)
-
-        event.stop()
-
-
 def unit_sort_priority(unit: str) -> int:
     suffix = unit.rsplit(".", maxsplit=1)[-1]
     try:
@@ -1548,8 +1658,11 @@ async def systemctl_async(
     sudo: bool = False,
     foreground: bool = False,
     head: Optional[int] = None,
+    remote: Optional[Remote] = None,
 ) -> Tuple[int, str, str]:
-    sys_cmd = systemctl_args_builder(*cmd, mode=mode, units=units, sudo=sudo)
+    sys_cmd = systemctl_args_builder(
+        *cmd, mode=mode, units=units, sudo=sudo, remote=remote
+    )
     if foreground:
         show_command(*sys_cmd)
     proc = await asyncio.create_subprocess_exec(
@@ -1560,7 +1673,7 @@ async def systemctl_async(
         stdin=None if foreground else subprocess.DEVNULL,
     )
     # maxlen appending works as a fifo.
-    stdout_deque: Deque[bytes] = Deque(maxlen=head)
+    stdout_deque: Deque[bytes] = deque(maxlen=head)
     if proc.stdout is not None:
         i = 0
         async for line in proc.stdout:
@@ -1568,7 +1681,7 @@ async def systemctl_async(
             i += 1
             if i == head:
                 break
-    stderr_deque: Deque[bytes] = Deque(maxlen=head)
+    stderr_deque: Deque[bytes] = deque(maxlen=head)
     if proc.stderr is not None:
         i = 0
         async for line in proc.stderr:
@@ -1584,8 +1697,6 @@ async def systemctl_async(
     return return_code, stdout, stderr
 
 
-# HERE: Add support for "Remote"
-# though this should be a `dataclass`, where the remote _contains_ the data and wraps the type.
 def systemctl_args_builder(
     *cmd: str,
     mode: str,
@@ -1626,7 +1737,11 @@ def systemctl_args_builder(
         )
     # TODO: Check if this is allowed:
     if remote is not None:
-        sys_cmd.extend([f"--{str(remote.type)}", remote.arg])
+        if remote.type == RemoteType("machine --user"):
+            type = "--machine"  # split out the `--user` component
+        else:
+            type = f"--{str(remote.type)}"
+        sys_cmd.extend([type, remote.arg])
     sys_cmd.extend(["--", *units])
     return sys_cmd
 
@@ -1691,7 +1806,7 @@ async def journalctl_async(
         async for line in proc.stdout:
             stdout_deque.append(line.rstrip())
         # I believe that will read everything until EOF
-    stderr_deque: Deque[bytes] = Deque(maxlen=tail)
+    stderr_deque: Deque[bytes] = deque(maxlen=tail)
     if proc.stdout is not None:
         async for line in proc.stdout:
             stderr_deque.append(line.rstrip())
