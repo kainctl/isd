@@ -22,6 +22,7 @@ from dataclasses import dataclass
 from . import __version__
 
 import asyncio
+import asyncio.subprocess
 import json
 import os
 import shutil
@@ -85,7 +86,6 @@ from textual.widgets import (
     Footer,
     Header,
     Input,
-    RadioButton,
     RichLog,
     Button,
     SelectionList,
@@ -549,6 +549,7 @@ class ConnectRemote(ModalScreen[Optional[str]]):
 
         sel.border_title = "Connection Type"
         # TODO: Disable capsule or machine if these options are not supported.
+        # TODO: Figure out how to use capsule at all!
         sel.add_options(
             [
                 Selection(Text.from_markup("--host [dim][i]REMOTE[/i][/dim]"), "host"),
@@ -606,7 +607,7 @@ class ConnectRemote(ModalScreen[Optional[str]]):
     async def try_new_remote(self, data):
         assert self.new_remote_type is not None
         new_remote = Remote(type=RemoteType(self.new_remote_type), arg=data)
-        # TODO: Allow user to enter data in foreground.
+        # HERE: Allow user to enter data in foreground.
         # Let me think... What cases do we have to support?
         #
         # 1. `--host` is configured via `ssh`, which means that a user _might_ have to enter
@@ -626,9 +627,8 @@ class ConnectRemote(ModalScreen[Optional[str]]):
         # I also _cannot_ forget that this is allowed for `sudo`.
         # Or should I simply allow switching the mode? Then the current mode is used.
         mode = "user" if self.new_remote_type == "machine --user" else "system"
-        # TODO: Change the test command as `degraded` also results in non-zero exit code...
-        # TODO: Fix the odd behavor where it tries to wait for user input even if I have no user input configured.
-        test_command = "show"
+
+        test_command = ["show", "--property=Version", "--value"]
 
         # machine --user
         # $ systemctl --machine klara@.host is-system-running
@@ -645,56 +645,44 @@ class ConnectRemote(ModalScreen[Optional[str]]):
         # Only if that works, I can be sure that follow-up runs work as expected.
         # For `--machine/--capsule` I somehow need to
 
-        return_code, stdout, stderr = await systemctl_async(
-            test_command,
-            mode=mode,
+        no_sudo_bg = dict(
             units=[],
+            mode=mode,
             remote=new_remote,
             sudo=False,
+            foreground=False,
+            no_ask_password=True,
         )
+        sudo_bg = no_sudo_bg | dict(sudo=True)
+        sudo_fg = sudo_bg | dict(foreground=True)
+
+        # this is the "host workflow"
+        return_code, stdout, stderr = await systemctl_async(*test_command, **no_sudo_bg)
         # if it fails, check if there was an authentication issue
         # and prefix it with sudo or explicitly wait for polkit authentication.
         if return_code != 0:
             if "auth" in stderr or "Permission denied" in stderr:
-                # if AUTHENTICATION_MODE == "sudo":
-                if True:
-                    # first try again with sudo and see
-                    # if previous cached password works
-                    # invalidate with sudo --reset-timestamp
-                    return_code, stdout, stderr = await systemctl_async(
-                        test_command,
-                        mode=mode,
-                        units=[],
-                        remote=new_remote,
-                        sudo=True,
-                        foreground=False,
-                    )
-                    if return_code == 1:
-                        with self.app.suspend():
-                            return_code, stdout, stderr = await systemctl_async(
-                                test_command,
-                                mode=mode,
-                                units=[],
-                                remote=new_remote,
-                                sudo=True,
-                                foreground=True,
-                            )
-                else:
-                    with self.app.suspend():
-                        return_code, stdout, stderr = await systemctl_async(
-                            test_command,
-                            mode=mode,
-                            units=[],
-                            remote=new_remote,
-                            sudo=False,
-                            foreground=True,
-                        )
-            else:
-                self.notify(
-                    f"Unexpected error:\n{Text.from_ansi(stderr)}",
-                    severity="error",
-                    timeout=30,
+                # first try again with sudo and see
+                # if previous cached password works
+                # invalidate with sudo --reset-timestamp
+                return_code, stdout, stderr = await systemctl_async(
+                    *test_command, **sudo_bg
                 )
+                if return_code == 1:
+                    with self.app.suspend():
+                        subprocess.call("clear")
+                        print(
+                            "$ # The following shows the about to be executed command to verify the connection to the remote."
+                        )
+                        return_code, stdout, stderr = await systemctl_async(
+                            *test_command, **sudo_fg
+                        )
+                else:
+                    self.notify(
+                        f"Unexpected error:\n{Text.from_ansi(stderr)}",
+                        severity="error",
+                        timeout=30,
+                    )
 
         # TODO: Store and add to history if successful
         self.notify(f"{stdout}\n\n{stderr}")
@@ -1593,64 +1581,52 @@ async def load_unit_to_state_dict(mode: str, *pattern: str) -> Dict[str, UnitRep
     but if `patterns` is given, those will be forwarded to the
     `list-unit-files` and `list-units` calls!
     """
-    list_units = [
-        get_systemctl_bin(),
-        "list-units",
-    ]
-    list_unit_files = [
-        get_systemctl_bin(),
-        "list-unit-files",
-    ]
-    if mode == "user":
-        mode_arg = ["--user"]
-    else:
-        mode_arg = []
-
-    args = mode_arg + [
+    common_args = [
         "--all",
         "--full",
         "--plain",
         "--no-legend",
-        "--",
-        *pattern,
     ]
-    proc = await asyncio.create_subprocess_exec(
-        *list_units,
-        *args,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        stdin=subprocess.DEVNULL,
-    )
-    stdout, stderr = await proc.communicate()
-    # proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    parsed_units = parse_list_units_lines(stdout.decode())
+    list_units = ["list-units", *common_args]
+    list_unit_files = ["list-unit-files", *common_args]
+    # HERE: this MAY require `sudo` with the new `remote`s...
+    # Similarly to `update_preview_window`.
+    # So this bad boy also needs to be aware if `sudo` was required
+    # for the switch to the non-local remote.
+    #
+    # Yeah, I should probably rename `units` to `pattern` or final args or something.
 
-    proc = await asyncio.create_subprocess_exec(
-        *list_unit_files,
-        *args,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-        stdin=subprocess.DEVNULL,
+    _, stdout, stderr = await systemctl_async(
+        *list_units,
+        mode=mode,
+        units=pattern,
+        color=False,
     )
-    stdout, stderr = await proc.communicate()
+    parsed_units = parse_list_units_lines(stdout)
+
+    _, stdout, stderr = await systemctl_async(
+        *list_unit_files,
+        mode=mode,
+        units=pattern,
+        color=False,
+    )
 
     # If there are no matches for the selected pattern,
     # `systemctl list-unit-files` returns a non-zero exit code!
     # Better to check `stderr`.
-    if stderr.decode() != "":
-        raise Exception(proc.stderr)
+    if stderr != "":
+        raise Exception(stderr)
 
-    parsed_unit_files = parse_list_unit_files_lines(stdout.decode())
+    parsed_unit_files = parse_list_unit_files_lines(stdout)
     return {**parsed_unit_files, **parsed_units}
 
 
 def show_command(*args: str) -> None:
-    # clean up terminal
-    subprocess.call("clear")
     # show current command
-    print(f"\n$ {' '.join(args)}")
+    print(f"$ {' '.join(args)}")
 
 
+# TODO: Maybe rename `units` to `pattern`
 async def systemctl_async(
     *cmd: str,
     mode: str,
@@ -1659,9 +1635,16 @@ async def systemctl_async(
     foreground: bool = False,
     head: Optional[int] = None,
     remote: Optional[Remote] = None,
+    no_ask_password: bool = True,
+    color: bool = True,
 ) -> Tuple[int, str, str]:
     sys_cmd = systemctl_args_builder(
-        *cmd, mode=mode, units=units, sudo=sudo, remote=remote
+        *cmd,
+        mode=mode,
+        units=units,
+        sudo=sudo,
+        remote=remote,
+        no_ask_password=no_ask_password,
     )
     if foreground:
         show_command(*sys_cmd)
@@ -1669,7 +1652,7 @@ async def systemctl_async(
         *sys_cmd,
         stdout=None if foreground else asyncio.subprocess.PIPE,
         stderr=None if foreground else asyncio.subprocess.PIPE,
-        env=env_with_color(),
+        env=env_with_color() if color else os.environ.copy(),
         stdin=None if foreground else subprocess.DEVNULL,
     )
     # maxlen appending works as a fifo.
@@ -1703,6 +1686,7 @@ def systemctl_args_builder(
     units: Iterable[str],
     sudo: bool = False,
     remote: Optional[Remote] = None,
+    no_ask_password: bool = True,
 ) -> List[str]:
     sys_cmd: List[str] = list()
     if sudo and not is_root():
@@ -1715,27 +1699,22 @@ def systemctl_args_builder(
         # override file from USER space and then only copies the file with elevated
         # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
+    sys_cmd.append(get_systemctl_bin())
+    if no_ask_password:
+        sys_cmd.append("--no-ask-password")
     if mode == "user":
         # `root` user _may_ have user services (https://github.com/isd-project/isd/issues/30)
         # if sudo or is_root():
         #     raise ValueError("user mode is not allowed when running as root!")
         sys_cmd.extend(
             [
-                get_systemctl_bin(),
-                # "systemctl",
                 "--user",
                 *cmd,
             ]
         )
     else:
-        sys_cmd.extend(
-            [
-                get_systemctl_bin(),
-                # "systemctl",
-                *cmd,
-            ]
-        )
-    # TODO: Check if this is allowed:
+        sys_cmd.extend(cmd)
+    # HERE: Make this less magic and decide who should be responsible for setting `--user`
     if remote is not None:
         if remote.type == RemoteType("machine --user"):
             type = "--machine"  # split out the `--user` component
@@ -1801,7 +1780,7 @@ async def journalctl_async(
         stdin=subprocess.DEVNULL,
         env=env,
     )
-    stdout_deque: Deque[bytes] = Deque(maxlen=tail)
+    stdout_deque: Deque[bytes] = deque(maxlen=tail)
     if proc.stdout is not None:
         async for line in proc.stdout:
             stdout_deque.append(line.rstrip())
@@ -1937,17 +1916,24 @@ class PreviewArea(Container):
         Update the current preview window.
         It only updates the currently selected preview window/tab
         to avoid spamming subprocesses.
+
+        It simply calls the underlying `systemctl` command in the background
+        with the current mode. It does NOT auto-prefix the output with `sudo`.
+        This might be an issue, if the current user is not in the `systemd-journal` group
+        but this will simply propagate the error.
+
+        HERE:
+        However, with the new `remote`s, the function might fail for `machinectl` as
+        this call MAY depend on `sudo`. For `host` I will NOT support `sudo` prefixing.
+        So while switching TO `machinectl` I need to track if `sudo` is required for ALL
+        other apps.
         """
         if len(self.units) == 0:
             return
 
-        # FUTURE:
-        # This smart refresh is an okay-ish solution.
-        # The better solution would be to implement a textarea that
-        # can allow basic highlighting/copy pasting and searching.
-        # Then I would only update the lines that have changed, which would make the updates
-        # much less aggressive.
         tabbed_content = cast(TabbedContent, self.query_one(TabbedContent))
+        common_kwargs = dict(mode=self.mode, units=self.units, head=self.max_lines)
+
         match tabbed_content.active:
             case "status":
                 preview = tabbed_content.query_one("#status_log", RichLog)
@@ -1956,9 +1942,7 @@ class PreviewArea(Container):
                 # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
                     "status",
-                    mode=self.mode,
-                    units=self.units,
-                    head=self.max_lines,
+                    **common_kwargs,
                 )
             case "dependencies":
                 preview = tabbed_content.query_one("#dependencies_log", RichLog)
@@ -1966,34 +1950,30 @@ class PreviewArea(Container):
                 # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
                     "list-dependencies",
-                    mode=self.mode,
-                    units=self.units,
-                    head=self.max_lines,
+                    **common_kwargs,
                 )
             case "help":
                 preview = tabbed_content.query_one("#help_log", RichLog)
                 # FUTURE: Expand on the functionality from _from_ansi
                 # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
-                    "help", mode=self.mode, units=self.units, head=self.max_lines
+                    "help",
+                    **common_kwargs,
                 )
             case "show":
                 preview = tabbed_content.query_one("#show_log", RichLog)
                 return_code, stdout, stderr = await systemctl_async(
-                    "show", mode=self.mode, units=self.units, head=self.max_lines
+                    "show", **common_kwargs
                 )
             case "cat":
                 preview = tabbed_content.query_one("#cat_log", RichLog)
                 return_code, stdout, stderr = await systemctl_async(
-                    "cat", mode=self.mode, units=self.units, head=self.max_lines
+                    "cat", **common_kwargs
                 )
             case "journal":
                 preview = tabbed_content.query_one("#journal_log", RichLog)
                 return_code, stdout, stderr = await journalctl_async(
-                    *self.journalctl_args,
-                    mode=self.mode,
-                    units=self.units,
-                    tail=self.max_lines,
+                    *self.journalctl_args, **common_kwargs
                 )
             case other:
                 self.notify(f"Unknown state {other}", severity="error")
@@ -2067,6 +2047,7 @@ def derive_startup_mode(startup_mode: StartupMode) -> str:
     else:
         mode = startup_mode
     if mode == "user" and is_root():
+        # HERE: Fix this
         if systemctl_is_system_running(mode="user").returncode == 0:
             return "user"
         else:
@@ -2081,14 +2062,6 @@ def cached_search_term() -> str:
     if fp.exists():
         return json.loads(fp.read_text()).get("search_term", "")
     return ""
-
-
-def systemctl_is_system_running(*, mode: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        systemctl_args_builder("is-system-running", mode=mode, units=[]),
-        capture_output=True,
-        text=True,
-    )
 
 
 # class SettingsError(ModalScreen):
@@ -2343,11 +2316,13 @@ class MainScreen(Screen):
             # is probably the most straight-forward solution IF the mode is `system`!
             # In `user` mode, there should never be a reason to prefix it with sudo!
             with self.app.suspend():
+                subprocess.call("clear")
                 args = systemctl_args_builder(
                     *command,
                     mode=self.mode,
                     units=self.relevant_units,
                     sudo=self.mode == "system",
+                    no_ask_password=False,
                 )
                 show_command(*args)
                 subprocess.call(args)
@@ -2377,6 +2352,7 @@ class MainScreen(Screen):
                         )
                         if return_code == 1:
                             with self.app.suspend():
+                                subprocess.call("clear")
                                 return_code, stdout, stderr = await systemctl_async(
                                     *command,
                                     mode=self.mode,
@@ -2386,12 +2362,14 @@ class MainScreen(Screen):
                                 )
                     else:
                         with self.app.suspend():
+                            subprocess.call("clear")
                             return_code, stdout, stderr = await systemctl_async(
                                 *command,
                                 mode=self.mode,
                                 units=self.relevant_units,
                                 sudo=False,
                                 foreground=True,
+                                no_ask_password=False,
                             )
                 else:
                     self.notify(
@@ -2435,16 +2413,42 @@ class MainScreen(Screen):
 
     def action_toggle_mode(self) -> None:
         """
-        Toggle the current `bus`.
-        Try to protect the user from accidentally crashing the program by trying
-        to access the `--user` bus from the `root` user. But I still have to
-        allow access, as some have user services configured for the `root` user:
+        Toggle the current `bus` between `user` and `system`.
+
+        If the current user is `root` with `mode=system`, the function
+        will check if the switch to `mode=user` _would_ work.
+        This ensures that the switch does not end up in a broken/non-functional state.
+        Usually, the `root` user has no `user` bus configured which would otherwise crash the application.
+
+        Here, I am relying on the fact that a non-sudo and non-interactive switch works.
+        HERE: Is this actually the case???
+
+        Possible problematic switches:
+
+        `root` + `system` + remote=None -> may fail if the `root` user has no user services
+        `root` + `system` + remote=machine -> may be allowed to switch but could also fail.
+           - TODO: What is with the switch from user to system in this case?
+        `root` + `system` + remote=host -> is not allowed
+           - This _could_ require SSH based authentication and break everything but I am relying on
+             the fact that this `remote` can only ever been reached without further authentication.
 
         - <https://github.com/isd-project/isd/issues/30>
         """
+        # The local test _only_ checks while in `system` mode and sees if
+        # the `root` user can switch to `--user`.
         if is_root() and self.mode == "system":
             # Test if `root` user can actually connect to a `--user` bus.
-            proc = systemctl_is_system_running(mode="user")
+            proc = subprocess.run(
+                systemctl_args_builder(
+                    *["show", "--property=Version", "--value"],
+                    mode="user",
+                    units=[],
+                    sudo=False,
+                    # remote=remote
+                ),
+                capture_output=True,
+                text=True,
+            )
             if proc.returncode != 0:
                 self.notify(
                     "Could not connect to `root` users `--user` bus.\n"
@@ -2529,6 +2533,7 @@ class MainScreen(Screen):
             pager_args = get_default_pager_args_presets(pager)
 
         with self.app.suspend():
+            subprocess.call("clear")
             cmd_args = self.preview_output_command_builder(cur_tab)
             env = env_with_color()
             p1 = subprocess.Popen(
@@ -2548,6 +2553,7 @@ class MainScreen(Screen):
         cur_tab = cast(TabbedContent, self.query_one(TabbedContent)).active
         editor = cast(InteractiveSystemd, self.app).editor
         with self.app.suspend():
+            subprocess.call("clear")
             args = self.preview_output_command_builder(cur_tab)
             p1 = subprocess.run(
                 args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
