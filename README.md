@@ -82,4 +82,4 @@ Big thanks to the developers of:
 
 
 ## Star history ⭐
-[![Star History Chart](https://api.star-history.com/svg?repos=isd-project/isd&type=Date)](https://star-history.com/#isd-project/isd&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=kainctl/isd&type=Date)](https://star-history.com/#kainctl/isd&Date)
