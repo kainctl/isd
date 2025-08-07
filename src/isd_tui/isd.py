@@ -890,10 +890,13 @@ class Settings(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         config_file = get_config_file_path()
+        global_config_file = get_global_config_file_path()
         settings = [init_settings]
         settings.append(env_settings)
         if config_file is not None and config_file.exists():
             settings.append(YamlConfigSettingsSource(settings_cls, config_file))
+        if global_config_file is not None and global_config_file.exists():
+            settings.append(YamlConfigSettingsSource(settings_cls, global_config_file))
         return tuple(settings)
 
     @model_validator(mode="after")
@@ -1045,6 +1048,11 @@ def get_isd_persistent_json_file_path() -> Path:
 def get_config_file_path() -> Path:
     config_dir = isd_config_dir()
     return config_dir / "config.yaml"
+
+
+def get_global_config_file_path() -> Path:
+    assert __package__ is not None
+    return Path("/etc") / __package__ / "config.yaml"
 
 
 class Fluid(Horizontal):

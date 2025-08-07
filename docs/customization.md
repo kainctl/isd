@@ -5,7 +5,9 @@ As eluded to in the [Getting Started section](./index.md),
 Almost _all_ keybindings and commands are configurable!
 During start-up `isd` will read a configuration file and load those settings.
 
-By default, the configuration is read from `~/.config/isd_tui/config.yaml`[^1].
+Global configuration is read from `/etc/isd_tui/config.yaml`.
+User configuration is read from `~/.config/isd_tui/config.yaml`[^1],
+overriding the global configuration.
 Though you can also simply open the file from _within_ `isd` by running the
 `Open Config` command ({{ render_shortcut(default_settings.generic_keybindings.open_config) }} by default).
 However, you will _have_ to restart `isd` for the changes to take effect!
