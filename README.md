@@ -33,18 +33,18 @@ for power-users and newcomers alike.
 
 https://github.com/user-attachments/assets/a22868c0-fc01-4973-86ea-410b80b188a8
 
-[Click here for a higher quality recording](https://isd-project.github.io/isd/#working-with-isd).
+[Click here for a higher quality recording](https://kainctl.github.io/isd/#working-with-isd).
 
 ## Documentation
 
 The documentation is live at:
 
-- <https://isd-project.github.io/isd>
+- <https://kainctl.github.io/isd/>
 
 ## Installation
 
 The tool can be installed via `uv`, `nix`, and as an `AppImage`.
-Refer to the [official installation documentation](https://isd-project.github.io/isd/#installation) for more details.
+Refer to the [official installation documentation](https://kainctl.github.io/isd/#installation) for more details.
 
 ## Road map
 
