@@ -1,5 +1,7 @@
 # Presentation
 
+20 min in total!
+
 ## Motivation
 
 Thank you for joining my presentation!

@@ -30,6 +30,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+!docs/slides/dist
 downloads/
 eggs/
 .eggs/
