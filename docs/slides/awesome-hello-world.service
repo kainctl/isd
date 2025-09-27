@@ -1,0 +1,12 @@
+[Unit]
+Description=Awesome Hello World Server
+After=network.target
+
+[Service]
+ExecStart=/opt/hello/serve-hello.py
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
+
