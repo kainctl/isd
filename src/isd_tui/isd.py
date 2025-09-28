@@ -1380,8 +1380,11 @@ async def systemctl_async(
     sudo: bool = False,
     foreground: bool = False,
     head: Optional[int] = None,
+    ask_password: bool = False,
 ) -> Tuple[int, str, str]:
-    sys_cmd = systemctl_args_builder(*cmd, mode=mode, units=units, sudo=sudo)
+    sys_cmd = systemctl_args_builder(
+        *cmd, mode=mode, units=units, sudo=sudo, ask_password=ask_password
+    )
     if foreground:
         show_command(*sys_cmd)
     proc = await asyncio.create_subprocess_exec(
@@ -1417,7 +1420,11 @@ async def systemctl_async(
 
 
 def systemctl_args_builder(
-    *cmd: str, mode: str, units: Iterable[str], sudo: bool = False
+    *cmd: str,
+    mode: str,
+    units: Iterable[str],
+    sudo: bool = False,
+    ask_password: bool = True,
 ) -> List[str]:
     sys_cmd: List[str] = list()
     if sudo and not is_root():
@@ -1430,14 +1437,16 @@ def systemctl_args_builder(
         # override file from USER space and then only copies the file with elevated
         # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
+    sys_cmd.append(get_systemctl_bin())
+    if not ask_password:
+        # TODO: Ensure that this works with older versions.
+        sys_cmd.append("--no-ask-password")
     if mode == "user":
         # `root` user _may_ have user services (https://github.com/kainctl/isd/issues/30)
         # if sudo or is_root():
         #     raise ValueError("user mode is not allowed when running as root!")
         sys_cmd.extend(
             [
-                get_systemctl_bin(),
-                # "systemctl",
                 "--user",
                 *cmd,
                 "--",
@@ -1446,8 +1455,6 @@ def systemctl_args_builder(
     else:
         sys_cmd.extend(
             [
-                get_systemctl_bin(),
-                # "systemctl",
                 *cmd,
                 "--",
             ]
@@ -2102,6 +2109,7 @@ class MainScreen(Screen):
                                 units=self.relevant_units,
                                 sudo=False,
                                 foreground=True,
+                                ask_password=True,
                             )
                 else:
                     self.notify(
