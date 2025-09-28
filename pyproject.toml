@@ -74,10 +74,10 @@ isd = "isd_tui.isd:main"
 isd-tui = "isd_tui.isd:main"
 
 [project.urls]
-Hompage = "https://github.com/isd-project/isd"
-Documentation = "https://isd-project.github.io/isd/"
-Repository = "https://github.com/isd-project/isd"
-"Bug Tracker" = "https://github.com/isd-project/isd/issues"
+Hompage = "https://github.com/kainctl/isd"
+Documentation = "https://kainctl.github.io/isd/"
+Repository = "https://github.com/kainctl/isd"
+"Bug Tracker" = "https://github.com/kainctl/isd/issues"
 
 # build.hooks.<HOOK_NAME> is global
 # and applied to _all_ build targets

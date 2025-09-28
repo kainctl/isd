@@ -1,6 +1,6 @@
 site_name: isd
-site_url: https://isd-project.github.io/isd
-repo_url: https://github.com/isd-project/isd
+site_url: https://kainctl.github.io/isd
+repo_url: https://github.com/kainctl/isd
 theme:
   name: material
   palette:

@@ -124,7 +124,7 @@ If you are interested, read on and take a look at the [recorded terminal session
     ??? warning "Ubuntu 24.04 Additional Requirements"
 
         If you are using Ubuntu 24.04, extra installation steps are required.
-        Please see the [issue #10 for more details](https://github.com/isd-project/isd/issues/10).
+        Please see the [issue #10 for more details](https://github.com/kainctl/isd/issues/10).
 
         In short, you have to create an `apparmor` profile by creating the file: `/etc/apparmor.d/isd-appimage` with:
 

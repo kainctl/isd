@@ -1431,7 +1431,7 @@ def systemctl_args_builder(
         # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
     if mode == "user":
-        # `root` user _may_ have user services (https://github.com/isd-project/isd/issues/30)
+        # `root` user _may_ have user services (https://github.com/kainctl/isd/issues/30)
         # if sudo or is_root():
         #     raise ValueError("user mode is not allowed when running as root!")
         sys_cmd.extend(
@@ -2150,7 +2150,7 @@ class MainScreen(Screen):
         to access the `--user` bus from the `root` user. But I still have to
         allow access, as some have user services configured for the `root` user:
 
-        - <https://github.com/isd-project/isd/issues/30>
+        - <https://github.com/kainctl/isd/issues/30>
         """
         if is_root() and self.mode == "system":
             # Test if `root` user can actually connect to a `--user` bus.
