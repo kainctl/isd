@@ -26,7 +26,7 @@
             </a>
             <h1>isd – interactive systemd</h1>
             <p>
-              <small>Created by
+              <small>Developed and presented by
                 <a href="https://kainctl.github.io/isd/">Kai Norman Clasen</a></small>
             </p>
           </div>
@@ -35,24 +35,24 @@
           <h2>A Bit About Me</h2>
           <ul class="vfill">
             <li>
-              Hobby System Administrator since a few years
+              I’ve been a hobby system administrator for a few years
               <br>
               <small>(I use NixOS ❄️ btw.)</small>
             </li>
             <li class="fragment">
-              Actively started working with
+              Started working actively with
               <code>systemd</code>
-              almost 2 years ago
+              about 2 years ago
             </li>
             <li class="fragment">
               Features of
               <code>systemd</code>
-              ⩵ ♥️
+              ⩵  ♥️
             </li>
             <li class="fragment">
-              User experience of
+              User/developer experience of
               <code>systemd</code>
-              ⩵ 😐
+              ⩵  😐
             </li>
           </ul>
         </section>
@@ -85,7 +85,7 @@
           </div>
         </section>
         <section>
-          <h2>My Old Workflow</h2>
+          <h2>My Old (and slow) Workflow</h2>
         </section>
         <section>
           <div id="old_workflow.cast"></div>
@@ -94,23 +94,22 @@
           <h2><code>sysz</code></h2>
           <ul class="vfill">
             <li>
-              a terminal UI (<em>TUI</em>) for
+              A terminal user interface (<em>TUI</em>) for
               <code>systemctl</code>
             </li>
             <li>
-              is written as a shell script wrapping around
-              <code>systemctl</code>
-              utilizing  the
+              Written as a shell script that wraps around
+              <code>systemctl</code>,
+              using the
               <code>fzf</code>
               tool
             </li>
             <li>
-              includes a
-              <code>status</code>
-              preview window and
-              automatically prefixes
+              Includes a
+              <code>systemctl status</code>
+              preview window and automatically adds
               <code>sudo</code>
-              if necessary
+              when needed
             </li>
           </ul>
         </section>
@@ -129,24 +128,24 @@
             <code>sysz</code></h2>
           <div class="vfill">
             <pre>
-            <code data-trim data-noescape class="language-bash" data-line-numbers="1-30|4,6,14">
-            _sysz_systemctl() {
-              if [[ $EUID -ne 0 && $1 = --system ]]; then
-                # only run sudo if we aren't root and it's a system unit
-                _sysz_run sudo systemctl "$@"
-              else
-                _sysz_run systemctl "$@"
-              fi
-            }
+              <code data-trim data-noescape class="language-bash" data-line-numbers="1-30|4,6,14">
+              _sysz_systemctl() {
+                if [[ $EUID -ne 0 && $1 = --system ]]; then
+                  # only run sudo if we aren't root and it's a system unit
+                  _sysz_run sudo systemctl "$@"
+                else
+                  _sysz_run systemctl "$@"
+                fi
+              }
 
 
-            _sysz_journalctl() {
-              if [[ $1 = --user ]]; then
-                # use --user-unit flag if it's a user unit
-                _sysz_run journalctl --user-unit="$2" "${@:3}"
-            # [...]
-          </code>
-        </pre>
+              _sysz_journalctl() {
+                if [[ $1 = --user ]]; then
+                  # use --user-unit flag if it's a user unit
+                  _sysz_run journalctl --user-unit="$2" "${@:3}"
+              # [...]
+            </code>
+          </pre>
           </div>
         </section>
         <section>
@@ -162,8 +161,8 @@
           <div id="custom.cast"></div>
         </section>
         <section>
-          <h2>CLI tools<br>
-            + modern TUI frameworks
+          <h2>CLI Tools<br>
+            + Modern TUI Frameworks
             <br>
             = 🚀💘🚀</h2>
         </section>
@@ -177,12 +176,14 @@
             </li>
             <li class="fragment">
               <em>Shelling</em>
-              out is an option in higher and lower level languages
+              out is an option in both high-level and low-level languages
             </li>
             <li class="fragment">
-              Limit the scope/use the correct tool for the job
+              Limit the scope; use the correct tool for the job
             </li>
-            <li class="fragment">LSPs are great for editing configuration files</li>
+            <li class="fragment">
+              Language Server Protocols (LSPs) make editing configuration files easier
+            </li>
           </ul>
         </section>
         <!-- <section data-preload data-background-iframe="./customization.html" data-background-interactive> -->
@@ -229,6 +230,27 @@
       <!-- }); -->
     </script>
     <script>
+      document.addEventListener('keydown', function (event) {
+        // 27 is Escape
+        if (event.key === 'Escape' || event.keyCode === 27) {
+          const active = document.activeElement;
+
+          // If focus is inside an asciinema wrapper, remove it
+          if (active && active.closest('.ap-wrapper')) {
+            active.blur();
+
+            // Optionally move focus explicitly to the Reveal container
+            const revealContainer = document.querySelector('.reveal');
+            if (revealContainer) {
+              revealContainer.focus();
+            }
+
+            event.stopPropagation();
+            event.preventDefault();
+          }
+        }
+      });
+
       // Also available as an ES module, see:
 			// https://revealjs.com/initialization/
 			Reveal.initialize({
@@ -238,6 +260,15 @@
 				hash: true,
         display: 'flex',
         overview: false,
+        keyboard: {
+          // Disable fullscreen (F key)
+          70: null,
+          72: () => Reveal.left(),
+
+          // l = right
+          76: () => Reveal.right()
+        },
+
         // Optional function that blocks keyboard events when retuning false
         keyboardCondition: function(event) {
           // Don't let Reveal.js handle keyboard if target is inside asciinema player

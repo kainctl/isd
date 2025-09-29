@@ -39,9 +39,10 @@ Sleep 1s
 Type "i" Backspace
 Type "lnav" Enter
 Sleep 1s
-Type "navigation_keybindings: " Tab
+Type "navigation_" Sleep 1s Tab Sleep 2s
+Enter
 Sleep 2s
-Sleep 1s Escape
+Escape
 Ctrl+N
 Type ":wq" Enter
 
@@ -50,25 +51,25 @@ Ctrl+N
 Sleep 1s
 Ctrl+Q
 Sleep 1s
-Type "isd" Enter
-Sleep 2s
-Ctrl+N
-Type "awesome-"
-Sleep 1s
-Tab@500ms 3
-Sleep 1s Right Sleep 1s
-Enter
-Sleep 1s
-Ctrl+N
-Sleep 1s
-Type ":filter-in DEBUG"
-Sleep 2s
-Enter
-Sleep 1s
-Right 1
-Ctrl+N
-Sleep 1s
-Type "q"
+# Type "isd" Enter
+# Sleep 2s
+# Ctrl+N
+# Type "awesome-"
+# Sleep 1s
+# Tab@500ms 3
+# Sleep 1s Right Sleep 1s
+# Enter
+# Sleep 1s
+# Ctrl+N
+# Sleep 1s
+# Type ":filter-in DEBUG"
+# Sleep 2s
+# Enter
+# Sleep 1s
+# Right 1
+# Ctrl+N
+# Sleep 1s
+# Type "q"
 
 Ctrl+D
 

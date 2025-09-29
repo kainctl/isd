@@ -20,7 +20,7 @@ Sleep 0.5s
 
 Show
 
-Type "sysz" Sleep 500ms Enter Sleep 1.5s
+Type "sysz" Sleep 500ms Enter Sleep 2s
 Ctrl+N
 Type "awesome-" Sleep 1s 
 Ctrl+N
