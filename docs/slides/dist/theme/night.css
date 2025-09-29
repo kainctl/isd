@@ -61,6 +61,18 @@ section.has-light-background h6 {
   --r-code-font: 'CascadiaCodeNF';
 }
 
+q {
+  quotes: "„" "“" "‚" "‘";
+}
+
+q::before {
+  content: open-quote;
+}
+
+q::after {
+  content: close-quote;
+}
+
 .ap-wrapper pre.ap-terminal {
   /* border-width: 0em; */
   padding: 0;
@@ -84,6 +96,10 @@ section.has-light-background h6 {
   flex-direction: column;
   justify-content: space-around;
   height: 100%;
+}
+
+.large {
+  font-size: var(--r-heading2-size);
 }
 
 .vfill::after {

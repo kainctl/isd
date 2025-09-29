@@ -3,9 +3,11 @@ Description=Awesome Hello World Server
 After=network.target
 
 [Service]
-ExecStart=/opt/hello/serve-hello.py
-ProtectSystem=strict
-ProtectHome=yes
+ExecStart=/opt/hello/awesome-hello-world.py
+DynamicUser=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_INET6
+SystemCallFilter=~@chown @clock @cpu-emulation @privileged
 
 [Install]
 WantedBy=multi-user.target

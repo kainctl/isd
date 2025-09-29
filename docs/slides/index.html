@@ -68,14 +68,18 @@
             <pre>
               <code data-trim data-noescape class="language-toml">
                 [Unit]
-                Description="Returns Hello World on :8181"
-                Documentation=http:example.com
-                Wants=default.target
-                After=default.target
+                Description=Awesome Hello World Server
+                After=network.target
 
                 [Service]
-                Type=simple
-                ExecStart=python awesome-hello-world.py
+                ExecStart=/opt/hello/awesome-hello-world.py
+                DynamicUser=yes
+                PrivateTmp=yes
+                RestrictAddressFamilies=AF_UNIX AF_INET6
+                SystemCallFilter=~@chown @clock @cpu-emulation @privileged
+
+                [Install]
+                WantedBy=multi-user.target
               </code>
             </pre>
           </div>
@@ -84,12 +88,150 @@
           <h2>My Old Workflow</h2>
         </section>
         <section>
-          <div id="test.cast"></div>
+          <div id="old_workflow.cast"></div>
+        </section>
+        <section>
+          <h2><code>sysz</code></h2>
+          <ul class="vfill">
+            <li>
+              a terminal UI (<em>TUI</em>) for
+              <code>systemctl</code>
+            </li>
+            <li>
+              is written as a shell script wrapping around
+              <code>systemctl</code>
+              utilizing  the
+              <code>fzf</code>
+              tool
+            </li>
+            <li>
+              includes a
+              <code>status</code>
+              preview window and
+              automatically prefixes
+              <code>sudo</code>
+              if necessary
+            </li>
+          </ul>
+        </section>
+        <section>
+          <div id="sysz_workflow.cast"></div>
+        </section>
+        <section>
+          <div class="vfill">
+            <h2>Biggest Limitation of
+              <code>sysz</code>:</h2>
+            <p class="fname large fragment">Stateless</p>
+          </div>
+        </section>
+        <section>
+          <h2><code>sysz</code>
+            code snippet</h2>
+          <div class="vfill">
+            <pre>
+            <code data-trim data-noescape class="language-bash" data-line-numbers="1-30|4,6,14">
+            _sysz_systemctl() {
+              if [[ $EUID -ne 0 && $1 = --system ]]; then
+                # only run sudo if we aren't root and it's a system unit
+                _sysz_run sudo systemctl "$@"
+              else
+                _sysz_run systemctl "$@"
+              fi
+            }
+
+
+            _sysz_journalctl() {
+              if [[ $1 = --user ]]; then
+                # use --user-unit flag if it's a user unit
+                _sysz_run journalctl --user-unit="$2" "${@:3}"
+            # [...]
+          </code>
+        </pre>
+          </div>
+        </section>
+        <section>
+          <h2>isd Workflow</h2>
+        </section>
+        <section>
+          <div id="new_workflow.cast"></div>
+        </section>
+        <section>
+          <div id="custom.cast"></div>
+        </section>
+        <section>
+          <h2>CLI tools<br>
+            + modern TUI frameworks
+            <br>
+            = 🚀💘🚀</h2>
+        </section>
+        <section>
+          <h2>Lessons Learned</h2>
+        </section>
+        <section>
+          <h3>
+            Insight 1: Take advantage of
+            <em>upstream</em>
+          </h3>
+          <ul class="vfill">
+            <li>
+              CLI tools expose a cherry-picked API that upstream
+              <em>recommends</em>
+              and
+              <em>tests</em>
+              against.
+            </li>
+            <li>
+              Wrapping around upstream CLI tools can be a great core to develop useful TUIs.
+            </li>
+            <li>
+              Using a CLI avoids re-developing a lot of the functionality.
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h3>
+            Insight 2: Limit the scope
+          </h3>
+          <ul class="vfill">
+            <li>
+              Use the
+              <em>correct</em>
+              tool for the job!
+            </li>
+            <li>
+              Avoid recreating a worse version of a tool
+              that you could use instead.
+            </li>
+          </ul>
+        </section>
+        <section>
+          lnav example
+        </section>
+        <section>
+          <h3>
+            Insight 3: TUI users like customization options
+          </h3>
+          <ul class="vfill">
+            <li>
+              keybindings/shortcuts
+            </li>
+            <li>
+              Pager example
+            </li>
+          </ul>
         </section>
         <section data-preload data-background-iframe="./customization.html" data-background-interactive>
-          <div style="position: absolute; width: 40%; bottom: 10%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
-            <p>Nobody likes to read the documentation.</p>
+          <div style="position: absolute; width: 45%; bottom: 10%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 20px; text-align: left;">
+            <p>... but nobody likes to read the documentation.</p>
           </div>
+        </section>
+        <section>
+          <h3>
+            Insight 4: LSPs are great for configuration files
+          </h3>
+        </section>
+        <section>
+          LSP asciicast
         </section>
       </div>
     </div>
@@ -120,6 +262,10 @@
               controls: true,
               loop: false,
               preload: true,
+              speed: 0.75,
+              pauseOnMarkers: true,
+              <!-- fit: false, -->
+              <!-- terminalFontSize: "20px", -->
             }
           );
         });

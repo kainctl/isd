@@ -224,7 +224,7 @@
               cp ${pkgs.asciinema_3}/bin/asciinema $out/bin/my_asciinema
               cat > $out/config/asciinema/config.toml <<EOF
               [recording]
-              add_marker_key = "]"
+              add_marker_key = "^n"
               EOF
               # Wrap the binary to set XDG_CONFIG_HOME
               wrapProgram $out/bin/my_asciinema --set ASCIINEMA_CONFIG_HOME "$out/config/asciinema"
