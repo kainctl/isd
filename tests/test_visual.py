@@ -12,9 +12,25 @@ from isd_tui.isd import (
 from pathlib import Path
 from textual.pilot import Pilot
 from textual.widgets import RichLog, TabbedContent, Tabs
-from xdg_base_dirs import xdg_data_home
 
 os.environ["PATH"] = str(Path(__file__).parent.resolve()) + ":" + os.environ["PATH"]
+
+
+@pytest.fixture(autouse=True)
+def isolated_xdg_folders(monkeypatch, tmp_path):
+    """
+    Each test gets its own set of random XDG directories.
+    Also removes ALL environment variables starting with `ISD_`
+    """
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
+
+    for key in list(os.environ):
+        if key.lower().startswith("isd_"):
+            monkeypatch.delenv(key, raising=False)
+
+    yield tmp_path
 
 
 def first_key(inp: str) -> str:
@@ -210,11 +226,8 @@ async def test_donation_screen_interaction():
 #         assert app.screen.mode == "system"
 
 
-async def test_usage_counter(monkeypatch, tmp_path):
-    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
-    assert xdg_data_home() == Path(tmp_path)
-
-    p = Path(tmp_path) / "isd_tui" / "persistent_state.json"
+async def test_usage_counter(monkeypatch, isolated_xdg_folders):
+    p = Path(isolated_xdg_folders) / "data" / "isd_tui" / "persistent_state.json"
     assert not p.exists()
 
     # The initialization updates the `startup_count`
@@ -300,3 +313,17 @@ def test_snap_height(snap_compare):
         await pilot.press(pilot.app.settings.main_keybindings.increase_widget_height)
 
     assert snap_compare(app, run_before=run_before)
+
+
+def test_theme_from_settings(monkeypatch, snap_compare):
+    # but override theme via environment
+    monkeypatch.setenv("ISD_THEME", "dracula")
+    app = InteractiveSystemd()
+    assert snap_compare(app)
+
+
+# Yeah, I am too lazy to figure out how to detect that a notification was sent
+def test_invalid_settings(monkeypatch, snap_compare):
+    monkeypatch.setenv("ISD_STARTUP_MODE", "invalid")
+    app = InteractiveSystemd()
+    assert snap_compare(app)

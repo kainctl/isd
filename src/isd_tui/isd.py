@@ -56,6 +56,7 @@ from pydantic_settings import (
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
+import rich.markup
 from rich.style import Style
 from rich.text import Text
 from textual import on, work, events, log
@@ -120,7 +121,7 @@ else:
     del _tmp_file
 
 ToggleButton.BUTTON_LEFT = ""
-ToggleButton.BUTTON_INNER = "▐"  # "▌"  # "█"
+ToggleButton.BUTTON_INNER = "▐"  # "▌" # "█"
 ToggleButton.BUTTON_RIGHT = ""
 
 UNIT_PRIORITY_ORDER = [
@@ -148,8 +149,7 @@ UNIT_PRIORITY_ORDER = [
 AUTHENTICATION_MODE = "sudo"
 # AUTHENTICATION_MODE = "polkit"
 
-_CACHE_DIR = xdg_cache_home() / __package__ / __version__
-_CONFIG_DIR = xdg_config_home() / __package__
+# HERE: Remove this from the global scope for testing!
 Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
 
@@ -995,7 +995,8 @@ def isd_cache_dir() -> Path:
     The function will try to create the directory if it doesn't exist
     but will skip any errors.
     """
-    cache_dir: Path = _CACHE_DIR
+    assert __package__ is not None
+    cache_dir = Path(xdg_cache_home()) / __package__ / __version__
     try:
         cache_dir.mkdir(parents=True, exist_ok=True)
     except Exception as e:
@@ -1024,7 +1025,8 @@ def isd_config_dir() -> Path:
     The function will try to create the directory if it doesn't exist
     but will skip any errors.
     """
-    config_dir: Path = _CONFIG_DIR
+    assert __package__ is not None
+    config_dir: Path = xdg_config_home() / __package__
     try:
         config_dir.mkdir(parents=True, exist_ok=True)
     except Exception as e:
@@ -2528,9 +2530,6 @@ class MainScreen(Screen):
 
     # FUTURE: Evaluate if updating the self values in compose makes sense.
     def compose(self) -> ComposeResult:
-        # theme should be loaded very early,
-        # as the theme change can be quite jarring.
-        self.theme = self.settings.theme
         # search_term is used in the following input function
         if self.settings.cache_input:
             self.search_term = cached_search_term()
@@ -2595,23 +2594,16 @@ class InteractiveSystemd(App, inherit_bindings=False):
     def __init__(
         self,
         *args,
-        force_defaults: bool = True,
         fake_startup_count: Optional[int] = 1,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        if force_defaults:
-            self.settings = Settings.model_construct()
-            self.settings.cache_input = False
-            self.settings.startup_mode = StartupMode("user")
+        try:
+            self.settings = Settings()
             self.settings_error = None
-        else:
-            try:
-                self.settings = Settings()
-                self.settings_error = None
-            except Exception as e:
-                self.settings = Settings.model_construct()
-                self.settings_error = e
+        except Exception as e:
+            self.settings = Settings.model_construct()
+            self.settings_error = e
         _persistent_json_fp = get_isd_persistent_json_file_path()
 
         try:
@@ -2768,25 +2760,27 @@ class InteractiveSystemd(App, inherit_bindings=False):
         self.notify(f"isd version: {__version__}", timeout=30)
 
     def on_mount(self) -> None:
+        # The theme should be loaded very early,
+        # as the theme change can be quite jarring.
+        self.theme = self.settings.theme
         # Always make sure to use the latest schema
         self.update_schema()
         self.install_screen(MainScreen(self.settings), "main")
         if self.settings_error is not None:
+            error_text = str(self.settings_error)
             self.notify(
                 "Error encountered while loading settings; falling back to defaults.",
                 severity="error",
                 timeout=90,
             )
-            n = tempfile.NamedTemporaryFile(
-                "w", prefix="isd_", suffix=".txt", delete=False
-            )
+            error_log_file = Path(tempfile.gettempdir()) / "isd_startup_error.log"
+            escaped_error_text = rich.markup.escape(error_text)
             self.notify(
-                f"Error while loading settings:\nLog stored under: {n.name})\n\n{self.settings_error}",
+                f"Error while loading settings:\nLog stored under: {error_log_file})\n\n{escaped_error_text}",
                 severity="error",
                 timeout=90,
             )
-            n.write(str(self.settings_error))
-            n.close()
+            error_log_file.write_text(error_text)
         self.push_screen("main")
 
         if self.startup_count % 100 == 0:
@@ -2903,7 +2897,7 @@ def render_model_as_yaml(model: Settings) -> str:
 
 
 def main():
-    app = InteractiveSystemd(force_defaults=False, fake_startup_count=None)
+    app = InteractiveSystemd(fake_startup_count=None)
     # In theory, I could trigger a custom exit code for the application
     # if a change is detected and then restart the application here.
     # But let's keep it simple for now. If somebody actually asks for this
