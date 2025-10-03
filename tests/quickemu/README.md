@@ -1,6 +1,7 @@
 # VM Notes
 
 Installed each `ubuntu-server` VM with `OpenSSH` via `quickemu`.
+Downloaded the images with `quickemu --download ubuntu-server XX.YY`.
 Then, connect to it via `ssh kai@<server-name>.localhost -p 22220`.
 Note that an address ending in `.localhost` will be bound to `.localhost`
 if `systemd-resolved` is used. This avoids having to fight with conflicting
