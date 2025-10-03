@@ -723,7 +723,7 @@ class Settings(BaseSettings):
     )
 
     preview_and_selection_refresh_interval_sec: float = Field(
-        default=3,
+        default=1,
         description=dedent("""\
             Auto refresh the preview unit _and_ unit states of selected units.
             Example: When a selected unit changes from running to failed
@@ -733,7 +733,7 @@ class Settings(BaseSettings):
     )
 
     full_refresh_interval_sec: float = Field(
-        default=15,
+        default=10,
         description=dedent("""\
             Auto refresh all unit states.
             This is important to find new units that have been added
@@ -1648,7 +1648,7 @@ class PreviewArea(Container):
         tabs: Tabs = self.query_one(Tabs)
         tabs.action_previous_tab()
 
-    @work(exclusive=True)
+    @work(exclusive=True, group="preview_area_preview_window")
     async def update_preview_window(self) -> None:
         """
         Update the current preview window.
@@ -2324,7 +2324,7 @@ class MainScreen(Screen):
         assert len(units) == len(set(units))
         self.relevant_units = units
 
-    @work(exclusive=True)
+    @work(exclusive=True, group="main_preview_window")
     async def refresh_preview(self) -> None:
         await asyncio.sleep(self.settings.updates_throttle_sec)
         if len(self.relevant_units) > 0:
@@ -2366,13 +2366,14 @@ class MainScreen(Screen):
         self, event: CustomSelectionList.SelectionHighlighted
     ) -> None:
         self.highlighted_unit = event.selection.value
+        self.update_relevant_units()
+
         if self.highlighted_unit is not None:
             # throttle since highlighted unit can change quite quickly
             # updating it since the current highlighted value should _always_
             # show the _current_ state of the unit!
-            self.throttled_refresh_unit_to_state_dict_worker(self.highlighted_unit)
+            self.throttled_refresh_unit_to_state_dict_worker()
 
-        self.update_relevant_units()
         self.refresh_preview()
 
     async def search_units(self, search_term: str) -> list[Dict[str, Any]]:
@@ -2381,7 +2382,7 @@ class MainScreen(Screen):
         # self.search_results = await fuzzy_match(search_term.replace(" ", ""), haystack)
         return await fuzzy_match(search_term.replace(" ", ""), haystack)
 
-    @work(exclusive=True)
+    @work(exclusive=True, group="search_units")
     async def debounced_search_units(self, search_term: str) -> None:
         await asyncio.sleep(self.settings.updates_throttle_sec)
         self.search_results = await self.search_units(search_term)
@@ -2486,14 +2487,14 @@ class MainScreen(Screen):
         self.search_results = await self.search_units(self.search_term)
         self.mutate_reactive(MainScreen.unit_to_state_dict)
 
-    @work(exclusive=True)
-    async def throttled_refresh_unit_to_state_dict_worker(self, *units: str) -> None:
+    @work(exclusive=True, group="refresh_unit_to_state_dict")
+    async def throttled_refresh_unit_to_state_dict_worker(self) -> None:
         """
         Will throttle the calls to `refresh_unit_to_state_dict_worker`.
         This should be done whenever many partial updates are expected.
         """
         await asyncio.sleep(self.settings.updates_throttle_sec)
-        self.refresh_unit_to_state_dict_worker(*units)
+        self.refresh_unit_to_state_dict_worker(*self.relevant_units)
 
     @work()
     async def refresh_unit_to_state_dict_worker(self, *units: str) -> None:
@@ -2509,8 +2510,8 @@ class MainScreen(Screen):
         But it should NOT be exclusive! If there is one full refresh queued
         and after it a partial update, then the full refresh might be interrupted!
         """
-        partial_unit_to_state_dict = await load_unit_to_state_dict(self.mode, *units)
         local_unit_to_state_dict = deepcopy(self.unit_to_state_dict)
+        partial_unit_to_state_dict = await load_unit_to_state_dict(self.mode, *units)
         for unit in partial_unit_to_state_dict:
             local_unit_to_state_dict[unit] = partial_unit_to_state_dict[unit]
 
