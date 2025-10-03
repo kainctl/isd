@@ -22,7 +22,7 @@ def first_key(inp: str) -> str:
 
 
 def pilots_active_tab(pilot: Pilot) -> str:
-    return pilot.app.query_one(TabbedContent).active
+    return pilot.app.screen.query_one(TabbedContent).active
 
 
 async def click_and_wait(pilot: Pilot, selector) -> None:
@@ -58,7 +58,7 @@ async def test_navigation_tabbed_content():
     nav = settings.navigation_keybindings
 
     async with app.run_test() as pilot:
-        pilot.app.query_one(Tabs).focus()
+        pilot.app.screen.query_one(Tabs).focus()
         right_key = first_key(nav.right)
         left_key = first_key(nav.left)
 
@@ -94,7 +94,7 @@ async def test_navigation_custom_selection():
 
     async with app.run_test() as pilot:
         assert isinstance(pilot.app.screen, MainScreen)
-        pilot.app.query_one(CustomSelectionList).focus()
+        pilot.app.screen.query_one(CustomSelectionList).focus()
 
         prev_highlighted_unit = pilot.app.screen.highlighted_unit
         nav = settings.navigation_keybindings
@@ -127,7 +127,7 @@ async def test_main_keybindings_change_preview_tab():
     settings = app.settings
     main_kbs = settings.main_keybindings
     async with app.run_test() as pilot:
-        pilot.app.query_one(CustomSelectionList).focus()
+        pilot.app.screen.query_one(CustomSelectionList).focus()
         await pilot.pause()
         # Cannot be CustomInput, as it might otherwise eat the key shortcuts
         assert not isinstance(pilot.app.focused, CustomInput)
@@ -149,15 +149,15 @@ async def test_main_keybindings_input_shortcuts():
     settings = app.settings
     main_kbs = settings.main_keybindings
     async with app.run_test() as pilot:
-        pilot.app.query_one(CustomInput).focus()
+        pilot.app.screen.query_one(CustomInput).focus()
         await pilot.press("c")
-        pilot.app.query_one(CustomSelectionList).focus()
+        pilot.app.screen.query_one(CustomSelectionList).focus()
         await pilot.press(first_key(main_kbs.clear_input))
         assert isinstance(pilot.app.focused, CustomInput)
         assert pilot.app.focused.value == ""
 
         await pilot.press("x")
-        pilot.app.query_one(CustomSelectionList).focus()
+        pilot.app.screen.query_one(CustomSelectionList).focus()
         await pilot.press(first_key(main_kbs.jump_to_input))
         assert isinstance(pilot.app.focused, CustomInput)
         assert pilot.app.focused.value == "x"
@@ -166,7 +166,7 @@ async def test_main_keybindings_input_shortcuts():
 async def test_selection_click():
     app = InteractiveSystemd()
     async with app.run_test() as pilot:
-        pilot.app.query_exactly_one(CustomSelectionList).focus()
+        pilot.app.screen.query_exactly_one(CustomSelectionList).focus()
         assert isinstance(app.screen, MainScreen)
         assert len(app.screen.ordered_selection) == 0
         default_hl_unit = app.screen.highlighted_unit
@@ -244,8 +244,9 @@ async def test_usage_counter(monkeypatch, tmp_path):
     ],
 )
 def test_snap_preview(snap_compare, click_target: str):
+    app = InteractiveSystemd()
     assert snap_compare(
-        InteractiveSystemd(),
+        app,
         run_before=partial(click_and_wait, selector=click_target),
     )
 
@@ -294,7 +295,7 @@ def test_snap_height(snap_compare):
     app = InteractiveSystemd()
 
     async def run_before(pilot: Pilot):
-        pilot.app.query_exactly_one(CustomSelectionList).focus()
+        pilot.app.screen.query_exactly_one(CustomSelectionList).focus()
         assert isinstance(pilot.app, InteractiveSystemd)
         await pilot.press(pilot.app.settings.main_keybindings.increase_widget_height)
 
