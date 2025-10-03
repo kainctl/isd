@@ -711,7 +711,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="isd_",
         env_ignore_empty=True,
-        cli_parse_args=True,
+        cli_parse_args=False,
         env_file_encoding="utf-8",
     )
 
