@@ -21,6 +21,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 .~lock.*
+*.tmp
+*.tmp.*
 
 # C extensions
 *.so

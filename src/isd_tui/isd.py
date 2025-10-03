@@ -1907,7 +1907,7 @@ class MainScreen(Screen):
                 partial(self.action_systemctl_command, systemctl_command.command),
             )
 
-        for action, field in self.settings.main_keybindings.model_fields.items():
+        for action in self.settings.main_keybindings.model_fields.keys():
             keys = getattr(self.settings.main_keybindings, action)
             yield SystemCommand(
                 action.replace("_", " ").title(),
@@ -2835,7 +2835,7 @@ def render_field(key, field, level: int = 0) -> str:
         ),
     ):
         text += f"{key}:\n"
-        for key, value in default_value.model_fields.items():
+        for key, value in type(default_value).model_fields.items():
             text += render_field(key, value, level=level + 1)
     elif isinstance(default_value, list):
         if len(default_value) == 0:
@@ -2889,12 +2889,12 @@ def render_model_as_yaml(model: Settings) -> str:
     with a custom `Dumper` and with `ruamel.yaml` to inject comments
     but it was unnecessarily complex and hard to configure.
 
-    Instead, I simply wrote a simple, custom renderer for my `pydantic.Settings`.
+    Instead, I wrote a simple, custom renderer for my `pydantic.Settings`.
     It will only work for this code-base but it gives me full control over the
     rendering process without having code with so much hidden functionality.
     """
     text = ""
-    model_fields = model.model_fields
+    model_fields = type(model).model_fields
     for key in model.model_dump().keys():
         field = model_fields[key]
         text += render_field(key, field)
