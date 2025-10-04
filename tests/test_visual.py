@@ -8,6 +8,7 @@ from isd_tui.isd import (
     DonationScreen,
     InteractiveSystemd,
     MainScreen,
+    SystemctlActionScreen,
 )
 from pathlib import Path
 from textual.pilot import Pilot
@@ -25,6 +26,7 @@ def isolated_xdg_folders(monkeypatch, tmp_path):
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
+    monkeypatch.setenv("XDG_CONFIG_DIRS", str(tmp_path / "etc" / "xdg"))
 
     for key in list(os.environ):
         if key.lower().startswith("isd_"):
@@ -327,3 +329,40 @@ def test_invalid_settings(monkeypatch, snap_compare):
     monkeypatch.setenv("ISD_STARTUP_MODE", "invalid")
     app = InteractiveSystemd()
     assert snap_compare(app)
+
+
+async def test_global_config(isolated_xdg_folders, snap_compare):
+    global_config = isolated_xdg_folders / "etc" / "xdg" / "isd_tui"
+    global_config.mkdir(parents=True)
+    (global_config / "config.yaml").write_text(
+        "generic_keybindings:\n    toggle_systemctl_modal: 'ctrl+n'"
+    )
+    app = InteractiveSystemd()
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        await pilot.press("ctrl+n")
+        await pilot.pause()
+
+        assert isinstance(pilot.app.screen, SystemctlActionScreen)
+
+    # check that local overwrites global
+    local_config = isolated_xdg_folders / "config" / "isd_tui"
+    local_config.mkdir(parents=True, exist_ok=True)
+    (local_config / "config.yaml").write_text(
+        "generic_keybindings:\n    toggle_systemctl_modal: 'ctrl+m'"
+    )
+
+    app = InteractiveSystemd()
+
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        await pilot.press("ctrl+n")
+        await pilot.pause()
+        assert not isinstance(pilot.app.screen, SystemctlActionScreen)
+
+        await pilot.pause()
+        await pilot.press("ctrl+m")
+        await pilot.pause()
+
+        assert isinstance(pilot.app.screen, SystemctlActionScreen)

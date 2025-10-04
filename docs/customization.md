@@ -3,11 +3,19 @@
 As eluded to in the [Getting Started section](./index.md),
 `isd` is _very_ configurable.
 Almost _all_ keybindings and commands are configurable!
-During start-up `isd` will read a configuration file and load those settings.
+During start-up `isd` will derive the settings from a global, a local configuration file and environment variables.
+From lowest to highest priority:
 
-By default, the configuration is read from `~/.config/isd_tui/config.yaml`[^1].
-Though you can also simply open the file from _within_ `isd` by running the
+- Global configuration file
+- Local configuration file
+- Environment variable in the form of `ISD_` (for example: `ISD_STARTUP_MODE=user`)
+
+By default, the local configuration is read from `~/.config/isd_tui/config.yaml`[^1].
+The global configuration file is read from `/etc/xdg/isd_tui/config.yaml`[^2] if it exists.
+
+For convenience, you can also simply open the _local_ configuration file from _within_ `isd` by running the
 `Open Config` command ({{ render_shortcut(default_settings.generic_keybindings.open_config) }} by default).
+The directories and file will be created if they do not exist yet.
 However, you will _have_ to restart `isd` for the changes to take effect!
 
 !!! warning
@@ -19,6 +27,8 @@ However, you will _have_ to restart `isd` for the changes to take effect!
 
 [^1]: More precisely from `$XDG_CONFIG_DIR/isd_tui` but for most users, it will
 default to the path above.
+
+[^2]: More precisely from the first existing folder called `isd_tui` in one of `$XDG_CONFIG_DIRS`. If `$XDG_CONFIG_DIRS` is not set, it defaults to `/etc/xdg/`.
 
 ## Configuration Options
 
@@ -95,10 +105,10 @@ This options is mainly relevant for the _auto-refresh_
 feature from `isd`.
 With these fixed interval updates, the unit state (`○`) and output of the `Status` preview
 is kept in sync with the system state _without_ any user input.
-The value should not be set too low, in order to avoid spamming too many[^2]
+The value should not be set too low, in order to avoid spamming too many[^3]
 sub-processes.
 
-[^2]: Although, the code only applies partial updates to the selected units.
+[^3]: Although, the code only applies partial updates to the selected units.
 So even fairly low values should not cause too many issues.
 
 ### Full Refresh Interval

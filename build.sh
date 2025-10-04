@@ -26,12 +26,21 @@ rm -f "$REPO_ROOT/isd.aarch64-linux.AppImage"
 # start building everything
 uv build
 
+if [[ -n "$(git status --porcelain | grep '??')" ]]; then
+  echo "Untracked files exist"
+  exit 1
+else
+  echo "No untracked files"
+fi
+
+rm -rf ./result
 echo "Building x86-64 isd-AppImage"
 nix build ./?dir=nix/appimage#packages.x86_64-linux.default
 cp "$(readlink -f ./result)" isd.x86_64-linux.AppImage
 
+rm -rf ./result
 echo "Building aarch64 isd-AppImage"
-nix build .#packages.aarch64-linux.default
+nix build ./?dir=nix/appimage#packages.aarch64-linux.default
 cp "$(readlink -f ./result)" isd.aarch64-linux.AppImage
 
 # publish latest docs

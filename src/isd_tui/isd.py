@@ -94,7 +94,12 @@ from textual.widgets import (
     Markdown,
 )
 from textual.widgets._toggle_button import ToggleButton
-from xdg_base_dirs import xdg_cache_home, xdg_config_home, xdg_data_home
+from xdg_base_dirs import (
+    xdg_cache_home,
+    xdg_config_home,
+    xdg_data_home,
+    xdg_config_dirs,
+)
 from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
 
@@ -890,10 +895,14 @@ class Settings(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         config_file = get_config_file_path()
+        global_config_file = get_global_config_file_path()
         settings = [init_settings]
+        # The environment variables should have preference over global configuration.
         settings.append(env_settings)
         if config_file is not None and config_file.exists():
             settings.append(YamlConfigSettingsSource(settings_cls, config_file))
+        if global_config_file.exists():
+            settings.append(YamlConfigSettingsSource(settings_cls, global_config_file))
         return tuple(settings)
 
     @model_validator(mode="after")
@@ -1034,6 +1043,25 @@ def isd_config_dir() -> Path:
     return config_dir
 
 
+def isd_global_config_dir() -> Path:
+    """
+    Return the path to the global isd config directory.
+    It will return the first matching directory within XDG_CONFIG_DIRS
+    and return `/etc/xdg/<pkg>` otherwise.
+    The function will NOT try to create the directory if it doesn't exist.
+    """
+    assert __package__ is not None
+    matched_config_dirs = [
+        p / __package__ for p in xdg_config_dirs() if (p / __package__).exists()
+    ]
+    config_dir: Path = (
+        matched_config_dirs[0]
+        if len(matched_config_dirs) > 0
+        else (Path("/etc/xdg/") / __package__)
+    )
+    return config_dir
+
+
 def get_isd_cached_state_json_file_path() -> Path:
     cache_dir = isd_cache_dir()
     return cache_dir / "state.json"
@@ -1046,6 +1074,11 @@ def get_isd_persistent_json_file_path() -> Path:
 
 def get_config_file_path() -> Path:
     config_dir = isd_config_dir()
+    return config_dir / "config.yaml"
+
+
+def get_global_config_file_path() -> Path:
+    config_dir = isd_global_config_dir()
     return config_dir / "config.yaml"
 
 
