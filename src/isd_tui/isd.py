@@ -299,6 +299,32 @@ def render_keybinding(inp_str: str) -> str:
     return "+".join(key_tokens)
 
 
+def from_ansi_to_textual_themed_text(ansi_string: str, app: App) -> Text:
+    output = Text.from_ansi(ansi_string)
+    vars = app.get_css_variables()
+    ansi_color_idx_to_css_value = {
+        1: vars.get("text-error"),
+        2: vars.get("text-success"),
+        3: vars.get("text-accent"),
+        4: vars.get("text-primary"),
+        245: vars.get("text-muted"),
+    }
+    for span in output.spans.copy():
+        style = span.style if isinstance(span.style, Style) else Style.parse(span.style)
+        if style.color is None or style.color.number is None:
+            continue
+        color_number = style.color.number
+        new_color = ansi_color_idx_to_css_value.get(color_number)
+
+        if new_color is not None:
+            output.stylize(
+                new_color,
+                start=span.start,
+                end=span.end,
+            )
+    return output
+
+
 class SystemctlActionScreen(ModalScreen[Optional[str]]):
     """
     Present a screen with the configured systemctl actions.
@@ -1196,7 +1222,14 @@ class UnitReprState(Enum):
     file = auto()
 
     def render_state(
-        self, unit: str, highlight_indices: Optional[List[int]] = None
+        self,
+        unit: str,
+        highlight_indices: Optional[List[int]] = None,
+        color_success: str = "green",
+        color_warn: str = "yellow",
+        color_error: str = "error",
+        color_different: str = "yellow",
+        color_inactive: str = "gray",
     ) -> Text:
         """
         Given a `unit` and an optional list of indices, highlight them depending
@@ -1206,21 +1239,22 @@ class UnitReprState(Enum):
         Use mapping from upstream:
         https://github.com/systemd/systemd/blob/78056ba850fbe0606c3e264f5af68ac3eb52c9e7/src/basic/unit-def.c#L361-L378
         """
+
         if self == UnitReprState.active:
             prefix = "●"
-            style = "green"
+            style = color_success
         elif self == UnitReprState.reloading or self == UnitReprState.refreshing:
             prefix = "↻"
-            style = "green"
+            style = color_success
         elif self == UnitReprState.failed:
             prefix = "×"
-            style = "red"
+            style = color_error
         elif self == UnitReprState.activating or self == UnitReprState.deactivating:
             prefix = "●"
-            style = "yellow"  # This is custom
+            style = color_warn  # This is custom
         elif self == UnitReprState.inactive or self == UnitReprState.maintenance:
             prefix = "○"
-            style = ""
+            style = color_inactive
         # until here, I am following the settings from upstream:
         # https://github.com/systemd/systemd/blob/78056ba850fbe0606c3e264f5af68ac3eb52c9e7/src/basic/unit-def.c#L361-L378
         # The following a more custom visualization that I provide for "more detailed"
@@ -1229,14 +1263,14 @@ class UnitReprState(Enum):
         # symbol as `inactive`.
         elif self == UnitReprState.not_found or self == UnitReprState.masked:
             prefix = "○"
-            style = "yellow"
+            style = color_warn
         elif self == UnitReprState.error or self == UnitReprState.bad_setting:
             prefix = "○"
-            style = "red"
+            style = color_error
         elif auto:
             # -> this is a visual indication that it is "different"
             prefix = "○"
-            style = "#878787"  # gray
+            style = color_different
         else:
             raise NotImplementedError("Unknown render state")
 
@@ -1246,7 +1280,6 @@ class UnitReprState(Enum):
             for idx in highlight_indices:
                 text.stylize(Style(dim=False, bold=True), start=idx, end=idx + 1)
 
-        # FUTURE: Could implement overflow method
         return Text.assemble(prefix, " ", text, style=style)
 
 
@@ -1474,7 +1507,6 @@ def systemctl_args_builder(
         sys_cmd.extend(["sudo", "--stdin", "-E"])
     sys_cmd.append(get_systemctl_bin())
     if not ask_password:
-        # TODO: Ensure that this works with older versions.
         sys_cmd.append("--no-ask-password")
     if mode == "user":
         # `root` user _may_ have user services (https://github.com/kainctl/isd/issues/30)
@@ -1701,11 +1733,11 @@ class PreviewArea(Container):
         # much less aggressive.
         tabbed_content = cast(TabbedContent, self.query_one(TabbedContent))
         match tabbed_content.active:
+            # FUTURE: Expand on the functionality from _from_ansi
+            # to open URLs or man pages, maybe skip if unknown
             case "status":
                 preview = tabbed_content.query_one("#status_log", RichLog)
                 # preview = cast(RichLog, self.query_one(PreviewStatus))
-                # FUTURE: Expand on the functionality from _from_ansi
-                # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
                     "status",
                     mode=self.mode,
@@ -1714,8 +1746,6 @@ class PreviewArea(Container):
                 )
             case "dependencies":
                 preview = tabbed_content.query_one("#dependencies_log", RichLog)
-                # FUTURE: Expand on the functionality from _from_ansi
-                # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
                     "list-dependencies",
                     mode=self.mode,
@@ -1724,8 +1754,6 @@ class PreviewArea(Container):
                 )
             case "help":
                 preview = tabbed_content.query_one("#help_log", RichLog)
-                # FUTURE: Expand on the functionality from _from_ansi
-                # to open URLs or man pages, maybe skip if unknown
                 return_code, stdout, stderr = await systemctl_async(
                     "help", mode=self.mode, units=self.units, head=self.max_lines
                 )
@@ -1750,10 +1778,15 @@ class PreviewArea(Container):
             case other:
                 self.notify(f"Unknown state {other}", severity="error")
                 return
-        # style it like systemctl from CLI
+
+        # Style it like `systemctl` from CLI.
         # For example, previewing a template file with `status` raises
-        # an error but it shouldn't "cover" stdout.
-        output = Text.from_ansi(stdout if stderr == "" else stderr + "\n" + stdout)
+        # an error but it shouldn't "cover" `stdout`.
+        output = from_ansi_to_textual_themed_text(
+            stdout if stderr == "" else stderr + "\n" + stdout,
+            self.app,
+        )
+
         # Not sure if this comparison makes it slower or faster
         if output != self.last_output:
             preview.clear()
@@ -2456,10 +2489,19 @@ class MainScreen(Screen):
 
         sel.clear_options()
         match_dicts = self.search_results
+        # get the relevant color values from the theme.
+        vars = self.app.get_css_variables()
+        render_state_colors = {
+            "color_success": vars["text-success"],
+            "color_warn": vars["text-warning"],
+            "color_error": vars["text-error"],
+            "color_different": vars["text-warning"],
+            "color_inactive": vars["text-muted"],
+        }
         matches = [
             Selection(
                 prompt=self.unit_to_state_dict[d["value"]].render_state(
-                    d["value"], d["indices"]
+                    d["value"], d["indices"], **render_state_colors
                 ),
                 value=d["value"],
                 initial_state=d["value"] in prev_selected,
@@ -2472,7 +2514,10 @@ class MainScreen(Screen):
         # otherwise they might be hidden by the scrollbar
         prev_selected_unmatched_units = [
             Selection(
-                prompt=self.unit_to_state_dict[unit].render_state(unit),
+                prompt=self.unit_to_state_dict[unit].render_state(
+                    unit,
+                    **render_state_colors,
+                ),
                 value=unit,
                 initial_state=True,
                 id=unit,

@@ -1,17 +1,12 @@
-/* Even if it isn't in focus, keep the highlight up */
-OptionList > .option-list--option-highlighted {
-  background: $primary;
-}
-
-TabbedContent > ContentTabs {
+TabbedContent>ContentTabs {
   dock: bottom;
 }
 
-TabbedContent > ContentTabs #tabs-list {
+TabbedContent>ContentTabs #tabs-list {
   offset: 0 1;
 }
 
-TabbedContent > ContentTabs Underline {
+TabbedContent>ContentTabs Underline {
   offset: 0 -1;
 }
 
@@ -20,22 +15,26 @@ SystemctlActionScreen {
   align: center middle;
 }
 
-DonationScreen, RootUserBusModal {
+DonationScreen,
+RootUserBusModal {
   align: center middle;
 }
 
-DonationScreen VerticalGroup, RootUserBusModal VerticalGroup {
+DonationScreen VerticalGroup,
+RootUserBusModal VerticalGroup {
   max-width: 75%;
   min-width: 50%;
 }
 
-DonationScreen Markdown, RootUserBusModal Markdown {
+DonationScreen Markdown,
+RootUserBusModal Markdown {
   text-style: bold;
   padding: 1 2;
   width: 1fr;
 }
 
-DonationScreen Button, RootUserBusModal Button {
+DonationScreen Button,
+RootUserBusModal Button {
   width: 1fr;
 }
 
@@ -67,38 +66,44 @@ PreviewArea:focus-within Tab.-active {
 */
 
 Preview:focus {
-  background: $boost 75%;
+  background: $boost 20%;
 }
 
 
-#unit-selection > .selection-list--button {
-  background: $boost 100% !important;
+#unit-selection>.selection-list--button {
+  background: $boost 50% !important;
 }
 
-#unit-selection > .option-list--separator {
+#unit-selection>.option-list--separator {
   background: $primary;
 }
 
-#unit-selection > .option-list--option-hover {
-  background: $boost 100%;
+#unit-selection>.option-list--option-hover {
+  background: $boost 50%;
 }
 
-#unit-selection > .selection-list--button {
+/* Even if it isn't in focus, keep the highlight up */
+OptionList>.option-list--option-highlighted {
+  background: $primary 25%;
+}
+
+
+#unit-selection>.selection-list--button {
   color: $primary;
   background: $primary;
 }
 
-#unit-selection:focus > .selection-list--button,
-#unit-selection > .selection-list--button-selected,
-#unit-selection:focus > .selection-list--button-selected,
- {
-  color: $primary;
-  background: $accent;
+#unit-selection:focus>.selection-list--button,
+#unit-selection>.selection-list--button-selected,
+#unit-selection:focus>.selection-list--button-selected,
+{
+color: $primary;
+background: $accent;
 }
 
-#unit-selection:focus > .selection-list--button-highlighted,
-#unit-selection > .selection-list--button-highlighted,
-#unit-selection > .selection-list--button-selected-highlighted {
+#unit-selection:focus>.selection-list--button-highlighted,
+#unit-selection>.selection-list--button-highlighted,
+#unit-selection>.selection-list--button-selected-highlighted {
   color: $accent;
   background: $accent;
 }
@@ -111,7 +116,8 @@ Fluid {
 }
 
 Input {
-  height: 3; /* Fix the height */
+  height: 3;
+  /* Fix the height */
   width: 100%;
 }
 
@@ -124,4 +130,3 @@ MainScreen OptionList {
 * {
   scrollbar-size: 0 1;
 }
-
