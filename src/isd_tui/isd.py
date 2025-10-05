@@ -102,6 +102,7 @@ from xdg_base_dirs import (
 )
 from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
+from .derive_terminal_theme import derive_textual_theme
 
 
 # make type checker happy.
@@ -154,8 +155,9 @@ UNIT_PRIORITY_ORDER = [
 AUTHENTICATION_MODE = "sudo"
 # AUTHENTICATION_MODE = "polkit"
 
-# HERE: Remove this from the global scope for testing!
-Theme = StrEnum("Theme", [key for key in BUILTIN_THEMES.keys()])  # type: ignore
+Theme = StrEnum(
+    "Theme", [key for key in BUILTIN_THEMES.keys()] + ["terminal-derived-theme"]
+)  # type: ignore
 StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
 
 SETTINGS_YAML_HEADER = dedent("""\
@@ -2840,7 +2842,21 @@ class InteractiveSystemd(App, inherit_bindings=False):
     def on_mount(self) -> None:
         # The theme should be loaded very early,
         # as the theme change can be quite jarring.
-        self.theme = self.settings.theme
+        t = self.settings.theme
+        if t == "terminal-derived-theme":
+            with self.app.suspend():
+                derived_theme = derive_textual_theme()
+                if derived_theme is not None:
+                    self.register_theme(derived_theme)
+                    self.theme = t
+                else:
+                    self.notify(
+                        "Could not derive theme from terminal. Use a modern terminal such as ghostty or kitty instead."
+                    )
+                    self.theme = "textual-dark"
+        else:
+            self.theme = t
+
         # Always make sure to use the latest schema
         self.update_schema()
         self.install_screen(MainScreen(self.settings), "main")

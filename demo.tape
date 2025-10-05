@@ -82,7 +82,7 @@ Type@10ms "systemctl start --user '0-isd-example-unit-01.service' '0-isd-example
 # do not full refresh during recording -> Set it to a very large value
 # normal refresh should use the default value!
 # `my_asciinema` is simply `asciinema_3` wrapped in a bash script, where a custom `config.toml` is utilized.
-Type@10ms "ISD_CACHE_INPUT=false ISD_STARTUP_MODE=user ISD_JOURNAL_PAGER=lnav ISD_DEFAULT_PAGER=moar ISD_FULL_REFRESH_INTERVAL_SEC=1000 my_asciinema rec --overwrite --quiet --command isd ./docs/assets/images/isd.cast"
+Type@10ms "XDG_CACHE_HOME=$(mktemp -d) XDG_CONFIG_HOME=$(mktemp -d) ISD_STARTUP_MODE=user ISD_JOURNAL_PAGER=lnav ISD_DEFAULT_PAGER=moar ISD_FULL_REFRESH_INTERVAL_SEC=1000 my_asciinema rec --overwrite --quiet --command isd ./docs/assets/images/isd.cast"
 Enter
 
 # # Sleep 2s
