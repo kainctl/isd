@@ -27,7 +27,7 @@ dependencies = [
     "pydantic>=2.10.4",
     "types-pyyaml>=6.0.12.20241221",
 ]
-version = "0.6.0"
+version = "0.6.1"
 
 # # versioningit was great in theory
 # # but it comes with too many issues for packaging
@@ -99,7 +99,7 @@ exclude = [
 "share/" = "share/"
 
 [tool.bumpversion]
-current_version = "0.6.0"
+current_version = "0.6.1"
 parse = """
     (?P<major>0|[1-9]\\d*)\\.
     (?P<minor>0|[1-9]\\d*)\\.
