@@ -1,0 +1,1339 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://kainctl.github.io/isd/customization/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../faq/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>Customization - isd</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.bd2ff1a2.css">
+        <style>:root{--md-text-font:"Atkinson Hyperlegible";--md-code-font:"Noto Sans Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra_fonts.css">
+    
+      <link rel="stylesheet" href="../stylesheets/asciinema-player.css">
+    
+      <link rel="stylesheet" href="../stylesheets/custom-asciinema-player.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="Customization - isd" >
+      
+        <meta  property="og:description"  content="None" >
+      
+        <meta  property="og:image"  content="https://kainctl.github.io/isd/assets/images/social/customization.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://kainctl.github.io/isd/customization/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="Customization - isd" >
+      
+        <meta  name="twitter:description"  content="None" >
+      
+        <meta  name="twitter:image"  content="https://kainctl.github.io/isd/assets/images/social/customization.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#customization" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="isd" class="md-header__button md-logo" aria-label="isd" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            isd
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Customization
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kainctl/isd" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="isd" class="md-nav__button md-logo" aria-label="isd" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    isd
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kainctl/isd" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Customization
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Customization
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Options
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#editing-the-configuration-with-editor-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Editing The Configuration With Editor Support
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#startup-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Startup Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preview-and-selection-refresh-interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preview And Selection Refresh Interval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-refresh-interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      Full Refresh Interval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input Caching
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-throttling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Update Throttling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Editor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-pager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Default Pager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#journal-pager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Journal Pager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#journal-pager-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Journal Pager Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#theme" class="md-nav__link">
+    <span class="md-ellipsis">
+      Theme
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keybindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Keybindings
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Keybindings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reserved-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reserved Keys
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generic-keybindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generic Keybindings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#main-keybindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Main Keybindings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigation-keybindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Navigation Keybindings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systemctl-keybindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      systemctl Keybindings
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pager-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pager Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#journal-pager-arguments_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Journal Pager Arguments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maximum-preview-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Maximum Preview Lines
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../media/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Media
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="customization">Customization<a class="headerlink" href="#customization" title="Permanent link">&para;</a></h1>
+<p>As eluded to in the <a href="../">Getting Started section</a>,
+<code>isd</code> is <em>very</em> configurable.
+Almost <em>all</em> keybindings and commands are configurable!
+During start-up <code>isd</code> will derive the settings from a global, a local configuration file and environment variables.
+From lowest to highest priority:</p>
+<ul>
+<li>Global configuration file</li>
+<li>Local configuration file</li>
+<li>Environment variable in the form of <code>ISD_</code> (for example: <code>ISD_STARTUP_MODE=user</code>)</li>
+</ul>
+<p>By default, the local configuration is read from <code>~/.config/isd_tui/config.yaml</code><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
+The global configuration file is read from <code>/etc/xdg/isd_tui/config.yaml</code><sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup> if it exists.</p>
+<p>For convenience, you can also simply open the <em>local</em> configuration file from <em>within</em> <code>isd</code> by running the
+<code>Open Config</code> command (<span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-g">G</kbd></span> by default).
+The directories and file will be created if they do not exist yet.
+However, you will <em>have</em> to restart <code>isd</code> for the changes to take effect!</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You need to configure the <code>config.yaml</code> file and <strong>not</strong> the
+<code>schema.json</code> file. The <code>schema.json</code> file is always automatically
+generated by <code>isd</code>. This file defines the <a href="https://json-schema.org/">json-schema</a>
+for <code>config.yaml</code> file that will only be generated via the <code>Open Config</code> command!</p>
+</div>
+<h2 id="configuration-options">Configuration Options<a class="headerlink" href="#configuration-options" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do <em>not</em> manually create the file!
+Open <code>isd</code> and run the <code>Open Config</code> command.
+It will create a default configuration file and open it with
+your configured editor.</p>
+</div>
+<p>The following collapsed document shows the <em>entire</em> default configuration:</p>
+<details>
+<summary>Default <code>config.yaml</code></summary>
+<div class="highlight"><pre><span></span><code><span class="c1"># yaml-language-server: $schema=schema.json</span>
+<span class="c1"># ^ This links to the JSON Schema that provides auto-completion support</span>
+<span class="c1">#   and dynamically checks the input. For this to work, your editor must have</span>
+<span class="c1">#   support for the `yaml-language-server`</span>
+<span class="c1">#   - &lt;https://github.com/redhat-developer/yaml-language-server&gt;</span>
+<span class="c1">#</span>
+<span class="c1">#   Check the `Clients` section for more information:</span>
+<span class="c1">#   - &lt;https://github.com/redhat-developer/yaml-language-server?tab=readme-ov-file#clients&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># To create a fresh `config.yaml` file with the defaults,</span>
+<span class="c1"># simply delete this file. It will be re-created when `isd` starts.</span>
+
+<span class="c1">## The systemctl startup mode (`user`/`system`).</span>
+<span class="c1">## By default loads the mode from the last session (`auto`).</span>
+<span class="c1"># startup_mode: &quot;auto&quot;</span>
+
+<span class="c1">## Auto refresh the preview unit _and_ unit states of selected units.</span>
+<span class="c1">## Example: When a selected unit changes from running to failed</span>
+<span class="c1">## the unit state color and preview window will be updated after this</span>
+<span class="c1">## time has passed, even if _nothing_ is pressed.</span>
+<span class="c1"># preview_and_selection_refresh_interval_sec: 1</span>
+
+<span class="c1">## Auto refresh all unit states.</span>
+<span class="c1">## This is important to find new units that have been added</span>
+<span class="c1">## since the start of `isd`.</span>
+<span class="c1">## Please note that low values will cause many and large systemctl calls.</span>
+<span class="c1"># full_refresh_interval_sec: 10</span>
+
+<span class="c1">## Cache the unit search text input across restarts.</span>
+<span class="c1">## Enabled by default.</span>
+<span class="c1"># cache_input: True</span>
+
+<span class="c1">## Seconds to wait before computing state updates (default 0.05s).</span>
+<span class="c1">## For example, time after input has changed before updating the selection.</span>
+<span class="c1">## Or time to wait to update preview window after highlighting new value.</span>
+<span class="c1">## The idea is to minimize the number of &#39;irrelevant&#39; updated during fast</span>
+<span class="c1">## scrolling through the unit list or quick typing.</span>
+<span class="c1"># updates_throttle_sec: 0.05</span>
+
+<span class="c1">## Editor to use; Default = `auto`</span>
+<span class="c1">## Defaults to the first editor defined in one of the environment variables:</span>
+<span class="c1">## - $SYSTEMD_EDITOR, $EDITOR, $VISUAL</span>
+<span class="c1">## and then falls back to the first available editor:</span>
+<span class="c1">## - `editor`, `nano`, `vim`, `vi`.</span>
+<span class="c1"># editor: &quot;auto&quot;</span>
+
+<span class="c1">## Default pager to open preview tabs in (except for `Journal`). Default = `auto`</span>
+<span class="c1">## Defaults to the first pager defined in one of the environment variables:</span>
+<span class="c1">## - `SYSTEMD_PAGER`, `PAGER`</span>
+<span class="c1">## and then falls back to the first available pager:</span>
+<span class="c1">## - `less`, `more`.</span>
+<span class="c1">## </span>
+<span class="c1">## Note: Input is always provided via STDIN to the pager!</span>
+<span class="c1"># default_pager: &quot;auto&quot;</span>
+
+<span class="c1">## Default pager to open preview for `Journal` tab. Default = `auto`</span>
+<span class="c1">## Defaults to the first pager defined in one of the environment variables:</span>
+<span class="c1">## - `SYSTEMD_PAGER`, `PAGER`</span>
+<span class="c1">## and then falls back to the first available pager:</span>
+<span class="c1">## - `less`, `more`.</span>
+<span class="c1">## </span>
+<span class="c1">## Note: Input is always provided via STDIN to the pager!</span>
+<span class="c1"># journal_pager: &quot;auto&quot;</span>
+
+<span class="c1">## Default arguments for `journalctl` to generate the</span>
+<span class="c1">## output of the `Journal` preview window.</span>
+<span class="c1"># journalctl_args: </span>
+<span class="c1">#   - &quot;--catalog&quot;</span>
+<span class="c1">#   - &quot;--lines=1000&quot;</span>
+
+<span class="c1">## The theme of the application.</span>
+<span class="c1"># theme: &quot;textual-dark&quot;</span>
+
+<span class="c1">## Relative height compared to preview height.</span>
+<span class="c1"># search_results_height_fraction: 1</span>
+
+<span class="c1">## Relative height compared to search result height.</span>
+<span class="c1"># preview_height_fraction: 2</span>
+
+<span class="c1">## Uncategorized generic keybindings for</span>
+<span class="c1">## toggling screens/modals and opening settings.</span>
+<span class="c1"># generic_keybindings:</span>
+<span class="c1">#   # Systemctl action</span>
+<span class="c1">#   toggle_systemctl_modal: &quot;ctrl+o&quot;</span>
+<span class="c1">#   # Open config in editor</span>
+<span class="c1">#   open_config: &quot;ctrl+g&quot;</span>
+
+<span class="c1">## Configurable keybindings for common actions on the main screen.</span>
+<span class="c1">## These keybindings must be unique across the entire application.</span>
+<span class="c1"># main_keybindings:</span>
+<span class="c1">#   # Next preview tab</span>
+<span class="c1">#   next_preview_tab: &quot;full_stop&quot;</span>
+<span class="c1">#   # Previous preview tab</span>
+<span class="c1">#   previous_preview_tab: &quot;comma&quot;</span>
+<span class="c1">#   # Clear search input</span>
+<span class="c1">#   clear_input: &quot;backspace,ctrl+backspace&quot;</span>
+<span class="c1">#   # Jump to search input</span>
+<span class="c1">#   jump_to_input: &quot;slash&quot;</span>
+<span class="c1">#   # Copy highlighted unit path to clipboard</span>
+<span class="c1">#   copy_unit_path: &quot;ctrl+x&quot;</span>
+<span class="c1">#   # Open in pager</span>
+<span class="c1">#   open_preview_in_pager: &quot;enter&quot;</span>
+<span class="c1">#   # Open in editor</span>
+<span class="c1">#   open_preview_in_editor: &quot;ctrl+v&quot;</span>
+<span class="c1">#   # Toggle mode</span>
+<span class="c1">#   toggle_mode: &quot;ctrl+t&quot;</span>
+<span class="c1">#   # Increase height of currently focused widget</span>
+<span class="c1">#   increase_widget_height: &quot;plus&quot;</span>
+<span class="c1">#   # Decrease height of currently focused widget</span>
+<span class="c1">#   decrease_widget_height: &quot;minus&quot;</span>
+
+<span class="c1">## Keybindings specific to navigation.</span>
+<span class="c1">## These will be applied to _all_ widgets that</span>
+<span class="c1">## have any navigational component.</span>
+<span class="c1">## To avoid confusion, these must be unique across the entire application;</span>
+<span class="c1">## even if a given widget does not have horizontal navigation.</span>
+<span class="c1"># navigation_keybindings:</span>
+<span class="c1">#   # Down</span>
+<span class="c1">#   down: &quot;down,j&quot;</span>
+<span class="c1">#   # Up</span>
+<span class="c1">#   up: &quot;up,k&quot;</span>
+<span class="c1">#   # Page down</span>
+<span class="c1">#   page_down: &quot;ctrl+down,ctrl+f,pagedown&quot;</span>
+<span class="c1">#   # Page up</span>
+<span class="c1">#   page_up: &quot;ctrl+up,ctrl+b,pageup&quot;</span>
+<span class="c1">#   # Goto top</span>
+<span class="c1">#   top: &quot;home&quot;</span>
+<span class="c1">#   # Goto bottom</span>
+<span class="c1">#   bottom: &quot;end&quot;</span>
+<span class="c1">#   # Left</span>
+<span class="c1">#   left: &quot;left,h&quot;</span>
+<span class="c1">#   # Right</span>
+<span class="c1">#   right: &quot;right,l&quot;</span>
+<span class="c1">#   # Page left</span>
+<span class="c1">#   page_left: &quot;ctrl+left&quot;</span>
+<span class="c1">#   # Page right</span>
+<span class="c1">#   page_right: &quot;ctrl+right&quot;</span>
+
+<span class="c1">## List of configurable systemctl subcommand keybindings.</span>
+<span class="c1">## The exact subcommand (including arguments) can be defined by setting `command`.</span>
+<span class="c1">## The `modal_keybinding`s provide the shortcut key(s)</span>
+<span class="c1">## for the modal action window.</span>
+<span class="c1">## Optionally, `direct_keybinding`s can be configured to</span>
+<span class="c1">## immediately trigger the systemctl action from the main screen</span>
+<span class="c1">## without having to open the modal first.</span>
+<span class="c1">## </span>
+<span class="c1">## The description is used to describe the subcommand</span>
+<span class="c1">## in the `CommandPalette`</span>
+<span class="c1"># systemctl_commands: </span>
+<span class="c1">#   - command: &quot;start&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;a&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Start unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;stop&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;o&quot;</span>
+<span class="c1">#     direct_keybinding: &quot;ctrl+s&quot;</span>
+<span class="c1">#     description: &quot;Stop unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;restart&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;s&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Restart unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;edit&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;e&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Edit highlighted unit via drop-in with configured editor&quot;</span>
+<span class="c1">#   - command: &quot;edit --full&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;f&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Edit highlighted unit source with configured editor&quot;</span>
+<span class="c1">#   - command: &quot;edit --runtime&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;r&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Edit highlighted unit only for current runtime&quot;</span>
+<span class="c1">#   - command: &quot;reload&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;d&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Reload unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;enable&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;n&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Enable unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;disable&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;i&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Disable unit(s).&quot;</span>
+<span class="c1">#   - command: &quot;mask&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;m&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Mask/Disable starting unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;unmask&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;u&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Undo masking of unit(s)&quot;</span>
+<span class="c1">#   - command: &quot;reset-failed&quot;</span>
+<span class="c1">#     modal_keybinding: &quot;-&quot;</span>
+<span class="c1">#     direct_keybinding: null</span>
+<span class="c1">#     description: &quot;Reset failed state of unit(s), including the restart counter.&quot;</span>
+
+<span class="c1">## Arguments passed to the configured `default_pager`.</span>
+<span class="c1">## Should NOT be required most of the time.</span>
+<span class="c1">## As for most pagers, the correct arguments/environment variables are set by default</span>
+<span class="c1">## if this value is unset (`null`).</span>
+<span class="c1"># default_pager_args: null</span>
+
+<span class="c1">## Arguments passed to the configured `journal_pager`.</span>
+<span class="c1">## Should NOT be required most of the time.</span>
+<span class="c1">## As for most pagers, the correct arguments/environment variables are set by default</span>
+<span class="c1">## if this value is unset (`null`).</span>
+<span class="c1"># journal_pager_args: null</span>
+
+<span class="c1">## How many lines to show in the preview windows.</span>
+<span class="c1">## Setting this value too large, especially with long journal entries</span>
+<span class="c1">## will considerably slow down the application.</span>
+<span class="c1">## Usually the default should be left as is.</span>
+<span class="c1">## </span>
+<span class="c1">## Note: The output is not trimmed when a pager or editor is opened!</span>
+<span class="c1"># preview_max_lines: 500</span>
+</code></pre></div>
+</details>
+<p>To not get too bored by the wall 🧱 of text, let's have a look
+at the different options individually.
+As smaller walls 🧱 of text...
+Though, I don't know how exciting
+these sections will be 😅.
+Some sections will contain more context or additional information.</p>
+<p>Just jump to the sections that sound interesting:</p>
+<!--toc:start-->
+<ul>
+<li><a href="#editing-the-configuration-with-editor-support">Editing The Configuration With Editor Support</a></li>
+<li><a href="#startup-mode">Startup Mode</a></li>
+<li><a href="#preview-and-selection-refresh-interval">Preview And Selection Refresh Interval</a></li>
+<li><a href="#full-refresh-interval">Full Refresh Interval</a></li>
+<li><a href="#input-caching">Input Caching</a></li>
+<li><a href="#update-throttling">Update Throttling</a></li>
+<li><a href="#editor">Editor</a></li>
+<li><a href="#default-pager">Default Pager</a></li>
+<li><a href="#journal-pager">Journal Pager</a></li>
+<li><a href="#journal-pager-arguments">Journal Pager Arguments</a></li>
+<li><a href="#theme">Theme</a></li>
+<li><a href="#layout">Layout</a></li>
+<li><a href="#keybindings">Keybindings</a><ul>
+<li><a href="#generic-keybindings">Generic Keybindings</a></li>
+<li><a href="#main-keybindings">Main Keybindings</a></li>
+<li><a href="#navigation-keybindings">Navigation Keybindings</a></li>
+<li><a href="#systemctl-keybindings"><code>systemctl</code> Keybindings</a></li>
+</ul>
+</li>
+<li><a href="#pager-arguments">Pager Arguments</a></li>
+<li><a href="#journal-pager-arguments">Journal Pager Arguments</a></li>
+<li><a href="#maximum-preview-lines">Maximum Preview Lines</a></li>
+</ul>
+<!--toc:end-->
+
+<h3 id="editing-the-configuration-with-editor-support">Editing The Configuration With Editor Support<a class="headerlink" href="#editing-the-configuration-with-editor-support" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># yaml-language-server: $schema=schema.json</span>
+<span class="c1"># ^ This links to the JSON Schema that provides auto-completion support</span>
+<span class="c1">#   and dynamically checks the input. For this to work, your editor must have</span>
+<span class="c1">#   support for the `yaml-language-server`</span>
+<span class="c1">#   - &lt;https://github.com/redhat-developer/yaml-language-server&gt;</span>
+<span class="c1">#</span>
+<span class="c1">#   Check the `Clients` section for more information:</span>
+<span class="c1">#   - &lt;https://github.com/redhat-developer/yaml-language-server?tab=readme-ov-file#clients&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># To create a fresh `config.yaml` file with the defaults,</span>
+<span class="c1"># simply delete this file. It will be re-created when `isd` starts.</span>
+</code></pre></div>
+<p>As the <a href="https://en.wikipedia.org/wiki/YAML"><abbr title="a human-readable, space-sensitive markup language.">YAML</abbr></a> comments indicate, the <code>isd</code> configuration file supports
+auto-completion and input validation from <em>within</em> the editor
+<em>without</em> having to start <code>isd</code>
+or reading error 🐛 messages! If this does not work in your editor out-of-the-box,
+checkout the
+<a href="https://github.com/redhat-developer/yaml-language-server">yaml-language-server documentation</a>.</p>
+<h3 id="startup-mode">Startup Mode<a class="headerlink" href="#startup-mode" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># The systemctl startup mode (`user`/`system`).</span>
+<span class="c1"># By default loads the mode from the last session (`auto`).</span>
+<span class="nt">startup_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span>
+</code></pre></div>
+<p>⬆️</p>
+<h3 id="preview-and-selection-refresh-interval">Preview And Selection Refresh Interval<a class="headerlink" href="#preview-and-selection-refresh-interval" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Auto refresh the preview unit _and_ unit states of selected units.</span>
+<span class="c1"># Example: When a selected unit changes from running to failed</span>
+<span class="c1"># the unit state color and preview window will be updated after this</span>
+<span class="c1"># time has passed, even if _nothing_ is pressed.</span>
+<span class="nt">preview_and_selection_refresh_interval_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+<p>This options is mainly relevant for the <em>auto-refresh</em>
+feature from <code>isd</code>.
+With these fixed interval updates, the unit state (<code>○</code>) and output of the <code>Status</code> preview
+is kept in sync with the system state <em>without</em> any user input.
+The value should not be set too low, in order to avoid spamming too many<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>
+sub-processes.</p>
+<h3 id="full-refresh-interval">Full Refresh Interval<a class="headerlink" href="#full-refresh-interval" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Auto refresh all unit states.</span>
+<span class="c1"># This is important to find new units that have been added</span>
+<span class="c1"># since the start of `isd`.</span>
+<span class="c1"># Please note that low values will cause many and large systemctl calls.</span>
+<span class="nt">full_refresh_interval_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+</code></pre></div>
+<p>Similar to <a href="#preview-and-selection-refresh-interval">Preview And Selection Refresh Interval</a> but more
+<em>aggressive</em> as it updates all and previously untracked units.</p>
+<h3 id="input-caching">Input Caching<a class="headerlink" href="#input-caching" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Cache the unit search text input across restarts.</span>
+<span class="c1"># Enabled by default.</span>
+<span class="nt">cache_input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</code></pre></div>
+<p>Having caching enabled by default might be the most <em>controversial</em> 💣 preset.
+The idea is that if you have opened <code>isd</code> to search for a specific unit,
+you are likely to search for the same unit again when you re-open <code>isd</code>.
+And, if not, then you can quickly clear the search input with <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-backspace">Backspace</kbd></span>
+or disable this option.</p>
+<h3 id="update-throttling">Update Throttling<a class="headerlink" href="#update-throttling" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Seconds to wait before computing state updates (default 0.05s).</span>
+<span class="c1"># For example, time after input has changed before updating the selection.</span>
+<span class="c1"># Or time to wait to update preview window after highlighting new value.</span>
+<span class="c1"># The idea is to minimize the number of &#39;irrelevant&#39; updated during fast</span>
+<span class="c1"># scrolling through the unit list or quick typing.</span>
+<span class="nt">updates_throttle_sec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span>
+</code></pre></div>
+<p>The preset is fairly low for the most responsive experience.
+Though, it can be increased to improve performance.
+Please raise an issue and let me know your specs/number of units
+to improve on it!</p>
+<h3 id="editor">Editor<a class="headerlink" href="#editor" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Editor to use; Default = `auto`</span>
+<span class="c1"># Defaults to the first editor defined in one of the environment variables:</span>
+<span class="c1"># - $SYSTEMD_EDITOR, $EDITOR, $VISUAL</span>
+<span class="c1"># and then falls back to the first available editor:</span>
+<span class="c1"># - `editor`, `nano`, `vim`, `vi`.</span>
+<span class="nt">editor</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span>
+</code></pre></div>
+<p>The <code>auto</code> logic, searches for an editor exactly like <code>systemctl</code>:</p>
+<ul>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#%24SYSTEMD_EDITOR">https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#%24SYSTEMD_EDITOR</a> </li>
+</ul>
+<p>It is highly recommended to either set the environment
+variables <code>$EDITOR</code> or <code>$VISUAL</code> for a more consistent
+Linux Terminal experience across different applications.</p>
+<p>For the security implications of setting this variable see
+the <a href="../security/#issues-with-systemctl-edit">systemctl edit security discussion</a>.</p>
+<h3 id="default-pager">Default Pager<a class="headerlink" href="#default-pager" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Default pager to open preview tabs in (except for `Journal`). Default = `auto`</span>
+<span class="c1"># Defaults to the first pager defined in one of the environment variables:</span>
+<span class="c1"># - `SYSTEMD_PAGER`, `PAGER`</span>
+<span class="c1"># and then falls back to the first available pager:</span>
+<span class="c1"># - `less`, `more`.</span>
+<span class="c1"># </span>
+<span class="c1"># Note: Input is always provided via STDIN to the pager!</span>
+<span class="nt">default_pager</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span>
+</code></pre></div>
+<p>The <code>auto</code> logic, searches for and editor exactly like <code>systemctl</code> 
+<em>WITH</em> <code>SYSTEMD_PAGERSECURE=0</code>:</p>
+<ul>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#%24SYSTEMD_PAGER">https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#%24SYSTEMD_PAGER</a></li>
+</ul>
+<p>For the security implications of setting this variable see
+the <a href="../security/#pagers">pagers discussion</a>.</p>
+<h3 id="journal-pager">Journal Pager<a class="headerlink" href="#journal-pager" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Default pager to open preview for `Journal` tab. Default = `auto`</span>
+<span class="c1"># Defaults to the first pager defined in one of the environment variables:</span>
+<span class="c1"># - `SYSTEMD_PAGER`, `PAGER`</span>
+<span class="c1"># and then falls back to the first available pager:</span>
+<span class="c1"># - `less`, `more`.</span>
+<span class="c1"># </span>
+<span class="c1"># Note: Input is always provided via STDIN to the pager!</span>
+<span class="nt">journal_pager</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;auto&quot;</span>
+</code></pre></div>
+<p><code>auto</code> behaves <em>exactly</em> like <a href="#default-pager">Default Pager</a>.
+Though, it is more common to set this value to a different pager
+like <a href="https://lnav.org/">lnav</a>.</p>
+<h3 id="journal-pager-arguments">Journal Pager Arguments<a class="headerlink" href="#journal-pager-arguments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Default arguments for `journalctl` to generate the</span>
+<span class="c1"># output of the `Journal` preview window.</span>
+<span class="nt">journalctl_args</span><span class="p">:</span><span class="w"> </span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;--catalog&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;--lines=1000&quot;</span>
+</code></pre></div>
+<p>These values can be adjusted according to personal preference.</p>
+<h3 id="theme">Theme<a class="headerlink" href="#theme" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># The theme of the application.</span>
+<span class="nt">theme</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;textual-dark&quot;</span>
+</code></pre></div>
+<p><code>isd</code> comes with a few default themes.
+You can <em>temporarily</em> view the themes via the <code>Change theme</code> command.
+But to persist the changes you <em>must</em> update the configuration file.</p>
+<!-- If you are familiar with theming your terminal via -->
+<!-- [ansi escape codes](https://github.com/tinted-theming/home) -->
+<!-- you -->
+
+<h3 id="layout">Layout<a class="headerlink" href="#layout" title="Permanent link">&para;</a></h3>
+<p><code>isd</code> allows you to customize the layout.
+Currently, the relative heights between the search results and preview widgets
+can be adjusted:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Relative height compared to preview height.</span>
+<span class="nt">search_results_height_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1"># Relative height compared to search result height.</span>
+<span class="nt">preview_height_fraction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</code></pre></div>
+<p>By default the preview widget is about twice as tall as the search results widget.</p>
+<h3 id="keybindings">Keybindings<a class="headerlink" href="#keybindings" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>With great flexibility comes great responsibility.</p>
+</blockquote>
+<p>This section shows the different keybinding configuration options.
+For all entries, multiple keys can be defined by separating them with a comma <code>,</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Please note that depending on the terminal, terminal multiplexer, and
+operating system, supported keys will vary and may require trial and error.</p>
+<p>See <a href="https://posting.sh/guide/keymap/#key-format">https://posting.sh/guide/keymap/#key-format</a> for more details.</p>
+</div>
+<p><code>isd</code> is opinionated regarding <em>overlapping</em> keybindings and will
+usually fail if keybindings are not globally unique.
+The motivation is simply to ensure that <code>isd</code> does not accidentally
+stop an important unit, just because the keybinding was overloaded and
+the focus was accidentally on a different widget.</p>
+<h4 id="reserved-keys">Reserved Keys<a class="headerlink" href="#reserved-keys" title="Permanent link">&para;</a></h4>
+<p>Please note that the following keys are <em>reserved</em> and cannot be used
+for keybindings:</p>
+<ul>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-q">Q</kbd></span></li>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-c">C</kbd></span></li>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-z">Z</kbd></span></li>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-p">P</kbd></span></li>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-minus">-</kbd></span></li>
+<li><span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-plus">+</kbd></span></li>
+<li><span class="keys"><kbd class="key-escape">Esc</kbd></span></li>
+<li><span class="keys"><kbd class="key-tab">Tab</kbd></span></li>
+<li><span class="keys"><kbd class="key-shift">Shift</kbd><span>+</span><kbd class="key-tab">Tab</kbd></span></li>
+<li><span class="keys"><kbd class="key-space">Space</kbd></span></li>
+</ul>
+<h4 id="generic-keybindings">Generic Keybindings<a class="headerlink" href="#generic-keybindings" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Uncategorized generic keybindings for</span>
+<span class="c1"># toggling screens/modals and opening settings.</span>
+<span class="nt">generic_keybindings</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Systemctl action</span>
+<span class="w">  </span><span class="nt">toggle_systemctl_modal</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+o&quot;</span>
+<span class="w">  </span><span class="c1"># Open config in editor</span>
+<span class="w">  </span><span class="nt">open_config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+g&quot;</span>
+</code></pre></div>
+<p>See <a href="#keybindings">Keybindings</a> for more general information.</p>
+<h4 id="main-keybindings">Main Keybindings<a class="headerlink" href="#main-keybindings" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Configurable keybindings for common actions on the main screen.</span>
+<span class="c1"># These keybindings must be unique across the entire application.</span>
+<span class="nt">main_keybindings</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Next preview tab</span>
+<span class="w">  </span><span class="nt">next_preview_tab</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;full_stop&quot;</span>
+<span class="w">  </span><span class="c1"># Previous preview tab</span>
+<span class="w">  </span><span class="nt">previous_preview_tab</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;comma&quot;</span>
+<span class="w">  </span><span class="c1"># Clear search input</span>
+<span class="w">  </span><span class="nt">clear_input</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;backspace,ctrl+backspace&quot;</span>
+<span class="w">  </span><span class="c1"># Jump to search input</span>
+<span class="w">  </span><span class="nt">jump_to_input</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;slash&quot;</span>
+<span class="w">  </span><span class="c1"># Copy highlighted unit path to clipboard</span>
+<span class="w">  </span><span class="nt">copy_unit_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+x&quot;</span>
+<span class="w">  </span><span class="c1"># Open in pager</span>
+<span class="w">  </span><span class="nt">open_preview_in_pager</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enter&quot;</span>
+<span class="w">  </span><span class="c1"># Open in editor</span>
+<span class="w">  </span><span class="nt">open_preview_in_editor</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+v&quot;</span>
+<span class="w">  </span><span class="c1"># Toggle mode</span>
+<span class="w">  </span><span class="nt">toggle_mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+t&quot;</span>
+<span class="w">  </span><span class="c1"># Increase height of currently focused widget</span>
+<span class="w">  </span><span class="nt">increase_widget_height</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;plus&quot;</span>
+<span class="w">  </span><span class="c1"># Decrease height of currently focused widget</span>
+<span class="w">  </span><span class="nt">decrease_widget_height</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;minus&quot;</span>
+</code></pre></div>
+<p>See <a href="#keybindings">Keybindings</a> for more general information.</p>
+<h4 id="navigation-keybindings">Navigation Keybindings<a class="headerlink" href="#navigation-keybindings" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Keybindings specific to navigation.</span>
+<span class="c1"># These will be applied to _all_ widgets that</span>
+<span class="c1"># have any navigational component.</span>
+<span class="c1"># To avoid confusion, these must be unique across the entire application;</span>
+<span class="c1"># even if a given widget does not have horizontal navigation.</span>
+<span class="nt">navigation_keybindings</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Down</span>
+<span class="w">  </span><span class="nt">down</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;down,j&quot;</span>
+<span class="w">  </span><span class="c1"># Up</span>
+<span class="w">  </span><span class="nt">up</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;up,k&quot;</span>
+<span class="w">  </span><span class="c1"># Page down</span>
+<span class="w">  </span><span class="nt">page_down</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+down,ctrl+f,pagedown&quot;</span>
+<span class="w">  </span><span class="c1"># Page up</span>
+<span class="w">  </span><span class="nt">page_up</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+up,ctrl+b,pageup&quot;</span>
+<span class="w">  </span><span class="c1"># Goto top</span>
+<span class="w">  </span><span class="nt">top</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;home&quot;</span>
+<span class="w">  </span><span class="c1"># Goto bottom</span>
+<span class="w">  </span><span class="nt">bottom</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;end&quot;</span>
+<span class="w">  </span><span class="c1"># Left</span>
+<span class="w">  </span><span class="nt">left</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;left,h&quot;</span>
+<span class="w">  </span><span class="c1"># Right</span>
+<span class="w">  </span><span class="nt">right</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;right,l&quot;</span>
+<span class="w">  </span><span class="c1"># Page left</span>
+<span class="w">  </span><span class="nt">page_left</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+left&quot;</span>
+<span class="w">  </span><span class="c1"># Page right</span>
+<span class="w">  </span><span class="nt">page_right</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+right&quot;</span>
+</code></pre></div>
+<p>See <a href="#keybindings">Keybindings</a> for more general information.</p>
+<h4 id="systemctl-keybindings"><code>systemctl</code> Keybindings<a class="headerlink" href="#systemctl-keybindings" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># List of configurable systemctl subcommand keybindings.</span>
+<span class="c1"># The exact subcommand (including arguments) can be defined by setting `command`.</span>
+<span class="c1"># The `modal_keybinding`s provide the shortcut key(s)</span>
+<span class="c1"># for the modal action window.</span>
+<span class="c1"># Optionally, `direct_keybinding`s can be configured to</span>
+<span class="c1"># immediately trigger the systemctl action from the main screen</span>
+<span class="c1"># without having to open the modal first.</span>
+<span class="c1"># </span>
+<span class="c1"># The description is used to describe the subcommand</span>
+<span class="c1"># in the `CommandPalette`</span>
+<span class="nt">systemctl_commands</span><span class="p">:</span><span class="w"> </span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;start&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Start</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;stop&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;o&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ctrl+s&quot;</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Stop</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;restart&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;s&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Restart</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;edit&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;e&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Edit</span><span class="nv"> </span><span class="s">highlighted</span><span class="nv"> </span><span class="s">unit</span><span class="nv"> </span><span class="s">via</span><span class="nv"> </span><span class="s">drop-in</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">configured</span><span class="nv"> </span><span class="s">editor&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;edit</span><span class="nv"> </span><span class="s">--full&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;f&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Edit</span><span class="nv"> </span><span class="s">highlighted</span><span class="nv"> </span><span class="s">unit</span><span class="nv"> </span><span class="s">source</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">configured</span><span class="nv"> </span><span class="s">editor&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;edit</span><span class="nv"> </span><span class="s">--runtime&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;r&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Edit</span><span class="nv"> </span><span class="s">highlighted</span><span class="nv"> </span><span class="s">unit</span><span class="nv"> </span><span class="s">only</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">current</span><span class="nv"> </span><span class="s">runtime&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;reload&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;d&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Reload</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enable&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;n&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Enable</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;disable&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;i&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Disable</span><span class="nv"> </span><span class="s">unit(s).&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mask&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;m&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Mask/Disable</span><span class="nv"> </span><span class="s">starting</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;unmask&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;u&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Undo</span><span class="nv"> </span><span class="s">masking</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">unit(s)&quot;</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;reset-failed&quot;</span>
+<span class="w">    </span><span class="nt">modal_keybinding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-&quot;</span>
+<span class="w">    </span><span class="nt">direct_keybinding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Reset</span><span class="nv"> </span><span class="s">failed</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">unit(s),</span><span class="nv"> </span><span class="s">including</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">restart</span><span class="nv"> </span><span class="s">counter.&quot;</span>
+</code></pre></div>
+<p>This allows you to configure the <code>systemctl</code> commands and keybindings.
+It is important to note that the <code>command</code> key may contain spaces (like <code>edit --runtime</code>)
+but <em>may not</em> include the prefix <code>systemctl</code>, since this will always be inserted.
+The <code>description</code> is used to provide additional information about the command
+in the command palette.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure to avoid overlaps between the <a href="#navigation-keybindings">Navigation Keybindings</a>
+and these <code>modal_keybinding</code>s and <code>direct_keybinding</code>s!</p>
+</div>
+<p>Generally, it is recommended to use <code>ASCII</code> keys for the <code>modal_keybinding</code>s
+and modifier keys, such as <span class="keys"><kbd class="key-control">Ctrl</kbd></span> or <span class="keys"><kbd class="key-alt">Alt</kbd></span>, for the <code>direct_keybinding</code>s.</p>
+<p>See <a href="#keybindings">Keybindings</a> for more general information.</p>
+<p>For the security implications of setting these variables see
+the <a href="../security/#shell-injection">shell injection section</a>.</p>
+<h3 id="pager-arguments">Pager Arguments<a class="headerlink" href="#pager-arguments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Arguments passed to the configured `default_pager`.</span>
+<span class="c1"># Should NOT be required most of the time.</span>
+<span class="c1"># As for most pagers, the correct arguments/environment variables are set by default</span>
+<span class="c1"># if this value is unset (`null`).</span>
+<span class="nt">default_pager_args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</code></pre></div>
+<p>If you have to customize the pager arguments for a common pager,
+please open an issue!</p>
+<h3 id="journal-pager-arguments_1">Journal Pager Arguments<a class="headerlink" href="#journal-pager-arguments_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Arguments passed to the configured `journal_pager`.</span>
+<span class="c1"># Should NOT be required most of the time.</span>
+<span class="c1"># As for most pagers, the correct arguments/environment variables are set by default</span>
+<span class="c1"># if this value is unset (`null`).</span>
+<span class="nt">journal_pager_args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</code></pre></div>
+<p>If you have to customize the pager arguments for a common pager,
+please open an issue!</p>
+<h3 id="maximum-preview-lines">Maximum Preview Lines<a class="headerlink" href="#maximum-preview-lines" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># How many lines to show in the preview windows.</span>
+<span class="c1"># Setting this value too large, especially with long journal entries</span>
+<span class="c1"># will considerably slow down the application.</span>
+<span class="c1"># Usually the default should be left as is.</span>
+<span class="c1"># </span>
+<span class="c1"># Note: The output is not trimmed when a pager or editor is opened!</span>
+<span class="nt">preview_max_lines</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span>
+</code></pre></div>
+<p>This value can mainly be configured if opening the journal preview
+window takes too long. Though, it should usually not be required
+to lower this value.</p>
+<p>To view the entire output, open the output in the pager.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>More precisely from <code>$XDG_CONFIG_DIR/isd_tui</code> but for most users, it will
+default to the path above.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>More precisely from the first existing folder called <code>isd_tui</code> in one of <code>$XDG_CONFIG_DIRS</code>. If <code>$XDG_CONFIG_DIRS</code> is not set, it defaults to <code>/etc/xdg/</code>.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Although, the code only applies partial updates to the selected units.
+So even fairly low values should not cause too many issues.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 isd Project
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["search.suggest", "search.highlight", "navigation.sections", "toc.integrate", "content.code.annotate", "content.code.copy", "content.code.select"], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../javascripts/asciinema-player.min.js"></script>
+      
+    
+  </body>
+</html>

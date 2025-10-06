@@ -1,0 +1,901 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://kainctl.github.io/isd/">
+      
+      
+      
+        <link rel="next" href="customization/">
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>isd</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.2a3383ac.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="assets/external/fonts.googleapis.com/css.bd2ff1a2.css">
+        <style>:root{--md-text-font:"Atkinson Hyperlegible";--md-code-font:"Noto Sans Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="stylesheets/extra_fonts.css">
+    
+      <link rel="stylesheet" href="stylesheets/asciinema-player.css">
+    
+      <link rel="stylesheet" href="stylesheets/custom-asciinema-player.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+      
+        <meta  property="og:type"  content="website" >
+      
+        <meta  property="og:title"  content="isd" >
+      
+        <meta  property="og:description"  content="None" >
+      
+        <meta  property="og:image"  content="https://kainctl.github.io/isd/assets/images/social/index.png" >
+      
+        <meta  property="og:image:type"  content="image/png" >
+      
+        <meta  property="og:image:width"  content="1200" >
+      
+        <meta  property="og:image:height"  content="630" >
+      
+        <meta  property="og:url"  content="https://kainctl.github.io/isd/" >
+      
+        <meta  name="twitter:card"  content="summary_large_image" >
+      
+        <meta  name="twitter:title"  content="isd" >
+      
+        <meta  name="twitter:description"  content="None" >
+      
+        <meta  name="twitter:image"  content="https://kainctl.github.io/isd/assets/images/social/index.png" >
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="isd" class="md-header__button md-logo" aria-label="isd" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            isd
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Getting Started
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/kainctl/isd" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="isd" class="md-nav__button md-logo" aria-label="isd" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    isd
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/kainctl/isd" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#short-motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Short Motivation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-isd" class="md-nav__link">
+    <span class="md-ellipsis">
+      Working with isd
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with isd">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usersystem-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      User/System mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fuzzy-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fuzzy search
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#selecting-multiple-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      Selecting multiple units
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#systemctl-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      systemctl action
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-palette" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Palette
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pager-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pager support
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#journal-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Journal Support
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customizeability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizeability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quitting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quitting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="customization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Customization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Security
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="media/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Media
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><code>isd</code> – a better way to work with <code>systemd</code> units</p>
+</blockquote>
+<p>Simplify <code>systemd</code> management with <code>isd</code>!
+<code>isd</code> is a <abbr title="Terminal User Interface">TUI</abbr> offering fuzzy search for units, auto-refreshing previews,
+smart <code>sudo</code> handling, and a fully customizable interface
+for power-users and newcomers alike.</p>
+<center>
+    <img src="./assets/images/isd.png" alt="isd logo" style="max-width: 50vh;">
+</center>
+
+<h2 id="short-motivation">Short Motivation<a class="headerlink" href="#short-motivation" title="Permanent link">&para;</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you prefer an example terminal recording over text,
+<a href="#working-with-isd">jump to the next section</a>.</p>
+</div>
+<p>If you ever became frustrated while typing:</p>
+<ul>
+<li><code>systemctl start --user unit-A.service</code> (manually starting a unit ⬆️)</li>
+<li><code>systemctl status --user unit-A.service</code> (seeing that it failed ❌)</li>
+<li><code>journalctl -xe --user -u unit-A.service</code> (checking the logs 🔬)</li>
+<li><code>systemctl edit --user unit-A.service</code> (updating the unit 🧑‍🔬)</li>
+<li><code>systemctl start --user unit-A.service</code> (starting it again ⬆️)</li>
+<li><code>systemctl status --user unit-A.service</code> (checking the logs <em>again</em> 🔬)</li>
+<li>And repeat 🔁</li>
+</ul>
+<p>This tool is for you!</p>
+<p>But <code>isd</code> is not only designed for <code>systemd</code> power-users!
+<code>isd</code> lowers the bar to interact with <code>systemd</code> units and provides a unified
+interface that only shows <em>relevant</em> information and commands.
+If you only ever run <code>systemctl status &lt;unit&gt;</code>, then <code>isd</code> <em>might still</em> be for you,
+since <code>isd</code> will auto-refresh the output.</p>
+<p>If you are interested, read on and take a look at the <a href="#working-with-isd">recorded terminal session</a>.</p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p><code>isd</code> can currently be installed in three different ways:</p>
+<ul>
+<li>via <a href="https://docs.astral.sh/uv/">uv</a>, or via</li>
+<li><a href="https://nix.dev/#what-can-you-do-with-nix">nix</a>, or </li>
+<li>as an <a href="https://appimage.org/">AppImage</a>.</li>
+</ul>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">uv</label><label for="__tabbed_1_2">nix</label><label for="__tabbed_1_3">AppImage</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><a href="https://docs.astral.sh/uv/">uv</a> is a Python package manager.
+To install <a href="https://docs.astral.sh/uv/">uv</a> have a look at the <a href="https://docs.astral.sh/uv/">official uv installation documentation</a>.</p>
+<p>After installing <a href="https://docs.astral.sh/uv/">uv</a>, you can <em>try</em> <code>isd</code> by running:
+<code>uvx --python=3.11 isd-tui</code></p>
+<p>To install and manage <code>isd</code> via <a href="https://docs.astral.sh/uv/">uv</a>, run:
+<code>uv tool install --python=3.11 isd-tui</code></p>
+<p>After installing the tool, the program <code>isd</code> and its alias<sup id="fnref:alias"><a class="footnote-ref" href="#fn:alias">2</a></sup> <code>isd-tui</code>
+will be available.</p>
+<p><code>isd</code> requires <code>--python</code> to be set <code>&gt;=3.11</code> and would fail
+if the default Python version is older.
+For more details regarding the tool management, see the upstream
+<a href="https://docs.astral.sh/uv/">uv</a> tool documentation:</p>
+<ul>
+<li><a href="https://docs.astral.sh/uv/guides/tools/#installing-tools">https://docs.astral.sh/uv/guides/tools/#installing-tools</a></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>isd</code> is developed with a reproducible <a href="https://nix.dev/#what-can-you-do-with-nix">nix</a> environment and build as a <a href="https://nix.dev/#what-can-you-do-with-nix">nix</a> package.
+This is my personal preference to install <code>isd</code> but it is a higher barrier compared to the <code>.AppImage</code>.
+To install <a href="https://nix.dev/#what-can-you-do-with-nix">nix</a> with sensible default options, use the <a href="https://github.com/DeterminateSystems/nix-installer"><code>nix-installer</code></a>
+from <a href="https://determinate.systems/">determinate.systems</a>.</p>
+<p>Then, to <em>try out</em> <code>isd</code>, simply run <code>nix run github:kainctl/isd</code>.</p>
+<p>To install <code>isd</code>, add it to your packages list:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># flake.nix</span>
+<span class="p">{</span>
+
+    <span class="c1"># [...]</span>
+    inputs<span class="o">.</span>isd<span class="o">.</span><span class="ss">url</span> <span class="o">=</span> <span class="s2">&quot;github:kainctl/isd&quot;</span><span class="p">;</span>
+    <span class="c1"># [...]</span>
+
+    <span class="ss">outputs</span> <span class="o">=</span> <span class="p">{</span>self<span class="p">,</span> <span class="o">...</span><span class="p">}@</span>inputs<span class="p">:</span> <span class="p">{</span>
+      <span class="c1"># [...]</span>
+      <span class="c1"># inside nixosConfigurations.&lt;system&gt;.modules or</span>
+      <span class="c1"># {</span>
+      <span class="c1">#     environment.systemPackages = [ inputs.isd.packages.&lt;system&gt;.default ];</span>
+      <span class="c1"># };</span>
+      <span class="c1"># homeConfigurations.&lt;name&gt;.modules =</span>
+      <span class="c1"># {</span>
+      <span class="c1">#   home.packages = [ inputs.isd.packages.&lt;system&gt;.default ];</span>
+      <span class="c1"># };</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>An <a href="https://appimage.org/">AppImage</a> is a single self-containing <em>executable</em>, similar to a Windows
+<code>.exe</code> and MacOS <code>.dmg</code> file. This should make it easy to run <code>isd</code>
+on <em>any</em> Linux distribution and on remote servers where you do
+not have elevated privileges.</p>
+<p><em>Manual installation</em>:</p>
+<p>First, download the <code>.AppImage</code> file from:</p>
+<ul>
+<li><a href="https://github.com/kainctl/isd/releases/latest">https://github.com/kainctl/isd/releases/latest</a></li>
+</ul>
+<p>Then make the file executable as
+mentioned in the <a href="https://docs.appimage.org/introduction/quickstart.html#ref-quickstart">AppImage documentation</a>
+and run the application.</p>
+<p><em>Managed installation</em>:</p>
+<p>Or manage the <code>.AppImage</code> via <a href="https://assassinate-you.net/tags/appimagelauncher/">AppImageLauncher</a>
+for better desktop integration support (application icon &amp; entry) and in-app
+update functionality.</p>
+<details class="warning">
+<summary>Ubuntu 24.04 Additional Requirements</summary>
+<p>If you are using Ubuntu 24.04, extra installation steps are required.
+Please see the <a href="https://github.com/kainctl/isd/issues/10">issue #10 for more details</a>.</p>
+<p>In short, you have to create an <code>apparmor</code> profile by creating the file: <code>/etc/apparmor.d/isd-appimage</code> with:</p>
+<div class="highlight"><pre><span></span><code># This profile allows everything and only exists to give the
+# application a name instead of having the label &quot;unconfined&quot;
+abi &lt;abi/4.0&gt;,
+include &lt;tunables/global&gt;
+
+profile isd /home/{USER}/Applications/isd*.AppImage flags=(unconfined) {
+  userns,
+}
+</code></pre></div>
+<p>where you have to replace <code>{USER}</code> with your username, create the <code>Applications</code> directory if it does not exist,
+and move the <code>AppImage</code> into that directory.</p>
+<p>To update the <code>AppArmor</code> profile, run <code>sudo apparmor_parser -r /etc/apparmor.d/isd-appimage</code></p>
+</details>
+<div class="admonition warning">
+<p class="admonition-title">AppImage with <code>nix</code> installed causes issues</p>
+<p>If you have <code>nix</code> installed, this <code>AppImage</code> will <em>not</em> work!
+Either use the <code>nix</code> or <code>uv</code> installation instructions!</p>
+</div>
+</div>
+</div>
+</div>
+<details class="warning">
+<summary>Warning for Windows <abbr title="Windows Subsystem for Linux">WSL</abbr> users</summary>
+<p>The <code>systemd</code> support of <abbr title="Windows Subsystem for Linux">WSL</abbr> seems to be quite buggy (also for <abbr title="Windows Subsystem for Linux">WSL</abbr> 2).
+See these GitHub issues for more details</p>
+<ul>
+<li><a href="https://github.com/microsoft/WSL/issues/8842">https://github.com/microsoft/WSL/issues/8842</a></li>
+<li><a href="https://github.com/microsoft/WSL/issues/10205">https://github.com/microsoft/WSL/issues/10205</a></li>
+<li><a href="https://github.com/nix-community/NixOS-WSL/issues/375">https://github.com/nix-community/NixOS-WSL/issues/375</a></li>
+</ul>
+</details>
+<h2 id="working-with-isd">Working with <code>isd</code><a class="headerlink" href="#working-with-isd" title="Permanent link">&para;</a></h2>
+<p>The following recorded terminal session shows how <code>isd</code>
+can be used to:</p>
+<ul>
+<li>Search through <code>systemd</code> units with <em>fuzzy</em> search,</li>
+<li>View the current state of all matched units,</li>
+<li>See more detailed status information about <em>multiple</em> units in the preview,</li>
+<li>Send <code>systemctl</code> commands to the selected units with auto-refreshing status outputs,</li>
+<li>Open the full status output in a dedicated <code>pager</code> <em>without</em> leaving <code>isd</code>,</li>
+<li>Open a <em>different</em> <code>pager</code> for the <code>Journal</code> output, and</li>
+<li>Customize the <em>theme</em>.</li>
+</ul>
+<div id="asciinema-0b2456cd-2bae-4932-8d9b-9cfaa189e0bd" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-0b2456cd-2bae-4932-8d9b-9cfaa189e0bd'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": false,"poster": "npt:2.0880759999999996","markers": [[2.0880759999999996, "Overview"], [6.936361999999999, "Fuzzy Search"], [13.285897999999992, "Select Multiple Units"], [17.406283, "Systemctl Action"], [21.240963999999988, "Auto-Refreshing Preview Windows"], [26.35913199999999, "Command Palette"], [29.525088999999994, "Fuzzy Matching Commands"], [31.246033, "Open Pager"], [42.102526, "Preview Journal"], [47.697439000000024, "Custom Journal Pager"], [61.81335000000003, "Different theme"], [65.024716, "Cat Preview"], [67.23975, "Dependencies Preview"], [70.45092299999999, "Show Preview"], [73.66160199999997, "Help Preview"], [77.97628499999999, "Quit"]],});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-0b2456cd-2bae-4932-8d9b-9cfaa189e0bd'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": false,"poster": "npt:2.0880759999999996","markers": [[2.0880759999999996, "Overview"], [6.936361999999999, "Fuzzy Search"], [13.285897999999992, "Select Multiple Units"], [17.406283, "Systemctl Action"], [21.240963999999988, "Auto-Refreshing Preview Windows"], [26.35913199999999, "Command Palette"], [29.525088999999994, "Fuzzy Matching Commands"], [31.246033, "Open Pager"], [42.102526, "Preview Journal"], [47.697439000000024, "Custom Journal Pager"], [61.81335000000003, "Different theme"], [65.024716, "Cat Preview"], [67.23975, "Dependencies Preview"], [70.45092299999999, "Show Preview"], [73.66160199999997, "Help Preview"], [77.97628499999999, "Quit"]],});}</script>
+
+<h3 id="usersystem-mode">User/System <code>mode</code><a class="headerlink" href="#usersystem-mode" title="Permanent link">&para;</a></h3>
+<p>The top row shows in which <code>mode</code> <code>isd</code> is running.
+The <code>mode</code> can either be <code>user</code> or <code>system</code> and configures
+which types of units are shown and searched in the widgets below.</p>
+<div id="asciinema-9b1834e8-86ec-48b1-aed1-ec6d9e443536" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-9b1834e8-86ec-48b1-aed1-ec6d9e443536'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:2.0880759999999996",});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-9b1834e8-86ec-48b1-aed1-ec6d9e443536'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:2.0880759999999996",});}</script>
+
+<h3 id="fuzzy-search">Fuzzy search<a class="headerlink" href="#fuzzy-search" title="Permanent link">&para;</a></h3>
+<p>The top widget is the <em>fuzzy</em> search bar.
+<code>isd</code> will load all units and unit files that match the input<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>
+and highlight them according to their current state in the <em>search result</em> widget
+below.
+To switch from the current search widget to the next widget either
+press <span class="keys"><kbd class="key-tab">Tab</kbd></span> or <span class="keys"><kbd class="key-enter">Enter</kbd></span>.</p>
+<div id="asciinema-123b1fe2-f9d4-416f-bedf-346aa8c370e5" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-123b1fe2-f9d4-416f-bedf-346aa8c370e5'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:6.936361999999999","startAt": 6.936361999999999,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-123b1fe2-f9d4-416f-bedf-346aa8c370e5'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:6.936361999999999","startAt": 6.936361999999999,});}</script>
+
+<h3 id="selecting-multiple-units">Selecting multiple units<a class="headerlink" href="#selecting-multiple-units" title="Permanent link">&para;</a></h3>
+<p>The <em>search result</em> widget can be navigated with the arrow keys (<span class="keys"><kbd class="key-arrow-up">Up</kbd></span>, <span class="keys"><kbd class="key-arrow-down">Down</kbd></span>)
+or the vim keys (<span class="keys"><kbd class="key-j">J</kbd></span>, <span class="keys"><kbd class="key-k">K</kbd></span>).
+Multiple units can be selected with <span class="keys"><kbd class="key-space">Space</kbd></span>.
+Selected widgets are highlighted on the left side by an additional bar in an accent color,
+where the currently highlighted unit is always considered selected.</p>
+<p>Depending on the currently selected units, the <em>preview widget</em>
+will show a preview of the selected units for a given output (<code>Status</code> by default).</p>
+<div id="asciinema-c67d665c-4dbb-4388-b0c4-45aac5084eb2" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-c67d665c-4dbb-4388-b0c4-45aac5084eb2'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:13.285897999999992","startAt": 13.285897999999992,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-c67d665c-4dbb-4388-b0c4-45aac5084eb2'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:13.285897999999992","startAt": 13.285897999999992,});}</script>
+
+<h3 id="systemctl-action"><code>systemctl action</code><a class="headerlink" href="#systemctl-action" title="Permanent link">&para;</a></h3>
+<p>The toolbar at the bottom shows the most important keybindings for the currently focused
+widget, where the <code>^</code> symbol means <span class="keys"><kbd class="key-control">Ctrl</kbd></span>.
+To open the <code>systemctl action</code> modal, press <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-o">O</kbd></span>.</p>
+<div id="asciinema-2e5c88ef-00b8-4974-82bd-ce8688625d32" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-2e5c88ef-00b8-4974-82bd-ce8688625d32'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:17.406283","startAt": 17.406283,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-2e5c88ef-00b8-4974-82bd-ce8688625d32'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:17.406283","startAt": 17.406283,});}</script>
+
+<p>This modal will show a list of possible actions that can be applied to the
+currently selected/highlighted units. To select the desired action
+navigate the list with the same keys as for the <em>search result</em> widget and
+then press <span class="keys"><kbd class="key-enter">Enter</kbd></span> to select the unit. Or type any of the colored <em>shortcut</em> keys
+to directly execute the action.</p>
+<div id="asciinema-571a32ef-336d-4271-9c99-1f6126073e64" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-571a32ef-336d-4271-9c99-1f6126073e64'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:21.240963999999988","startAt": 21.240963999999988,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-571a32ef-336d-4271-9c99-1f6126073e64'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:21.240963999999988","startAt": 21.240963999999988,});}</script>
+
+<p>After running a <code>systemctl</code> command, a notification is shown about the
+executed command and if necessary, error messages.
+The selection and preview widget will automatically update to show
+the new state of the selected units.</p>
+<h3 id="command-palette">Command Palette<a class="headerlink" href="#command-palette" title="Permanent link">&para;</a></h3>
+<p>To open the command palette, press <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-p">P</kbd></span>.
+The command palette will show all currently available commands and their
+respective keybindings if available.</p>
+<div id="asciinema-1d090329-bd17-4623-b280-3f572cb79404" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-1d090329-bd17-4623-b280-3f572cb79404'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:26.35913199999999","startAt": 26.35913199999999,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-1d090329-bd17-4623-b280-3f572cb79404'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:26.35913199999999","startAt": 26.35913199999999,});}</script>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The command palette also includes the same actions as the <code>systemctl actions</code>
+modal. However, the <code>systemctl actions</code> modal provides a <em>cleaner</em> interface
+and is generally recommended over running these actions via the command palette.
+Though, you can use whatever you prefer 👍</p>
+</div>
+<p>The command palette also uses fuzzy searching to make it easier to find the command you are
+interested in.</p>
+<h3 id="pager-support">Pager support<a class="headerlink" href="#pager-support" title="Permanent link">&para;</a></h3>
+<p>To view the entire preview output, a <code>pager</code> can be opened <em>while</em>
+running <code>isd</code> and <em>without</em> closing the application.
+The <code>pager</code> can be opened
+by pressing <span class="keys"><kbd class="key-enter">Enter</kbd></span> while focusing the <em>search result</em> widget or
+via the <code>command palette</code>:</p>
+<div id="asciinema-00ac3c08-e3de-4d0c-b266-71ae6b9a6383" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-00ac3c08-e3de-4d0c-b266-71ae6b9a6383'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:29.525088999999994","startAt": 29.525088999999994,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-00ac3c08-e3de-4d0c-b266-71ae6b9a6383'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:29.525088999999994","startAt": 29.525088999999994,});}</script>
+
+<p>Then you can efficiently navigate the text with the <a href="customization/#default-pager"><code>pager</code> of your choice</a>.
+By deeply integrating with <code>pager</code>s <code>isd</code> avoids the need to re-invent the wheel
+for code navigation and gives you full control over how you would like to navigate
+the text. Here, for example, showing the output in <code>moar</code>.</p>
+<div id="asciinema-6dbbdc7a-964f-458a-bdf9-3b7d5d0cc88b" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-6dbbdc7a-964f-458a-bdf9-3b7d5d0cc88b'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:31.246033","startAt": 31.246033,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-6dbbdc7a-964f-458a-bdf9-3b7d5d0cc88b'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:31.246033","startAt": 31.246033,});}</script>
+
+<h3 id="journal-support">Journal Support<a class="headerlink" href="#journal-support" title="Permanent link">&para;</a></h3>
+<p>To switch to a different <em>tab</em> of the <em>preview widget</em> the
+arrow keys (<span class="keys"><kbd class="key-arrow-left">Left</kbd></span>, <span class="keys"><kbd class="key-arrow-right">Right</kbd></span>) or the vim keys (<span class="keys"><kbd class="key-h">H</kbd></span>, <span class="keys"><kbd class="key-l">L</kbd></span>)
+can be pressed while focusing the tab header or globally by triggering the
+<a href="customization/#main-keybindings"><code>Next/Previous Preview Tab</code> actions</a>.</p>
+<p>The next image shows the preview for the
+<code>Journal</code> output of the selected units:</p>
+<div id="asciinema-878bdc89-adf9-467d-8f15-483acbb92117" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-878bdc89-adf9-467d-8f15-483acbb92117'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:42.102526","startAt": 42.102526,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-878bdc89-adf9-467d-8f15-483acbb92117'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:42.102526","startAt": 42.102526,});}</script>
+
+<p>Similarly to the <code>Status</code> output, the output of the <code>Journal</code> preview
+window can be opened in a <code>pager</code>. To provide more flexibility, <code>isd</code>
+allows you <a href="customization/#journal-pager">to configure a special <code>pager</code> for the <code>Journal</code> output</a>.
+In this example, <a href="https://lnav.org/"><code>lnav</code></a> is used to view the <code>Journal</code> output.</p>
+<div id="asciinema-be16b06f-aea6-4af0-bf34-484f122cc0aa" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-be16b06f-aea6-4af0-bf34-484f122cc0aa'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:47.697439000000024","startAt": 47.697439000000024,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-be16b06f-aea6-4af0-bf34-484f122cc0aa'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:47.697439000000024","startAt": 47.697439000000024,});}</script>
+
+<h3 id="customizeability">Customizeability<a class="headerlink" href="#customizeability" title="Permanent link">&para;</a></h3>
+<p>One core feature of <code>isd</code> is it customizability and configurability.
+<em>You</em> decide which keybindings work best for you and maximize your productivity 🚀.
+It also comes with a couple of different <em>themes</em>. For example, the
+<code>dracula</code> theme:</p>
+<div id="asciinema-bb871315-84a9-47bf-ba22-5b7a7a7f2fb1" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-bb871315-84a9-47bf-ba22-5b7a7a7f2fb1'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:61.81335000000003","startAt": 61.81335000000003,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-bb871315-84a9-47bf-ba22-5b7a7a7f2fb1'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:61.81335000000003","startAt": 61.81335000000003,});}</script>
+
+<h3 id="quitting">Quitting<a class="headerlink" href="#quitting" title="Permanent link">&para;</a></h3>
+<p>To quit the application you can either press <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-q">Q</kbd></span> or stop it via the command palette:</p>
+<div id="asciinema-8dd5ea23-05f0-450b-99b5-25de40722f54" style="z-index: 1; position: relative;"></div>
+<script>if (document.readyState === 'loading') {document.addEventListener('DOMContentLoaded', function() {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-8dd5ea23-05f0-450b-99b5-25de40722f54'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:77.97628499999999","startAt": 77.97628499999999,});});} else {AsciinemaPlayer.create('./assets/images/isd.cast', document.getElementById('asciinema-8dd5ea23-05f0-450b-99b5-25de40722f54'), {"autoPlay": false,"controls": true,"loop": false,"pauseOnMarkers": true,"poster": "npt:77.97628499999999","startAt": 77.97628499999999,});}</script>
+
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<p>I hope that this short overview has helped you to get a feeling for what <code>isd</code>
+<em>is</em> and if it can be useful for you. If you are still unsure, try it out!
+It is a lot easier to get feeling for the tool when you try it on your own :)</p>
+<div class="admonition tip">
+<p class="admonition-title">Support</p>
+<p>If you like <code>isd</code>, please give it a <img alt="⭐" class="twemoji" src="assets/external/cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/svg/2b50.svg" title=":star:"> on GitHub!</p>
+<p>And if you <em>really</em> like it and can afford it, consider
+buying me a coffee via <a href="https://ko-fi.com/isdproject">ko-fi</a>.</p>
+</div>
+<h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>Checkout the other sections as well:</p>
+<ul>
+<li><a href="customization/">Customization</a></li>
+<li><a href="faq/">FAQ</a></li>
+<li><a href="security/">Security</a></li>
+</ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>If the input is empty, then all units and unit-files are shown.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:alias">
+<p>The reason why the <code>isd-tui</code> alias exists is due to a naming conflict
+on PyPI with a different package called <code>isd</code>. Providing the alias <code>isd-tui</code>
+allows <code>uv</code> users to try it without having to write <code>uvx --from isd-tui isd</code>.&#160;<a class="footnote-backref" href="#fnref:alias" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 isd Project
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": ".", "features": ["search.suggest", "search.highlight", "navigation.sections", "toc.integrate", "content.code.annotate", "content.code.copy", "content.code.select"], "search": "assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="javascripts/asciinema-player.min.js"></script>
+      
+    
+  </body>
+</html>
