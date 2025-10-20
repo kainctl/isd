@@ -2991,12 +2991,27 @@ def render_model_as_yaml(model: Settings) -> str:
 
 
 def main():
-    app = InteractiveSystemd(fake_startup_count=None)
-    # In theory, I could trigger a custom exit code for the application
-    # if a change is detected and then restart the application here.
-    # But let's keep it simple for now. If somebody actually asks for this
-    # feature, I might take a closer look at it.
-    app.run()
+    from unittest.mock import patch
+    from rich.color import ColorSystem
+
+    _TERM_COLORS = {
+        "kitty": ColorSystem.TRUECOLOR,
+        "ghostty": ColorSystem.TRUECOLOR,
+        "wezterm": ColorSystem.TRUECOLOR,
+        "256color": ColorSystem.TRUECOLOR,
+        # If this is too aggressive, I could only trigger this if I am inside of an SSH session.
+        # if os.getenv("SSH_TTY")
+        # else ColorSystem.EIGHT_BIT,
+        "alacritty": ColorSystem.TRUECOLOR,
+    }
+    with patch("rich.console._TERM_COLORS", new=_TERM_COLORS):
+        app = InteractiveSystemd(fake_startup_count=None)
+
+        # In theory, I could trigger a custom exit code for the application
+        # if a change is detected and then restart the application here.
+        # But let's keep it simple for now. If somebody actually asks for this
+        # feature, I might take a closer look at it.
+        app.run()
 
 
 if __name__ == "__main__":
