@@ -83,10 +83,12 @@ def query_foreground_color() -> Optional[str]:
     return parse_rgb(response)
 
 
-def derive_textual_theme() -> Optional[Theme]:
+def derive_textual_theme(is_dark: bool = True) -> Optional[Theme]:
     """
     Derive a textual theme by quering the current terminal
     via OSC escape codes.
+    By default, assume that the resulting `Theme` is a dark theme (`is_dark`).
+    If it is a `dark` or `light` theme cannot be derived from the terminal itself.
 
     Here, we assume that an iTerm2 color scheme (https://github.com/mbadolato/iTerm2-Color-Schemes) is used.
     This function may return `None` if the theme could not be derived.
@@ -124,4 +126,5 @@ def derive_textual_theme() -> Optional[Theme]:
         surface=bg,
         panel=iterm_colors[8],
         boost=iterm_colors[0],
+        dark=True,
     )

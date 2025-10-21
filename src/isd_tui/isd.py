@@ -836,6 +836,16 @@ class Settings(BaseSettings):
         default=Theme("textual-dark"), description="The theme of the application."
     )
 
+    terminal_derived_theme_is_dark: bool = Field(
+        default=True,
+        description=dedent("""\
+            This option is used to set whether the
+            `terminal_derived_theme` is a `dark` (default) or `light` theme.
+            This theme information is used to tune some colors
+            to ensure good legibility of text in different widgets.
+        """),
+    )
+
     search_results_height_fraction: PositiveInt = Field(
         default=1, description="Relative height compared to preview height."
     )
@@ -1278,10 +1288,18 @@ class UnitReprState(Enum):
 
         text = Text(unit)
         if highlight_indices is not None and len(highlight_indices) > 0:
-            text.stylize("dim")
             for idx in highlight_indices:
-                text.stylize(Style(dim=False, bold=True), start=idx, end=idx + 1)
+                text.stylize(
+                    Style(bold=True),
+                    start=idx,
+                    end=idx + 1,
+                )
 
+        # One limitation is that `style` passes colors like:
+        # `auto 75%` for the _muted_ text.
+        # If the style is simply "injected" as a string, nothing
+        # "bad" happens, as it will be evaluated later.
+        # But it means that I cannot call `Style.parse` here.
         return Text.assemble(prefix, " ", text, style=style)
 
 
@@ -2493,11 +2511,15 @@ class MainScreen(Screen):
         match_dicts = self.search_results
         # get the relevant color values from the theme.
         vars = self.app.get_css_variables()
+        # Should NOT be `success-text` as this color is used
+        # to render text that sits ON TOP of a widget with
+        # a `success` color! But I am rendering it on a plain
+        # background, so I _should_ select the `success` color.
         render_state_colors = {
-            "color_success": vars["text-success"],
-            "color_warn": vars["text-warning"],
-            "color_error": vars["text-error"],
-            "color_different": vars["text-warning"],
+            "color_success": vars["success"],
+            "color_warn": vars["warning"],
+            "color_error": vars["error"],
+            "color_different": vars["warning"],
             "color_inactive": vars["text-muted"],
         }
         matches = [
@@ -2518,6 +2540,7 @@ class MainScreen(Screen):
             Selection(
                 prompt=self.unit_to_state_dict[unit].render_state(
                     unit,
+                    highlight_indices=None,
                     **render_state_colors,
                 ),
                 value=unit,
@@ -2829,6 +2852,17 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 self.action_show_help_panel,
             )
 
+    async def on_theme_changed(self, event):
+        """
+        Manually subscribed to a theme change via the
+        signal handler in `on_mount`.
+        Ensures that the `selection` and `preview` is updated with the
+        new theme as well.
+        """
+        if isinstance(self.screen, MainScreen):
+            await self.screen.refresh_selection()
+            self.screen.refresh_preview()
+
     def action_stop(self) -> None:
         """
         Calls the `stop` function of the `MainScreen` and exists.
@@ -2845,7 +2879,9 @@ class InteractiveSystemd(App, inherit_bindings=False):
         t = self.settings.theme
         if t == "terminal-derived-theme":
             with self.app.suspend():
-                derived_theme = derive_textual_theme()
+                derived_theme = derive_textual_theme(
+                    is_dark=self.settings.terminal_derived_theme_is_dark
+                )
                 if derived_theme is not None:
                     self.register_theme(derived_theme)
                     self.theme = t
@@ -2875,6 +2911,8 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 timeout=90,
             )
             error_log_file.write_text(error_text)
+
+        self.theme_changed_signal.subscribe(self, self.on_theme_changed)
         self.push_screen("main")
 
         if self.startup_count % 100 == 0:

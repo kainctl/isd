@@ -1,6 +1,6 @@
 # Customization
 
-As eluded to in the [Getting Started section](./index.md),
+As alluded to in the [Getting Started section](./index.md),
 `isd` is _very_ configurable.
 Almost _all_ keybindings and commands are configurable!
 During start-up `isd` will derive the settings from a global, a local configuration file and environment variables.
@@ -68,6 +68,7 @@ Just jump to the sections that sound interesting:
 - [Journal Pager](#journal-pager)
 - [Journal Pager Arguments](#journal-pager-arguments)
 - [Theme](#theme)
+- [terminal-derived-theme dark/light toggle](#darklight-terminal-derived-theme-mode)
 - [Layout](#layout)
 - [Keybindings](#keybindings)
     - [Generic Keybindings](#generic-keybindings)
@@ -186,9 +187,17 @@ These values can be adjusted according to personal preference.
 You can _temporarily_ view the themes via the `Change theme` command.
 But to persist the changes you _must_ update the configuration file.
 
-<!-- If you are familiar with theming your terminal via -->
-<!-- [ansi escape codes](https://github.com/tinted-theming/home) -->
-<!-- you --> 
+### Dark/Light `terminal-derived-theme` Mode
+
+{{ config_block(11) }}
+
+Assumes that the `terminal_derived_theme` is a `dark` theme by default.
+Only set this value to `False` if your terminal derived theme
+is `light`. There could be a different `light_terminal_derived_theme`
+option but since most users use a dark theme, I opted for an additional configuration option.
+I am hoping that this is less confusing than the alternative `light/dark_terminal_derived_theme`.
+Especially, since the color adjustments are minor.
+If you set this option, please let me know!
 
 ### Layout
 
@@ -196,9 +205,9 @@ But to persist the changes you _must_ update the configuration file.
 Currently, the relative heights between the search results and preview widgets
 can be adjusted:
 
-{{ config_block(11) }}
-
 {{ config_block(12) }}
+
+{{ config_block(13) }}
 
 By default the preview widget is about twice as tall as the search results widget.
 
@@ -231,25 +240,25 @@ for keybindings:
 
 #### Generic Keybindings
 
-{{ config_block(13) }}
+{{ config_block(14) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### Main Keybindings
 
-{{ config_block(14) }}
+{{ config_block(15) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### Navigation Keybindings
 
-{{ config_block(15) }}
+{{ config_block(16) }}
 
 See [Keybindings](#keybindings) for more general information.
 
 #### `systemctl` Keybindings
 
-{{ config_block(16) }}
+{{ config_block(17) }}
 
 This allows you to configure the `systemctl` commands and keybindings.
 It is important to note that the `command` key may contain spaces (like `edit --runtime`)
@@ -273,21 +282,21 @@ the [shell injection section](security.md/#shell-injection).
 
 ### Pager Arguments
 
-{{ config_block(17) }}
+{{ config_block(18) }}
 
 If you have to customize the pager arguments for a common pager,
 please open an issue!
 
 ### Journal Pager Arguments
 
-{{ config_block(18) }}
+{{ config_block(19) }}
 
 If you have to customize the pager arguments for a common pager,
 please open an issue!
 
 ### Maximum Preview Lines
 
-{{ config_block(19) }}
+{{ config_block(20) }}
 
 This value can mainly be configured if opening the journal preview
 window takes too long. Though, it should usually not be required

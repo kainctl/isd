@@ -69,42 +69,45 @@ Preview:focus {
   background: $boost 20%;
 }
 
-
-#unit-selection>.selection-list--button {
-  background: $boost 50% !important;
-}
-
-#unit-selection>.option-list--separator {
+CustomSelectionList>.option-list--separator {
   background: $primary;
 }
 
-#unit-selection>.option-list--option-hover {
-  background: $boost 50%;
+CustomSelectionList:dark>.option-list--option-highlighted {
+  background: $surface-lighten-1;
+}
+CustomSelectionList:light>.option-list--option-highlighted {
+  background: $surface-darken-1;
 }
 
-/* Even if it isn't in focus, keep the highlight up */
-OptionList>.option-list--option-highlighted {
-  background: $primary 25%;
+CustomSelectionList:dark>.option-list--option-hover {
+  background: $surface-lighten-1 50%;
+}
+CustomSelectionList:light>.option-list--option-hover {
+  background: $surface-darken-1 75%;
 }
 
+/* Button options */
+CustomSelectionList:focus>.selection-list--button-highlighted,
+CustomSelectionList>.selection-list--button-highlighted,
+CustomSelectionList>.selection-list--button-selected-highlighted {
+  color: $accent;
+  background: $accent;
+}
 
-#unit-selection>.selection-list--button {
+CustomSelectionList>.selection-list--button {
+  background: $boost 50% !important;
+}
+
+CustomSelectionList>.selection-list--button {
   color: $primary;
   background: $primary;
 }
 
-#unit-selection:focus>.selection-list--button,
-#unit-selection>.selection-list--button-selected,
-#unit-selection:focus>.selection-list--button-selected,
-{
-color: $primary;
-background: $accent;
-}
-
-#unit-selection:focus>.selection-list--button-highlighted,
-#unit-selection>.selection-list--button-highlighted,
-#unit-selection>.selection-list--button-selected-highlighted {
-  color: $accent;
+CustomSelectionList:focus>.selection-list--button,
+CustomSelectionList>.selection-list--button-selected,
+CustomSelectionList:focus>.selection-list--button-selected {
+  color: $primary;
   background: $accent;
 }
 
