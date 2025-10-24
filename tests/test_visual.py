@@ -13,6 +13,7 @@ from isd_tui.isd import (
 from pathlib import Path
 from textual.pilot import Pilot
 from textual.widgets import RichLog, TabbedContent, Tabs
+from textual.theme import BUILTIN_THEMES
 
 os.environ["PATH"] = str(Path(__file__).parent.resolve()) + ":" + os.environ["PATH"]
 
@@ -327,6 +328,13 @@ def test_theme_from_settings(monkeypatch, snap_compare):
 # Yeah, I am too lazy to figure out how to detect that a notification was sent
 def test_invalid_settings(monkeypatch, snap_compare):
     monkeypatch.setenv("ISD_STARTUP_MODE", "invalid")
+    app = InteractiveSystemd()
+    assert snap_compare(app)
+
+
+@pytest.mark.parametrize("theme", BUILTIN_THEMES)
+def test_themes(theme, monkeypatch, snap_compare):
+    monkeypatch.setenv("ISD_THEME", theme)
     app = InteractiveSystemd()
     assert snap_compare(app)
 

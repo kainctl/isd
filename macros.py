@@ -59,6 +59,31 @@ def define_env(env):
     )
 
     @env.macro
+    def render_themes() -> str:
+        """
+        This does not work as expected...
+
+        The main issue is that the SVG renderer does not work
+        as reliable as I would like.
+        """
+        vis_dir = Path(env.project_dir) / "tests/__snapshots__/test_visual/"
+        themes = list(vis_dir.glob("test_themes*.svg"))
+
+        import textwrap
+
+        tpl = textwrap.dedent("""\
+        === "{name}"
+
+        <div class="excalidraw">
+            --8<-- "{path}"
+        </div>""")
+        vals = [
+            tpl.format(name=theme.name, path=theme.relative_to(env.project_dir))
+            for theme in themes
+        ]
+        return "".join(vals)
+
+    @env.macro
     def config_block(number: int) -> str:
         block = env.variables.default_config_data.split("\n\n")[number]
         return "```yaml\n" + block + "\n```"

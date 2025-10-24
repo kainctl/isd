@@ -78,7 +78,6 @@ Set Width 1280
 Set Height 720
 
 # Should first run  `nix run ./nix/systemd-units#generate-doc-test-data`.
-Type@10ms "systemctl start --user '0-isd-example-unit-01.service' '0-isd-example-unit-05.service'" Enter
 # do not full refresh during recording -> Set it to a very large value
 # normal refresh should use the default value!
 # `my_asciinema` is simply `asciinema_3` wrapped in a bash script, where a custom `config.toml` is utilized.
