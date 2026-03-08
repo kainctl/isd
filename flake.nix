@@ -2,7 +2,7 @@
   description = "interactive systemd flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
     # nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     pyproject-nix = {
@@ -288,7 +288,7 @@
                 self.packages.${system}.my_asciinema
 
                 pkgs.lnav
-                pkgs.moar
+                pkgs.moor
                 # pkgs.nushell
                 pkgs.quickemu
                 # pkgs.debootstrap
