@@ -76,6 +76,7 @@ from textual.keys import format_key
 # FUTURE: Fix the settings for the default themes!
 # Issue is that the default green/yellow/red colors may not
 # work well with the selection color
+import textual.theme
 from textual.theme import BUILTIN_THEMES
 
 # from textual.scrollbar import ScrollBarRender
@@ -102,7 +103,7 @@ from xdg_base_dirs import (
 )
 from textual.widgets.selection_list import Selection
 from textual.widgets.option_list import Option
-from .derive_terminal_theme import derive_textual_theme
+from .derive_terminal_theme import derive_textual_theme, TERMINAL_DERIVED_THEME_NAME
 
 
 # make type checker happy.
@@ -155,10 +156,15 @@ UNIT_PRIORITY_ORDER = [
 AUTHENTICATION_MODE = "sudo"
 # AUTHENTICATION_MODE = "polkit"
 
+
 Theme = StrEnum(
-    "Theme", [key for key in BUILTIN_THEMES.keys()] + ["terminal-derived-theme"]
-)  # type: ignore
-StartupMode = StrEnum("StartupMode", ["user", "system", "auto"])
+    "Theme", [key for key in BUILTIN_THEMES.keys()] + [TERMINAL_DERIVED_THEME_NAME]
+) # type: ignore
+
+class StartupMode(StrEnum):
+    USER = "user"
+    SYSTEM = "system"
+    AUTO = "auto"
 
 SETTINGS_YAML_HEADER = dedent("""\
         # yaml-language-server: $schema=schema.json
@@ -395,11 +401,11 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
         yield Footer()
 
     def action_select(self) -> None:
-        opt_list = cast(CustomOptionList, self.query_one(CustomOptionList))
+        opt_list = self.query_one(CustomOptionList)
         opt_list.action_select()
 
     def action_quick_select(self, id: str) -> None:
-        opt_list = cast(CustomOptionList, self.query_one(CustomOptionList))
+        opt_list = self.query_one(CustomOptionList)
         opt_idx = opt_list.get_option_index(id)
         opt_list.highlighted = opt_idx
         opt_list.action_select()
@@ -749,7 +755,7 @@ class Settings(BaseSettings):
     )
 
     startup_mode: StartupMode = Field(
-        default=StartupMode("auto"),
+        default=StartupMode.AUTO,
         description=dedent("""\
             The systemctl startup mode (`user`/`system`).
             By default loads the mode from the last session (`auto`)."""),
@@ -1751,7 +1757,7 @@ class PreviewArea(Container):
         # can allow basic highlighting/copy pasting and searching.
         # Then I would only update the lines that have changed, which would make the updates
         # much less aggressive.
-        tabbed_content = cast(TabbedContent, self.query_one(TabbedContent))
+        tabbed_content = self.query_one(TabbedContent)
         match tabbed_content.active:
             # FUTURE: Expand on the functionality from _from_ansi
             # to open URLs or man pages, maybe skip if unknown
@@ -2032,7 +2038,7 @@ class MainScreen(Screen):
         Clear the input from the input widget
         and switch focus to it.
         """
-        inp = cast(CustomInput, self.query_one(CustomInput))
+        inp = self.query_one(CustomInput)
         inp.clear()
         inp.focus()
 
@@ -2040,7 +2046,7 @@ class MainScreen(Screen):
         """
         Switch focus to the search input.
         """
-        inp = cast(CustomInput, self.query_one(CustomInput))
+        inp = self.query_one(CustomInput)
         inp.focus()
 
     def _change_widget_height_fraction(self, value: int):
@@ -2317,7 +2323,7 @@ class MainScreen(Screen):
     # then derive the required sudo state again.
     # -> Maybe it would be smarter to forward this logic to the main loop?
     def action_open_preview_in_pager(self) -> None:
-        cur_tab = cast(TabbedContent, self.query_one(TabbedContent)).active
+        cur_tab = self.query_one(TabbedContent).active
 
         if cur_tab == "journal":
             pager = (
@@ -2351,7 +2357,7 @@ class MainScreen(Screen):
         self.refresh()
 
     def action_open_preview_in_editor(self) -> None:
-        cur_tab = cast(TabbedContent, self.query_one(TabbedContent)).active
+        cur_tab =self.query_one(TabbedContent).active
         editor = cast(InteractiveSystemd, self.app).editor
         with self.app.suspend():
             args = self.preview_output_command_builder(cur_tab)
@@ -2675,6 +2681,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
     # itself to the focused widget.
     # Disabling auto-focus solves this issue.
     AUTO_FOCUS = None
+    THEME_COULD_BE_DERIVED: Optional[bool] = None
 
     # posting defines the `Binding`s manually here via `BINDINGS`
     # and then runs self.set_keymap(self.settings.keymap) to
@@ -2701,6 +2708,9 @@ class InteractiveSystemd(App, inherit_bindings=False):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        default = deepcopy(textual.theme.BUILTIN_THEMES["textual-dark"])
+        default.name = TERMINAL_DERIVED_THEME_NAME
+        self.register_theme(default)
         try:
             self.settings = Settings()
             self.settings_error = None
@@ -2826,14 +2836,19 @@ class InteractiveSystemd(App, inherit_bindings=False):
         # Always allow changing the theme:
         # if not self.ansi_color:
         yield SystemCommand(
-            "Preview theme",
+            "Theme",
             "Preview the current theme",
             self.action_change_theme,
         )
         yield SystemCommand(
-            "Quit application",
+            "Quit",
             "Quit the application as soon as possible (Shortcut: ctrl+q,ctrl+c)",
             self.action_stop,
+        )
+        yield SystemCommand(
+            "Screenshot",
+            "Screenshot",
+            self.action_screenshot,
         )
         yield SystemCommand(
             "Show version", "Show the isd version", self.action_show_version
@@ -2851,6 +2866,17 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 "Show help for the focused widget and a summary of available keys",
                 self.action_show_help_panel,
             )
+
+    def watch_theme(self, theme: str) -> None:
+        """
+        Check whether or not the new theme is the
+        `terminal-derived-theme`. If it is, call
+        the dedicated function.
+        """
+        if theme == TERMINAL_DERIVED_THEME_NAME:
+            self.set_terminal_derived_theme()
+            self.refresh()
+
 
     async def on_theme_changed(self, event):
         """
@@ -2873,23 +2899,40 @@ class InteractiveSystemd(App, inherit_bindings=False):
     def action_show_version(self) -> None:
         self.notify(f"isd version: {__version__}", timeout=30)
 
-    def on_mount(self) -> None:
-        # The theme should be loaded very early,
-        # as the theme change can be quite jarring.
-        t = self.settings.theme
-        if t == "terminal-derived-theme":
+    def set_terminal_derived_theme(self) -> None:
+        # Not checked yet
+        if self.THEME_COULD_BE_DERIVED is None:
             with self.app.suspend():
                 derived_theme = derive_textual_theme(
                     is_dark=self.settings.terminal_derived_theme_is_dark
                 )
+                # Just a quick safety check
                 if derived_theme is not None:
+                    assert derived_theme.name == TERMINAL_DERIVED_THEME_NAME
+                    self.THEME_COULD_BE_DERIVED = True
                     self.register_theme(derived_theme)
-                    self.theme = t
                 else:
-                    self.notify(
-                        "Could not derive theme from terminal. Use a modern terminal such as ghostty or kitty instead."
-                    )
-                    self.theme = "textual-dark"
+                    self.THEME_COULD_BE_DERIVED = False
+        if self.THEME_COULD_BE_DERIVED:
+            self.theme = TERMINAL_DERIVED_THEME_NAME
+        else:
+            self.notify(
+                "Could not derive theme from terminal. Use a modern terminal such as ghostty or kitty instead."
+            )
+            self.theme = "textual-dark"
+
+    def on_mount(self) -> None:
+        # The theme should be loaded very early,
+        # as the theme change can be quite jarring.
+        t = self.settings.theme
+        if t == TERMINAL_DERIVED_THEME_NAME:
+            # FUTURE: This is kinda silly...
+            # I should simply allow a single custom
+            # theme.yaml file.
+            # Then there should be a different command
+            # that can _generate_ the theme from the
+            # current terminal theme.
+            self.set_terminal_derived_theme()
         else:
             self.theme = t
 
@@ -2948,7 +2991,7 @@ def render_field(key, field, level: int = 0) -> str:
     if hasattr(field, "description"):
         text += "# " + "\n# ".join(field.description.splitlines()) + "\n"
     if isinstance(default_value, (str, StrEnum)):
-        text += f'{key}: "{field.default}"'
+        text += f'{key}: "{default_value}"'
     elif isinstance(default_value, (int, float)):
         text += f"{key}: {default_value}"
     elif default_value is None:

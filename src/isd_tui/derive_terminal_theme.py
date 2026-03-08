@@ -6,6 +6,8 @@ import select
 from typing import Optional
 from textual.theme import Theme
 
+TERMINAL_DERIVED_THEME_NAME = "terminal-derived-theme"
+
 # OSC Codes:
 # https://chromium.googlesource.com/apps/libapps/+/a5fb83c190aa9d74f4a9bca233dac6be2664e9e9/hterm/doc/ControlSequences.md#OSC
 
@@ -85,7 +87,7 @@ def query_foreground_color() -> Optional[str]:
 
 def derive_textual_theme(is_dark: bool = True) -> Optional[Theme]:
     """
-    Derive a textual theme by quering the current terminal
+    Derive a textual theme by querying the current terminal
     via OSC escape codes.
     By default, assume that the resulting `Theme` is a dark theme (`is_dark`).
     If it is a `dark` or `light` theme cannot be derived from the terminal itself.
@@ -114,7 +116,7 @@ def derive_textual_theme(is_dark: bool = True) -> Optional[Theme]:
         iterm_colors.append(iterm_color)
 
     return Theme(
-        name="terminal-derived-theme",
+        name=TERMINAL_DERIVED_THEME_NAME,
         primary=iterm_colors[4],
         secondary=iterm_colors[2],
         accent=iterm_colors[3],
