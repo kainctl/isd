@@ -278,7 +278,7 @@ via the `command palette`:
 Then you can efficiently navigate the text with the [`pager` of your choice](./customization.md#default-pager).
 By deeply integrating with `pager`s `isd` avoids the need to re-invent the wheel
 for code navigation and gives you full control over how you would like to navigate
-the text. Here, for example, showing the output in `moar`.
+the text. Here, for example, showing the output in `moor`.
 
 {{ asciinema("./assets/images/isd.cast", poster=poster_markers[7], startAt=timestamps[7]) }}
 

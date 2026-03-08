@@ -459,7 +459,7 @@ def get_default_pager_args_presets(pager: str) -> list[str]:
         return PRESET_LESS_DEFAULT_ARGS
     elif pager_bin == "more":
         return PRESET_MORE_DEFAULT_ARGS
-    elif pager_bin == "moar":
+    elif pager_bin == "moar" or pager_bin == "moor":
         return PRESET_MOAR_DEFAULT_ARGS
     elif pager_bin == "lnav":
         return PRESET_LNAV_DEFAULT_ARGS
@@ -472,7 +472,7 @@ def get_journal_pager_args_presets(pager: str) -> list[str]:
         return PRESET_LESS_JOURNAL_ARGS
     elif pager_bin == "more":
         return PRESET_MORE_JOURNAL_ARGS
-    elif pager_bin == "moar":
+    elif pager_bin == "moar" or pager_bin == "moor":
         return PRESET_MOAR_JOURNAL_ARGS
     elif pager_bin == "lnav":
         return PRESET_LNAV_JOURNAL_ARGS

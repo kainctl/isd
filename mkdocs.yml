@@ -92,7 +92,7 @@ watch:
   - docs_glossary
 
   # - pymdownx.details
-copyright: Copyright &copy; 2025 isd Project
+copyright: Copyright &copy; 2026 kainctl
 extra_css:
   - stylesheets/extra_fonts.css
   - stylesheets/asciinema-player.css
