@@ -196,14 +196,14 @@
           isd-tui = isd;
           player =
             let
-              version = "v3.11.0";
+              version = "v3.15.1";
               css = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.css";
-                sha256 = "sha256:16gk8yx92xhxjdv90bwfsz6g4kb0qppwlcb1xcg18is5ijbqpay9";
+                sha256 = "sha256:1vrizgcahdna2kz6xi9ld0dxvg2yvfaz4p01x0a9c87aj5vz7zqp";
               };
               js = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.min.js";
-                sha256 = "sha256:0l57lrcxaj0p1sqv72h9cavd8w8acg29wq12c57ykicrffq08hli";
+                sha256 = "sha256:0ns1hdw77jzf4mmddk4r2jg3p0dsfd29rvkfiwlfrv9awdwfggrs";
               };
             in
             pkgs.runCommand "combine-player" { } ''
