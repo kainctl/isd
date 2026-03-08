@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     pyproject-nix = {
       url = "github:pyproject-nix/pyproject.nix";
@@ -34,7 +33,11 @@
   # It's using https://pyproject-nix.github.io/pyproject.nix/build.html
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      ...
+    }@inputs:
     let
       inherit (nixpkgs) lib;
 
@@ -223,8 +226,18 @@
               mkdir -p $out/config/asciinema
               cp ${pkgs.asciinema_3}/bin/asciinema $out/bin/my_asciinema
               cat > $out/config/asciinema/config.toml <<EOF
-              [recording]
+              [session]
               add_marker_key = "]"
+
+              [recording]
+              prefix_key = ""
+
+              [notifications]
+              # Desktop notifications are displayed in several situations, e.g. when
+              # pausing/resuming the capture of terminal with ^\ keyboard shortcut.
+
+              # Should desktop notifications be enabled, default: true
+              enabled = true
               EOF
               # Wrap the binary to set XDG_CONFIG_HOME
               wrapProgram $out/bin/my_asciinema --set ASCIINEMA_CONFIG_HOME "$out/config/asciinema"
@@ -291,6 +304,7 @@
                 pkgs.moor
                 # pkgs.nushell
                 pkgs.quickemu
+                pkgs.vhs
                 # pkgs.debootstrap
               ];
               shellHook = ''
