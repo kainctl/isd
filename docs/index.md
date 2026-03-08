@@ -3,7 +3,7 @@
 --8<-- "README.md:tagline"
 
 <center>
-    <img src="./assets/images/isd.png" alt="isd logo" style="max-width: 50vh;">
+    <img src="./assets/images/isd.png" alt="isd logo" style="max-width: min(50vh, 95%);">
 </center>
 
 ## Short Motivation
