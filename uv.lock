@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11"
 
 [[package]]
@@ -687,7 +687,7 @@ dev = [
 ]
 docs = [
     { name = "markdown-callouts" },
-    { name = "mkdocs" },
+    { name = "mkdocs", specifier = "<2" },
     { name = "mkdocs-macros-plugin" },
     { name = "mkdocs-material", extras = ["imaging"] },
 ]

@@ -55,7 +55,7 @@ dev = [
     "textual-dev>=1.7.0",
 ]
 docs = [
-  "mkdocs",
+  "mkdocs<2",
   "mkdocs-material[imaging]",
   "mkdocs-macros-plugin",
   "markdown-callouts",
