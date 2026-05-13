@@ -26,11 +26,12 @@ jobs:
       # `cannot write uid_map: Operation not permitted`
       # - name: Test appimage
       #   run: ./result --help
-      # - name: Rename AppImage
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   run: cp ./result isd.${{ runner.arch }}.AppImage
-      # - name: Release AppImage
-      #   uses: softprops/action-gh-release@v2
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     files: isd.${{ runner.arch}}.AppImage
+      # Still push it "blindly" to the release page; if it is broken, I can still intervene
+      - name: Rename AppImage
+        if: startsWith(github.ref, 'refs/tags/')
+        run: cp ./result isd.${{ runner.arch }}.AppImage
+      - name: Release AppImage
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: isd.${{ runner.arch}}.AppImage
