@@ -32,13 +32,13 @@
             name:
             inputs.systemd-nix.lib.${system}.mkUserService name {
               description = name;
-              documentation = [ "man:${pkgs.python3Full}/share/man/man1/python3.1.gz" ];
+              documentation = [ "man:${pkgs.python3}/share/man/man1/python3.1.gz" ];
               wants = [ "default.target" ];
               after = [ "default.target" ];
               serviceConfig = {
                 Type = "simple"; # or oneshot for multiple ExecStart
                 # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pkgs.python3Full} ${../../docs/loggen.py} 100";
+                ExecStart = "${lib.getExe pkgs.python3} ${../../docs/loggen.py} 100";
                 # --number <number-of-messages>
                 # --interval <number of seconds loggen will run>
                 # --rate message per second
@@ -49,13 +49,13 @@
             name:
             inputs.systemd-nix.lib.${system}.mkUserService name {
               description = name;
-              documentation = [ "man:${pkgs.python3Full}/share/man/man1/python3.1.gz" ];
+              documentation = [ "man:${pkgs.python3}/share/man/man1/python3.1.gz" ];
               wants = [ "default.target" ];
               after = [ "default.target" ];
               serviceConfig = {
                 Type = "simple"; # or oneshot for multiple ExecStart
                 # ExecStart = "${lib.getExe' pkgs.coreutils "sleep"} 1m";
-                ExecStart = "${lib.getExe pkgs.python3Full} -asdf";
+                ExecStart = "${lib.getExe pkgs.python3} -asdf";
                 # --number <number-of-messages>
                 # --interval <number of seconds loggen will run>
                 # --rate message per second
@@ -64,11 +64,12 @@
             };
         in
         {
+          isd-example-python-unit = (gen_unit "0-isd-example-unit-01");
+
           isd-example-templated-unit =
             inputs.systemd-nix.lib.${system}.mkUserService "0-isd-example-unit-template@"
               {
                 description = "isd-example instantiated unit %i";
-                documentation = [ "man:python" ];
                 serviceConfig = {
                   Type = "oneshot";
                   ExecStart = "${lib.getExe' pkgs.coreutils "echo"} 'I am unit %i'";
