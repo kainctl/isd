@@ -128,5 +128,5 @@ def derive_textual_theme(is_dark: bool = True) -> Optional[Theme]:
         surface=bg,
         panel=iterm_colors[8],
         boost=iterm_colors[0],
-        dark=True,
+        dark=is_dark,
     )
