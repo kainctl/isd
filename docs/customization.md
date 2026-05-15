@@ -189,6 +189,14 @@ But to persist the changes you _must_ update the configuration file.
 
 ### Dark/Light `terminal-derived-theme` Mode
 
+!!! warning
+
+    Deprecated: With the release of [textual v8.2.5](https://github.com/Textualize/textual/releases/tag/v8.2.5)
+    the upstream themes `ansi-dark` and `ansi-light` should be preferred.
+
+    If you are having issues with `ansi-dark/light` please open an issue!
+
+
 {{ config_block(11) }}
 
 Assumes that the `terminal_derived_theme` is a `dark` theme by default.

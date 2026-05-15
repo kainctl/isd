@@ -307,6 +307,8 @@ def render_keybinding(inp_str: str) -> str:
 
 
 def from_ansi_to_textual_themed_text(ansi_string: str, app: App) -> Text:
+    # How does it compare to `color.from_rich_color` with ansi=True
+    # that was added in textual 8.2.5?
     output = Text.from_ansi(ansi_string)
     vars = app.get_css_variables()
     ansi_color_idx_to_css_value = {
@@ -2911,6 +2913,11 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 if derived_theme is not None:
                     assert derived_theme.name == TERMINAL_DERIVED_THEME_NAME
                     self.THEME_COULD_BE_DERIVED = True
+                    self.notify(
+                        "This theme is deprecated.\n"
+                        "Please use `ansi-dark` or `ansi-light` instead."
+                        ,severity="warning"
+                    )
                     self.register_theme(derived_theme)
                 else:
                     self.THEME_COULD_BE_DERIVED = False
