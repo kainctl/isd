@@ -289,9 +289,8 @@ class CustomOptionList(OptionList, inherit_bindings=False):
             )
 
 
-def rich_underline_key(inp_str: str, key: str) -> Text:
-    txt = inp_str.replace(key, f"[u]{key}[/u]", 1)
-    return Text.from_markup(txt)
+def rich_underline_key(inp_str: str, key: str) -> str:
+    return inp_str.replace(key, f"[u]{key}[/u]", 1)
 
 
 def render_keybinding(inp_str: str) -> str:
@@ -373,11 +372,13 @@ class SystemctlActionScreen(ModalScreen[Optional[str]]):
 
         opts = []
         for cmd in self.systemctl_commands:
-            k = Text.from_markup(
-                f"[b]{rendered_keys_map[cmd.modal_keybinding]:>{longest_rendered_keybinding}}[/b]",
-            )
+            # Text.from_markup seems to have issues with the new
+            # `ansi_color` feature that was added with the `ansi_light/dark`
+            # themes in Textual 8.2.5.
+            # Simply let the `Option` class handle the conversion.
+            k = f"[b]{rendered_keys_map[cmd.modal_keybinding]:>{longest_rendered_keybinding}}[/b]"
             if accent is not None:
-                k.stylize(accent, start=0)
+                k = f"[{accent}]" + k + f"[/{accent}]"
             opts.append(
                 Option(
                     k
