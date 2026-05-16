@@ -694,11 +694,11 @@ requires-dist = [
 dev = [
     { name = "bump-my-version", specifier = ">=0.30.1" },
     { name = "memray", specifier = ">=1.15.0" },
-    { name = "pytest", specifier = ">=8.3.4" },
+    { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
-    { name = "pytest-textual-snapshot", specifier = ">=1.1.0" },
-    { name = "pytest-xdist", extras = ["psutil"], specifier = ">=3.6.1" },
-    { name = "textual-dev", specifier = ">=1.7.0" },
+    { name = "pytest-textual-snapshot", specifier = ">=1.1" },
+    { name = "pytest-xdist", extras = ["psutil"], specifier = ">=3.6" },
+    { name = "textual-dev", specifier = ">=1.7" },
 ]
 docs = [
     { name = "markdown-callouts" },
