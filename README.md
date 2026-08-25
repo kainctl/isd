@@ -1,8 +1,6 @@
 # isd – *i*nteractive *s*ystem*d*
 
-<center>
-    <img src="./share/icons/hicolor/512x512/apps/isd.png" alt="isd logo" style="max-width: 50vh;">
-</center>
+<p align="center"><img width="50%" src="./share/icons/hicolor/512x512/apps/isd.png" alt="isd logo"></p>
 
 <!-- --8<-- [start:tagline]  -->
 > `isd` – a better way to work with `systemd` units
