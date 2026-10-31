@@ -1,5 +1,6 @@
 import pytest
 from functools import partial
+import inspect
 import os
 import json
 from isd_tui.isd import (
@@ -12,7 +13,7 @@ from isd_tui.isd import (
 )
 from pathlib import Path
 from textual.pilot import Pilot
-from textual.widgets import RichLog, TabbedContent, Tabs
+from textual.widgets import Input, RichLog, TabbedContent, Tabs
 from textual.theme import BUILTIN_THEMES
 
 os.environ["PATH"] = str(Path(__file__).parent.resolve()) + ":" + os.environ["PATH"]
@@ -47,6 +48,31 @@ def pilots_active_tab(pilot: Pilot) -> str:
 async def click_and_wait(pilot: Pilot, selector) -> None:
     await pilot.click(selector)
     await pilot.pause()
+
+
+async def disable_blink_for_active_cursors(pilot: Pilot) -> None:
+    """Stop input cursors from blinking before a snapshot is taken.
+
+    Textual's ``Input`` cursor is toggled by a timer, so the screenshot can
+    catch it in either phase and produce flaky snapshot comparisons. Setting
+    ``cursor_blink`` to ``False`` leaves the cursor visible but static.
+    """
+    for input_widget in pilot.app.screen.query(Input):
+        input_widget.cursor_blink = False
+    await pilot.pause()
+
+
+def before_snapshot(run_before=None):
+    """Compose an optional ``run_before`` with disabling cursor blinking."""
+
+    async def _run_before(pilot: Pilot) -> None:
+        if run_before is not None:
+            result = run_before(pilot)
+            if inspect.isawaitable(result):
+                await result
+        await disable_blink_for_active_cursors(pilot)
+
+    return _run_before
 
 
 async def test_focus_ordering():
@@ -263,14 +289,14 @@ def test_snap_preview(snap_compare, click_target: str):
     app = InteractiveSystemd()
     assert snap_compare(
         app,
-        run_before=partial(click_and_wait, selector=click_target),
+        run_before=before_snapshot(partial(click_and_wait, selector=click_target)),
     )
 
 
 def test_snap_donation_screen(snap_compare):
     assert snap_compare(
         InteractiveSystemd(fake_startup_count=100),
-        run_before=lambda pilot: pilot.pause(),
+        run_before=before_snapshot(lambda pilot: pilot.pause()),
     )
 
 
@@ -289,21 +315,27 @@ def test_snap_root_user_bus_screen(snap_compare, monkeypatch):
 
     app = InteractiveSystemd()
     assert snap_compare(
-        app, press=[first_key(app.settings.main_keybindings.toggle_mode)]
+        app,
+        press=[first_key(app.settings.main_keybindings.toggle_mode)],
+        run_before=before_snapshot(),
     )
 
 
 def test_snap_systemctl_action(snap_compare):
     app = InteractiveSystemd()
     assert snap_compare(
-        app, press=[first_key(app.settings.generic_keybindings.toggle_systemctl_modal)]
+        app,
+        press=[first_key(app.settings.generic_keybindings.toggle_systemctl_modal)],
+        run_before=before_snapshot(),
     )
 
 
 def test_snap_toggled_mode(snap_compare):
     app = InteractiveSystemd()
     assert snap_compare(
-        app, press=[first_key(app.settings.main_keybindings.toggle_mode)]
+        app,
+        press=[first_key(app.settings.main_keybindings.toggle_mode)],
+        run_before=before_snapshot(),
     )
 
 
@@ -315,28 +347,28 @@ def test_snap_height(snap_compare):
         assert isinstance(pilot.app, InteractiveSystemd)
         await pilot.press(pilot.app.settings.main_keybindings.increase_widget_height)
 
-    assert snap_compare(app, run_before=run_before)
+    assert snap_compare(app, run_before=before_snapshot(run_before))
 
 
 def test_theme_from_settings(monkeypatch, snap_compare):
     # but override theme via environment
     monkeypatch.setenv("ISD_THEME", "dracula")
     app = InteractiveSystemd()
-    assert snap_compare(app)
+    assert snap_compare(app, run_before=before_snapshot())
 
 
 # Yeah, I am too lazy to figure out how to detect that a notification was sent
 def test_invalid_settings(monkeypatch, snap_compare):
     monkeypatch.setenv("ISD_STARTUP_MODE", "invalid")
     app = InteractiveSystemd()
-    assert snap_compare(app)
+    assert snap_compare(app, run_before=before_snapshot())
 
 
 @pytest.mark.parametrize("theme", BUILTIN_THEMES)
 def test_themes(theme, monkeypatch, snap_compare):
     monkeypatch.setenv("ISD_THEME", theme)
     app = InteractiveSystemd()
-    assert snap_compare(app)
+    assert snap_compare(app, run_before=before_snapshot())
 
 
 async def test_global_config(isolated_xdg_folders, snap_compare):
