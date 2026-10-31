@@ -317,6 +317,10 @@
                 # Prevent uv from downloading managed Python's
                 export UV_PYTHON_DOWNLOADS=never
 
+                # Nix sets TMPDIR to a per-shell path. Use a stable temp
+                # directory so snapshot tests do not depend on the path length.
+                export TMPDIR=/tmp
+
                 export VENV=.venv/
 
                 # Get repository root using git. This is expanded at runtime by the editable `.pth` machinery.
