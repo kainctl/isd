@@ -27,7 +27,7 @@ dependencies = [
     "pydantic>=2.10.4",
     "types-pyyaml>=6.0.12.20241221",
 ]
-version = "0.6.3"
+version = "0.6.4-dev"
 
 # # versioningit was great in theory
 # # but it comes with too many issues for packaging

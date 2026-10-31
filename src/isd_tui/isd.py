@@ -24,9 +24,12 @@ import asyncio
 import json
 import os
 import shutil
+import signal
 import subprocess
+import sys
 import tempfile
 from collections import deque
+from contextlib import contextmanager
 from copy import deepcopy
 from enum import Enum, StrEnum, auto
 from functools import partial
@@ -40,6 +43,7 @@ from typing import (
     Deque,
     Dict,
     Iterable,
+    Iterator,
     List,
     Optional,
     Tuple,
@@ -152,9 +156,32 @@ UNIT_PRIORITY_ORDER = [
     "busname",
 ]
 
-# HERE: Consider if these options even have a reason to exist.
-AUTHENTICATION_MODE = "sudo"
-# AUTHENTICATION_MODE = "polkit"
+# `sudo` normally caches credentials for a few minutes. If authentication
+# succeeds but the credentials are still not cached afterwards (for example
+# with `timestamp_timeout=0`), there is no way to run commands non-interactively.
+# In that case this flag is set and all privileged commands use blocking
+# foreground calls instead.
+SUDO_CREDENTIALS_ARE_NOT_CACHED = False
+
+# Messages that systemd/systemctl emit when an operation needs authentication.
+# The first (unprivileged) attempt is run with `LC_ALL=C` so that these are not
+# translated.
+AUTHENTICATION_ERROR_HINTS = (
+    "interactive authentication",
+    "authentication is required",
+    "authentication required",
+    "requires authentication",
+    "access denied",
+    "permission denied",
+    "not authorized",
+)
+
+# Messages that indicate that the user is not allowed to use `sudo` at all.
+SUDO_NOT_ALLOWED_HINTS = (
+    "not allowed",
+    "not in the sudoers file",
+    "may not run sudo",
+)
 
 
 Theme = StrEnum(
@@ -1470,26 +1497,196 @@ def show_command(*args: str) -> None:
     print(f"\n$ {' '.join(args)}")
 
 
+def wait_for_user(message: str) -> None:
+    """
+    Wait for the user to acknowledge a message while the application is
+    suspended. Does nothing if stdin is not a terminal (for example when the
+    application was started without a TTY via SSH).
+    """
+    if not sys.stdin.isatty():
+        return
+    try:
+        input(message)
+    except (EOFError, KeyboardInterrupt):
+        pass
+
+
+@contextmanager
+def safe_app_suspend(app: App) -> Iterator[None]:
+    """
+    Suspend the application, but always resume it again.
+
+    `App.suspend()` itself does not resume the application if an exception
+    escapes its context manager. That leaves the terminal in a broken state
+    and makes Ctrl+C/Ctrl+D look like a freeze. This wrapper:
+
+    - ignores SIGINT in `isd` while the child process owns the terminal, so
+      Ctrl+C is delivered to the child but does not raise `KeyboardInterrupt`
+      in the TUI,
+    - catches exceptions, lets `App.suspend()` resume normally, and re-raises
+      them afterwards.
+
+    Only use blocking/synchronous work inside this context manager. Awaiting
+    inside a suspended app lets timers repaint into the stopped driver, which
+    can block on Textual's bounded writer queue.
+    """
+    previous_sigint_handler = signal.getsignal(signal.SIGINT)
+    sigint_handler_was_replaced = False
+    try:
+        signal.signal(signal.SIGINT, lambda *_: None)
+        sigint_handler_was_replaced = True
+    except ValueError:
+        # Not running in the main thread; keep the existing handler.
+        pass
+
+    exception_info: Optional[Tuple[Type[BaseException], BaseException, Any]] = None
+    try:
+        with app.suspend():
+            try:
+                yield
+            except BaseException:
+                exception_info = sys.exc_info()
+        # `App.suspend()` has resumed the application at this point, even if
+        # the body raised.
+    finally:
+        if sigint_handler_was_replaced:
+            signal.signal(
+                signal.SIGINT,
+                previous_sigint_handler
+                if previous_sigint_handler is not None
+                else signal.SIG_DFL,
+            )
+
+    if exception_info is not None:
+        raise exception_info[1].with_traceback(exception_info[2])
+
+
+def run_blocking_in_suspend(
+    app: App,
+    args: List[str],
+    *,
+    pause_on_error: bool = True,
+) -> int:
+    """
+    Run a command that needs the real terminal (for example `sudo`, a pager,
+    or an editor) while the application is suspended.
+
+    This is a synchronous call on purpose. An `await` inside `App.suspend()`
+    lets the application's timers run and paint into the stopped driver.
+    """
+    return_code = 1
+    with safe_app_suspend(app):
+        try:
+            show_command(*args)
+            return_code = subprocess.call(args)
+        except BaseException:
+            return_code = 1
+        if return_code != 0 and pause_on_error:
+            wait_for_user(
+                "\nThe command failed. Press Enter to return to isd..."
+            )
+    return return_code
+
+
+def authenticate_sudo(app: App, command: List[str]) -> int:
+    """
+    Ask `sudo` to authenticate the user on the real terminal.
+
+    `sudo --validate` only updates the cached credentials; it does not run a
+    command. This keeps the suspended time as short as possible, even when the
+    actual command would take a long time (for example a oneshot unit).
+
+    For the user, the displayed command is `command`: the privileged command
+    that will run after authentication. `sudo --validate` is an implementation
+    detail and is deliberately not shown.
+    """
+    if not sys.stdin.isatty():
+        return -1
+
+    with safe_app_suspend(app):
+        try:
+            show_command(*command)
+            return_code = subprocess.call(["sudo", "--validate"])
+        except BaseException:
+            return_code = 1
+        if return_code != 0:
+            wait_for_user(
+                "\nAuthentication failed or was cancelled. "
+                "Press Enter to return to isd..."
+            )
+    return return_code
+
+
+async def sudo_credentials_are_cached() -> Tuple[bool, str]:
+    """
+    Check whether `sudo` can run a command without asking for a password.
+
+    Returns `(True, "")` if the credentials are cached (or if `isd` runs as
+    root), otherwise `(False, stderr)`.
+    """
+    if is_root():
+        return True, ""
+
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "sudo",
+            "--non-interactive",
+            "--validate",
+            stdin=subprocess.DEVNULL,
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.PIPE,
+            env={**os.environ, "LC_ALL": "C"},
+        )
+    except FileNotFoundError:
+        return False, "sudo: command not found"
+
+    _, stderr = await proc.communicate()
+    return proc.returncode == 0, stderr.decode(errors="replace")
+
+
+def stderr_requires_authentication(stderr: str) -> bool:
+    """
+    Check whether `systemctl` failed because authentication is required.
+
+    The unprivileged attempt is run with `LC_ALL=C`, so these messages should
+    not be translated.
+    """
+    lowered = stderr.lower()
+    return any(hint in lowered for hint in AUTHENTICATION_ERROR_HINTS)
+
+
+def sudo_is_not_allowed(stderr: str) -> bool:
+    """
+    Check whether `sudo` failed because the user is not allowed to use it.
+    """
+    lowered = stderr.lower()
+    return any(hint in lowered for hint in SUDO_NOT_ALLOWED_HINTS)
+
+
 async def systemctl_async(
     *cmd: str,
     mode: str,
     units: Iterable[str],
     sudo: bool = False,
-    foreground: bool = False,
     head: Optional[int] = None,
     ask_password: bool = False,
+    non_interactive: bool = False,
+    extra_env: Optional[Dict[str, str]] = None,
 ) -> Tuple[int, str, str]:
     sys_cmd = systemctl_args_builder(
-        *cmd, mode=mode, units=units, sudo=sudo, ask_password=ask_password
+        *cmd,
+        mode=mode,
+        units=units,
+        sudo=sudo,
+        ask_password=ask_password,
+        non_interactive=non_interactive,
     )
-    if foreground:
-        show_command(*sys_cmd)
     proc = await asyncio.create_subprocess_exec(
         *sys_cmd,
-        stdout=None if foreground else asyncio.subprocess.PIPE,
-        stderr=None if foreground else asyncio.subprocess.PIPE,
-        env=env_with_color(),
-        stdin=None if foreground else subprocess.DEVNULL,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        env=env_with_color(extra_env),
+        stdin=subprocess.DEVNULL,
     )
     # maxlen appending works as a fifo.
     stdout_deque: Deque[bytes] = Deque(maxlen=head)
@@ -1522,20 +1719,29 @@ def systemctl_args_builder(
     units: Iterable[str],
     sudo: bool = False,
     ask_password: bool = True,
+    non_interactive: bool = False,
 ) -> List[str]:
     sys_cmd: List[str] = list()
     if sudo and not is_root():
-        # if `sudo = True` only prefix if process isn't running as `root` user.
+        # If `sudo = True` only prefix if the process isn't running as `root`.
         #
-        # -> -E/--preserve-env/--preserve-env=[...] may be disallowed for a given user.
-        # it is more "robust" to inject the environment variables to the command line.
-        # No! There are _many_ VSCode extensions that shouldn't be trusted.
-        # FUTURE: Implement a _custom_ `systemd edit` wrapper that opens an
-        # override file from USER space and then only copies the file with elevated
-        # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
-        sys_cmd.extend(["sudo", "--stdin", "-E"])
+        # `--preserve-env` (the long form of `-E`) is intentional: `systemctl
+        # edit` must see the user's `SYSTEMD_EDITOR`/`EDITOR`. The safer
+        # `systemctl edit --stdin` workflow requires a newer systemd than isd
+        # supports. Be aware that this forwards user-controlled variables to a
+        # root process and that the sudoers policy may reject it.
+        sys_cmd.append("sudo")
+        if non_interactive:
+            # Fail immediately instead of trying to read a password. This is
+            # used for background commands after `sudo --validate` succeeded.
+            sys_cmd.append("--non-interactive")
+        sys_cmd.append("--preserve-env")
     sys_cmd.append(get_systemctl_bin())
-    if not ask_password:
+    if not ask_password and not sudo:
+        # Only the unprivileged attempt needs this: it prevents `systemctl`
+        # from trying to invoke polkit. Privileged commands already run as
+        # root, so the flag would be redundant and confusing in the displayed
+        # command.
         sys_cmd.append("--no-ask-password")
     if mode == "user":
         # `root` user _may_ have user services (https://github.com/kainctl/isd/issues/30)
@@ -1560,19 +1766,19 @@ def systemctl_args_builder(
 
 
 def journalctl_args_builder(
-    *args: str, mode: str, units: Iterable[str], sudo: bool = False
+    *args: str,
+    mode: str,
+    units: Iterable[str],
+    sudo: bool = False,
+    non_interactive: bool = False,
 ) -> List[str]:
     sys_cmd = []
     if sudo and not is_root():
-        # if `sudo = True` only prefix if process isn't running as `root` user.
-        #
-        # -> -E/--preserve-env/--preserve-env=[...] may be disallowed for a given user.
-        # it is more "robust" to inject the environment variables to the command line.
-        # No! There are _many_ VSCode extensions that shouldn't be trusted.
-        # FUTURE: Implement a _custom_ `systemd edit` wrapper that opens an
-        # override file from USER space and then only copies the file with elevated
-        # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
-        sys_cmd.extend(["sudo", "--stdin", "-E"])
+        # See `systemctl_args_builder` for why `--preserve-env` is intentional.
+        sys_cmd.append("sudo")
+        if non_interactive:
+            sys_cmd.append("--non-interactive")
+        sys_cmd.append("--preserve-env")
     units = list(units)
     sys_cmd.append("journalctl")
 
@@ -1595,10 +1801,12 @@ def journalctl_args_builder(
     )
 
 
-def env_with_color() -> Dict[str, str]:
+def env_with_color(extra_env: Optional[Dict[str, str]] = None) -> Dict[str, str]:
     env = os.environ.copy()
     # systemd_colors = "1" if colors else "0"
     env.update(SYSTEMD_COLORS="1")
+    if extra_env is not None:
+        env.update(extra_env)
     return env
 
 
@@ -1955,6 +2163,9 @@ class MainScreen(Screen):
 
     def __init__(self, settings, *args, **kwargs) -> None:
         self.settings = settings
+        # Serializes `sudo` authentication so that concurrent commands cannot
+        # open multiple password prompts.
+        self._sudo_auth_lock = asyncio.Lock()
         super().__init__(*args, **kwargs)
         self.update_keybindings()
 
@@ -2127,106 +2338,227 @@ class MainScreen(Screen):
     # the application if the error message contains the 'magic' tty error.
     # Nah, too complicated.
     #
-    # 1. Allow two different authentication modes: sudo OR polkit (config)
-    # 2. Read from config which commands require "root" (yes, this may be different for each environment)
-    #    If no  -> run with as is -> if this is wrong, the output will complain about missing polkit authentication
-    #           -> inform the user about mistake & suggest to fix config.
-    #           -> Continue with 'yes' logic
-    #    If yes -> run with sudo and no foreground & see if caching is required
-    #             -> if it fails, then run it in the foreground
-    #           -> in polkit mode, run it directly in the foreground
-    # Somebody _could_ run the entire authentication as _root_. Then it should
-    # skip over asking for a password. To provide good support for "old fashioned"
-    # users. Though I would like to give users a warning that are running this program as root,
-    # as it is scary.
-    # -> Running as root should _imply_ polkit mode as there is no need to prefix anything with sudo!
+    # Privileged execution flow:
     #
-    # The asking should ONLY happen here! In the other functions, the error text should be reported
-    # in the preview. Again, if the command requires additional authentication, is something
-    # that needs to be defined by the user.
+    # 1. Try the command unprivileged first. This keeps custom commands that
+    #    do not require root working and avoids unnecessary sudo prompts.
+    # 2. If it failed because authentication is required, check whether sudo
+    #    has cached credentials (`sudo --non-interactive --validate`).
+    # 3. If not, authenticate in the foreground (`sudo --validate`). This is
+    #    the only part that suspends the application.
+    # 4. Execute the actual command with `sudo --non-interactive` in the
+    #    background. Long-running jobs (for example oneshot units) therefore do
+    #    not suspend or block the TUI.
+    # 5. If sudo authenticates but cannot cache credentials at all (for example
+    #    with `timestamp_timeout=0`), set `SUDO_CREDENTIALS_ARE_NOT_CACHED` and
+    #    use blocking foreground calls for the rest of the session.
+    #
+    # `systemctl edit` is the exception: it always needs a real foreground
+    # terminal and cannot have its output captured.
+    #
+    # This method is a worker so that Textual's message pump is not blocked
+    # while the subprocess runs. Otherwise key presses queue up and the UI
+    # appears frozen until the command finishes.
+    @work(group="systemctl_command", exit_on_error=False)
     async def action_systemctl_command(self, unsplit_command: str) -> None:
         """
-        Split the given `systemctl` subcommand (`unsplit_command`) by whitespaces and
-        execute the command in the background.
+        Split the given `systemctl` subcommand (`unsplit_command`) by whitespaces
+        and execute it.
 
         By enforcing `systemctl` as the prefix and making sure that no shell
         injection can be done, it should be fairly secure/safe.
         """
+        try:
+            await self._run_systemctl_command(unsplit_command)
+        except Exception as error:
+            self.notify(
+                f"Unexpected error while executing "
+                f"`systemctl {unsplit_command}`:\n{error}",
+                severity="error",
+                timeout=30,
+                markup=False,
+            )
+        finally:
+            # The worker may be cancelled during application shutdown, in
+            # which case the screen is already unmounted.
+            if self.is_mounted:
+                self.partial_refresh_unit_to_state_dict()
+                self.refresh()
+
+    async def _run_systemctl_command(self, unsplit_command: str) -> None:
+        global SUDO_CREDENTIALS_ARE_NOT_CACHED
+
         command = unsplit_command.split()
-        # first I need to check if this is systemctl edit
-        # if it is edit then I need to change the async commands to foreground
-        # commands with a foreground TTY!
+
         if "edit" in unsplit_command:
-            # since this MUST run in the foreground and I CANNOT capture stderr
-            # I am calling it directly with sudo if the current mode is `system`:
-            # In polkit mode, it will probably fail due to filesystem permissions errors,
-            # even if the unit could be "modified" by the current user.
-            # Since `edit` is such an weird outlier, enforcing `sudo` in this instance
-            # is probably the most straight-forward solution IF the mode is `system`!
-            # In `user` mode, there should never be a reason to prefix it with sudo!
-            with self.app.suspend():
-                args = systemctl_args_builder(
-                    *command,
-                    mode=self.mode,
-                    units=self.relevant_units,
-                    sudo=self.mode == "system",
-                )
-                show_command(*args)
-                subprocess.call(args)
-                input("Print any button to continue")
-        else:
-            # Try to run command as-is.
-            return_code, stdout, stderr = await systemctl_async(
+            # `systemctl edit` must run in the foreground: it needs the real
+            # terminal, cannot have its stderr captured, and starts an editor.
+            # In `system` mode it is always prefixed with `sudo`.
+            args = systemctl_args_builder(
                 *command,
                 mode=self.mode,
                 units=self.relevant_units,
-                sudo=False,
+                sudo=self.mode == "system",
+                ask_password=False,
             )
-            # if it fails, check if there was an authentication issue
-            # and prefix it with sudo or explicitly wait for polkit authentication.
-            if return_code != 0:
-                if "auth" in stderr:
-                    if AUTHENTICATION_MODE == "sudo":
-                        # first try again with sudo and see
-                        # if previous cached password works
-                        # invalidate with sudo --reset-timestamp
-                        return_code, stdout, stderr = await systemctl_async(
-                            *command,
-                            mode=self.mode,
-                            units=self.relevant_units,
-                            sudo=True,
-                            foreground=False,
-                        )
-                        if return_code == 1:
-                            with self.app.suspend():
-                                return_code, stdout, stderr = await systemctl_async(
-                                    *command,
-                                    mode=self.mode,
-                                    units=self.relevant_units,
-                                    sudo=True,
-                                    foreground=True,
-                                )
-                    else:
-                        with self.app.suspend():
-                            return_code, stdout, stderr = await systemctl_async(
-                                *command,
-                                mode=self.mode,
-                                units=self.relevant_units,
-                                sudo=False,
-                                foreground=True,
-                                ask_password=True,
-                            )
-                else:
+            return_code = run_blocking_in_suspend(self.app, args)
+            if return_code == 0:
+                self._notify_systemctl_success(unsplit_command)
+            else:
+                self.notify(
+                    f"`systemctl {unsplit_command}` failed "
+                    f"(exit {return_code}). See the terminal output above.",
+                    severity="error",
+                    timeout=30,
+                )
+            return
+
+        # Run the command as-is first. `LC_ALL=C` keeps systemd's
+        # authentication error messages stable for the check below.
+        return_code, stdout, stderr = await systemctl_async(
+            *command,
+            mode=self.mode,
+            units=self.relevant_units,
+            sudo=False,
+            extra_env={"LC_ALL": "C"},
+        )
+        if return_code == 0:
+            self._notify_systemctl_success(unsplit_command)
+            return
+
+        if not self._can_use_sudo() or not stderr_requires_authentication(stderr):
+            self._notify_systemctl_error(
+                unsplit_command, return_code, stderr, stdout
+            )
+            return
+
+        # The command needs authentication. Make sure sudo can run
+        # non-interactively, and authenticate in the foreground if necessary.
+        if shutil.which("sudo") is None:
+            self.notify(
+                "`sudo` was not found in PATH. Cannot execute privileged "
+                f"command `systemctl {unsplit_command}`.",
+                severity="error",
+                timeout=30,
+                markup=False,
+            )
+            return
+
+        # This is the command the user will see while authenticating. It is
+        # also exactly what runs in the blocking/no-caching fallback. The
+        # background path only adds `--non-interactive` to sudo.
+        privileged_args = systemctl_args_builder(
+            *command,
+            mode=self.mode,
+            units=self.relevant_units,
+            sudo=True,
+            ask_password=False,
+        )
+
+        if not SUDO_CREDENTIALS_ARE_NOT_CACHED:
+            async with self._sudo_auth_lock:
+                credentials_are_cached, probe_stderr = (
+                    await sudo_credentials_are_cached()
+                )
+
+                if not credentials_are_cached and sudo_is_not_allowed(probe_stderr):
                     self.notify(
-                        f"Unexpected error:\n{Text.from_ansi(stderr)}",
+                        f"Cannot use `sudo`:\n{probe_stderr}",
                         severity="error",
                         timeout=30,
+                        markup=False,
                     )
-        # FUTURE: Provide different colored outputs depending on the exit code.
-        # Potentially also include the error output.
-        self.notify(f"Executed `systemctl {unsplit_command}`")
-        self.partial_refresh_unit_to_state_dict()
-        self.refresh()
+                    return
+
+                if not credentials_are_cached:
+                    authentication_return_code = authenticate_sudo(
+                        self.app, privileged_args
+                    )
+                    if authentication_return_code != 0:
+                        self.notify(
+                            "Authentication failed or was cancelled. "
+                            f"`systemctl {unsplit_command}` was not executed.",
+                            severity="error",
+                            timeout=30,
+                        )
+                        return
+
+                    credentials_are_cached, probe_stderr = (
+                        await sudo_credentials_are_cached()
+                    )
+                    if not credentials_are_cached:
+                        # Authenticating worked, but sudo does not cache
+                        # credentials (for example `timestamp_timeout=0`). From
+                        # now on, use blocking foreground calls for privileged
+                        # commands.
+                        SUDO_CREDENTIALS_ARE_NOT_CACHED = True
+                        self.notify(
+                            "`sudo` authenticated, but does not cache "
+                            "credentials. Privileged commands will use blocking "
+                            "foreground calls for the rest of this session.",
+                            severity="warning",
+                            timeout=30,
+                        )
+
+        if SUDO_CREDENTIALS_ARE_NOT_CACHED:
+            return_code = run_blocking_in_suspend(self.app, privileged_args)
+            if return_code == 0:
+                self._notify_systemctl_success(unsplit_command)
+            else:
+                self.notify(
+                    f"`systemctl {unsplit_command}` failed "
+                    f"(exit {return_code}). See the terminal output above.",
+                    severity="error",
+                    timeout=30,
+                )
+            return
+
+        # Credentials are cached. Run the real command without prompting, but
+        # still in the background so the TUI remains responsive.
+        return_code, stdout, stderr = await systemctl_async(
+            *command,
+            mode=self.mode,
+            units=self.relevant_units,
+            sudo=True,
+            non_interactive=True,
+        )
+        if return_code == 0:
+            self._notify_systemctl_success(unsplit_command)
+        else:
+            self._notify_systemctl_error(
+                unsplit_command, return_code, stderr, stdout
+            )
+
+    def _can_use_sudo(self) -> bool:
+        return self.mode == "system" and not is_root()
+
+    def _notify_systemctl_success(self, unsplit_command: str) -> None:
+        self.notify(f"`systemctl {unsplit_command}` succeeded.")
+
+    def _notify_systemctl_error(
+        self,
+        unsplit_command: str,
+        return_code: int,
+        stderr: str,
+        stdout: str,
+    ) -> None:
+        output = stderr.strip() or stdout.strip()
+        if output:
+            self.notify(
+                f"`systemctl {unsplit_command}` failed (exit {return_code}):\n"
+                f"{output}",
+                severity="error",
+                timeout=30,
+                # systemctl output may contain brackets that would be parsed as
+                # Textual markup.
+                markup=False,
+            )
+        else:
+            self.notify(
+                f"`systemctl {unsplit_command}` failed (exit {return_code}).",
+                severity="error",
+                timeout=30,
+            )
 
     async def watch_mode(self, mode: str) -> None:
         self.query_one(PreviewArea).mode = mode
@@ -2351,7 +2683,7 @@ class MainScreen(Screen):
             )
             pager_args = get_default_pager_args_presets(pager)
 
-        with self.app.suspend():
+        with safe_app_suspend(self.app):
             cmd_args = self.preview_output_command_builder(cur_tab)
             env = env_with_color()
             p1 = subprocess.Popen(
@@ -2370,7 +2702,7 @@ class MainScreen(Screen):
     def action_open_preview_in_editor(self) -> None:
         cur_tab =self.query_one(TabbedContent).active
         editor = cast(InteractiveSystemd, self.app).editor
-        with self.app.suspend():
+        with safe_app_suspend(self.app):
             args = self.preview_output_command_builder(cur_tab)
             p1 = subprocess.run(
                 args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
@@ -2826,7 +3158,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
                 self.notify(f"Error while creating default config.yaml: {e}")
         else:
             prev = fp.read_text()
-        with self.app.suspend():
+        with safe_app_suspend(self.app):
             subprocess.call([self.editor, fp.absolute()])
         if prev != fp.read_text():
             self.notify(
@@ -2913,7 +3245,7 @@ class InteractiveSystemd(App, inherit_bindings=False):
     def set_terminal_derived_theme(self) -> None:
         # Not checked yet
         if self.THEME_COULD_BE_DERIVED is None:
-            with self.app.suspend():
+            with safe_app_suspend(self.app):
                 derived_theme = derive_textual_theme(
                     is_dark=self.settings.terminal_derived_theme_is_dark
                 )
@@ -2998,7 +3330,9 @@ class InteractiveSystemd(App, inherit_bindings=False):
         self.set_focus(prev_focus)
         if cmd is not None:
             screen = self.get_screen("main", MainScreen)
-            await screen.action_systemctl_command(cmd)
+            # `action_systemctl_command` is a worker now, so this schedules
+            # the command and returns immediately.
+            screen.action_systemctl_command(cmd)
 
 
 def render_field(key, field, level: int = 0) -> str:
