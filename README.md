@@ -46,24 +46,6 @@ The documentation is live at:
 The tool can be installed via `uv`, `nix`, and as an `AppImage`.
 Refer to the [official installation documentation](https://kainctl.github.io/isd/#installation) for more details.
 
-## Road map
-
-<!-- --8<-- [start:roadmap] -->
-A collection of some _unordered_ ideas that could improve `isd`:
-
-- [x] Add icon for project and application menu
-- [x] Support old `systemd` version
-- [ ] Option to view the security rating of units
-- [ ] Improve highlighting of `systemd` units (tree-sitter grammar)
-- [ ] Write a custom, more secure `$EDITOR` integration (more secure `sytemctl edit`)
-- [ ] Allow customization of preview windows
-- [ ] Improve `journal_pager` integration
-- [ ] Add custom sort options
-- [ ] Faster fuzzy search
-- [ ] Improve default themes
-<!-- --8<-- [end:roadmap] -->
-
-
 ## Acknowledgments
 
 <!-- --8<-- [start:acknowledgments] -->

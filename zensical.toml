@@ -8,7 +8,6 @@ nav = [
   { "Getting Started" = "index.md" },
   { "Customization" = "customization.md" },
   { "FAQ" = "faq.md" },
-  { "Roadmap" = "roadmap.md" },
   { "Security" = "security.md" },
   { "Media" = "media.md" },
 ]
