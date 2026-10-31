@@ -1573,16 +1573,24 @@ def journalctl_args_builder(
         # override file from USER space and then only copies the file with elevated
         # privileges. This avoids _all_ of the environment forwarding and editor trust issues.
         sys_cmd.extend(["sudo", "--stdin", "-E"])
+    units = list(units)
+    sys_cmd.append("journalctl")
+
     if mode == "user":
-        sys_cmd.extend(["journalctl", "--user"])
+        # `--user` would restrict us to per-user journal files, which do not
+        # exist with `Storage=volatile`. Use `--user-unit` instead, except when
+        # there is no unit to select, where `--user` is the only scoping left.
+        if not units:
+            sys_cmd.append("--user")
+        unit_flag = "--user-unit"
     else:
-        sys_cmd.extend(["journalctl"])
+        unit_flag = "--unit"
 
     return list(
         chain(
             sys_cmd,
             args,
-            *zip(repeat("--unit"), units),
+            *zip(repeat(unit_flag), units),
         )
     )
 
