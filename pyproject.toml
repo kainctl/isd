@@ -55,10 +55,8 @@ dev = [
     "textual-dev>=1.7",
 ]
 docs = [
-  "mkdocs<2",
-  "mkdocs-material[imaging]",
-  "mkdocs-macros-plugin",
-  "markdown-callouts",
+  "zensical>=0.0.74",
+  "ghp-import>=2.1.0",
 ]
 
 [build-system]
@@ -89,7 +87,7 @@ exclude = [
     "docs_glossary/",
     "flake.nix",
     "flake.lock",
-    "mkdocs.yml",
+    "zensical.toml",
     "macros.py",
     "*.tape",
     "src/isd/*.md"

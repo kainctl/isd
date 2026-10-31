@@ -1,0 +1,94 @@
+[project]
+site_name = "isd"
+site_url = "https://kainctl.github.io/isd"
+repo_url = "https://github.com/kainctl/isd"
+copyright = "Copyright &copy; 2026 kainctl"
+
+nav = [
+  { "Getting Started" = "index.md" },
+  { "Customization" = "customization.md" },
+  { "FAQ" = "faq.md" },
+  { "Roadmap" = "roadmap.md" },
+  { "Security" = "security.md" },
+  { "Media" = "media.md" },
+]
+
+extra_css = [
+  "stylesheets/extra_fonts.css",
+  "stylesheets/asciinema-player.css",
+  "stylesheets/custom-asciinema-player.css",
+]
+
+extra_javascript = [
+  "javascripts/asciinema-player.min.js",
+]
+
+watch = [
+  "docs_glossary",
+]
+
+[project.theme]
+name = "material"
+# variant = "classic"
+features = [
+  "search.suggest",
+  "search.highlight",
+  "navigation.sections",
+  "toc.integrate",
+  "content.code.annotate",
+  "content.code.copy",
+  "content.code.select",
+]
+
+[project.theme.font]
+text = "Atkinson Hyperlegible"
+code = "Noto Sans Mono"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "indigo"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+pymdownx.blocks.caption = {}
+pymdownx.details = {}
+pymdownx.emoji.emoji_index = "zensical.extensions.emoji.twemoji"
+pymdownx.emoji.emoji_generator = "zensical.extensions.emoji.to_svg"
+pymdownx.highlight = {}
+pymdownx.inlinehilite = {}
+pymdownx.keys = {}
+pymdownx.smartsymbols = {}
+pymdownx.snippets.auto_append = [
+  "docs_glossary/abbreviations.md",
+]
+pymdownx.superfences.custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+pymdownx.tabbed.alternate_style = true
+pymdownx.tasklist = {}
+tables = {}
+toc.permalink = true
+toc.slugify.object = "pymdownx.slugs.slugify"
+toc.slugify.kwds.case = "lower"
+
+[project.plugins.search]
+
+[project.plugins.tags]
+
+[project.plugins.privacy]
+assets = true
+assets_exclude = [
+  "imasdk.googleapis.com/*",
+]
+
+[project.plugins.social]
+
+[project.plugins.macros]
+module_name = "macros"
+on_error_fail = true
+on_undefined = "strict"

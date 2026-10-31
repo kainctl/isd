@@ -80,12 +80,8 @@
       pythonSet311 = (
         pkgs:
         let
-          # injecting cairosvg from upstream nixpkgs, as it is currently not
-          # supported by the uv2nix_hammer project and is still in the todo list.
-          # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
           # python = pkgs.python312;
           python = pkgs.python311;
-          hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
         in
         # Use base package set from pyproject.nix builders
         (pkgs.callPackage inputs.pyproject-nix.build.packages {
@@ -96,32 +92,15 @@
               inputs.pyproject-build-systems.overlays.default
               overlay
               pyprojectOverrides
-              (_final: prev: {
-                cairosvg = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python311Packages.cairosvg;
-                  prev = prev.cairosvg;
-                };
-                cairocffi = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python311Packages.cairocffi;
-                  prev = prev.cairocffi;
-                };
-              })
-              # (_final: prev: {
-              #   pythonPkgsBuildHost = prev.pythonPkgsBuildHost.overrideScope pyprojectOverrides;
-              # })
             ]
           )
       );
       pythonSet313 = (
         pkgs:
         let
-          # injecting cairosvg from upstream nixpkgs, as it is currently not
-          # supported by the uv2nix_hammer project and is still in the todo list.
-          # https://pyproject-nix.github.io/pyproject.nix/builders/hacks.html
           # pkgs = pkgsFor.${system};
           # python = pkgs.python312;
           python = pkgs.python313;
-          hacks = pkgs.callPackage inputs.pyproject-nix.build.hacks { };
         in
         # Use base package set from pyproject.nix builders
         (pkgs.callPackage inputs.pyproject-nix.build.packages {
@@ -132,16 +111,6 @@
               inputs.pyproject-build-systems.overlays.default
               overlay
               pyprojectOverrides
-              (_final: prev: {
-                cairosvg = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python313Packages.cairosvg;
-                  prev = prev.cairosvg;
-                };
-                cairocffi = hacks.nixpkgsPrebuilt {
-                  from = pkgs.python313Packages.cairocffi;
-                  prev = prev.cairocffi;
-                };
-              })
             ]
           )
       );
@@ -199,14 +168,14 @@
           isd-tui = isd;
           player =
             let
-              version = "v3.15.1";
+              version = "v3.17.0";
               css = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.css";
-                sha256 = "sha256:1vrizgcahdna2kz6xi9ld0dxvg2yvfaz4p01x0a9c87aj5vz7zqp";
+                sha256 = "sha256:1nsgvvx1m8gv8a2l1yqjp7l0x2dg7n5r3imj0d7mchvhb4bzw6gn";
               };
               js = builtins.fetchurl {
                 url = "https://github.com/asciinema/asciinema-player/releases/download/${version}/asciinema-player.min.js";
-                sha256 = "sha256:0ns1hdw77jzf4mmddk4r2jg3p0dsfd29rvkfiwlfrv9awdwfggrs";
+                sha256 = "sha256:105qrqx8mfnbaapdaza5rdjbrdd9369pnh98j7z4jp0v5rikfg51";
               };
             in
             pkgs.runCommand "combine-player" { } ''

@@ -9,6 +9,9 @@ from isd_tui.isd import (
 from typing import Dict, Any
 
 
+PROJECT_DIR = Path(__file__).resolve().parent
+
+
 def value_str(value) -> str:
     if isinstance(value, bool):
         return str(value).lower()
@@ -46,7 +49,7 @@ def format_timestamps(timestamps: list[str]) -> list[str]:
 
 def define_env(env):
     env.variables["timestamps"] = extract_marker_timestamps(
-        Path(env.project_dir) / "docs/assets/images/isd.cast"
+        PROJECT_DIR / "docs/assets/images/isd.cast"
     )
     env.variables["poster_markers"] = format_timestamps(env.variables["timestamps"])
     env.variables["default_settings"] = get_default_settings()
@@ -66,7 +69,7 @@ def define_env(env):
         The main issue is that the SVG renderer does not work
         as reliable as I would like.
         """
-        vis_dir = Path(env.project_dir) / "tests/__snapshots__/test_visual/"
+        vis_dir = PROJECT_DIR / "tests/__snapshots__/test_visual/"
         themes = list(vis_dir.glob("test_themes*.svg"))
 
         import textwrap
@@ -78,7 +81,7 @@ def define_env(env):
             --8<-- "{path}"
         </div>""")
         vals = [
-            tpl.format(name=theme.name, path=theme.relative_to(env.project_dir))
+            tpl.format(name=theme.name, path=theme.relative_to(PROJECT_DIR))
             for theme in themes
         ]
         return "".join(vals)

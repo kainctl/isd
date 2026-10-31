@@ -73,7 +73,7 @@ Big thanks to the developers of:
 - [NixOS](https://nixos.org/) for piquing my interest in `systemd` and service managers
 - [`sysz`](https://github.com/joehillen/sysz) for providing a starting point and a desire to build a more complex `systemctl` TUI
 - [textual](https://textual.textualize.io/) for making it a breeze to create TUIs in Python
-- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) for building a solid and simple to use static site generator for the documentation
+- [Zensical](https://zensical.org/) for building a solid and simple to use static site generator for the documentation
 - [asciinema](https://docs.asciinema.org/) for developing an easy to use _and self-hostable_ terminal recorder and player
 - [vhs](https://github.com/charmbracelet/vhs) for creating a scriptable terminal program
 - [posting](https://github.com/darrenburns/posting) for showing me how to use `textual`
